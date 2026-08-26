@@ -2,11 +2,11 @@
   "name": "montesinos",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "deploy": "astro build && wrangler deploy"
   },
   "keywords": [],
   "author": "",
@@ -15,5 +15,8 @@
   "dependencies": {
     "astro": "^7.2.8",
     "playwright-core": "^1.62.1"
+  },
+  "devDependencies": {
+    "wrangler": "^4.126.0"
   }
 }

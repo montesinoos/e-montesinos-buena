@@ -19,3 +19,6 @@ out/
 # Sistema
 .DS_Store
 Thumbs.db
+
+# Estado local de wrangler
+.wrangler/

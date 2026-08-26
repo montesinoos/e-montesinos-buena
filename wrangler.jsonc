@@ -1,0 +1,10 @@
+{
+  // Cloudflare Workers sirviendo el sitio estático que genera Astro.
+  // El despliegue va contra ./dist, así que hay que construir antes:
+  // `npm run deploy` encadena las dos cosas.
+  "name": "e-montesinos-buena",
+  "compatibility_date": "2026-08-27",
+  "assets": {
+    "directory": "./dist"
+  }
+}
