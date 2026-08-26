@@ -1,0 +1,21 @@
+# Secretos. La clave de KIE.AI vive aquí y no debe viajar nunca al repositorio.
+.env
+.env.*
+!.env.example
+
+# Dependencias y build
+node_modules/
+dist/
+.astro/
+
+# Andamio de trabajo: capturas de verificación, scripts de medición,
+# volcados del scraping de la web oficial.
+lab/
+
+# Fuentes generadas con KIE.AI. Son el origen de public/mundo/*.webp y de
+# public/puertas/*.webp, que sí están versionadas. Pesan ~30 MB.
+out/
+
+# Sistema
+.DS_Store
+Thumbs.db

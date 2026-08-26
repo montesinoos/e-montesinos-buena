@@ -1,0 +1,55 @@
+---
+import { paginas } from "../data/montesinos.js";
+interface Props { titulo: string; desc: string; ruta: string; mapa?: boolean; }
+const { titulo, desc, ruta, mapa = false } = Astro.props;
+---
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={desc} />
+    <meta name="theme-color" content="#F4F3F0" />
+    <title>{titulo}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap"
+    />
+    <link rel="stylesheet" href="/scrollcraft.css" />
+    <link rel="stylesheet" href="/tema.css" />
+  </head>
+  <body>
+    <a class="saltar" href="#principal">Saltar al contenido</a>
+
+    <header class="chrome">
+      <a class="chrome__marca" href="/">Montesinos <span>· Ebanistería</span></a>
+
+      {mapa && (
+        <ul class="mapa" id="mapa" aria-label="Recorrido por la nave">
+          <li><button type="button" aria-current="true"><span class="txt">Nave</span></button></li>
+          <li><button type="button" aria-current="false"><span class="txt">Materia</span></button></li>
+          <li><button type="button" aria-current="false"><span class="txt">Banco</span></button></li>
+          <li><button type="button" aria-current="false"><span class="txt">1:1</span></button></li>
+          <li><button type="button" aria-current="false"><span class="txt">Salida</span></button></li>
+        </ul>
+      )}
+
+      <nav aria-label="Páginas">
+        <ul class="chrome__menu">
+          {paginas.map((p) => (
+            <li>
+              <a href={p.href} aria-current={p.href === ruta ? "page" : undefined}>{p.t}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </header>
+
+    <slot />
+
+    <script src="/scrollcraft.js" is:inline></script>
+    <script src="/montesinos.js" is:inline></script>
+  </body>
+</html>

@@ -1,0 +1,110 @@
+---
+import Base from "../layouts/Base.astro";
+import Pie from "../components/Pie.astro";
+import { pilares, prensa, acabados } from "../data/montesinos.js";
+---
+
+<Base
+  titulo="Estudio — Ebanistería Montesinos"
+  desc="Más de 40 años de ebanistería. Cuatro pilares, credenciales ecológicas, acabados especiales y proyectos en más de diez países."
+  ruta="/estudio"
+>
+  <main id="principal" class="pagina sc-wrap">
+    <div class="titular">
+      <p class="eti">Estudio</p>
+      <h1>Más de cuarenta años en el mismo oficio.</h1>
+      <p>
+        La identidad propia, el buen hacer y la calidad nos han llevado a tener
+        reconocimiento nacional e internacional.
+      </p>
+    </div>
+
+    <div class="dos" style="align-items:start;">
+      <div>
+        <p style="max-width:46ch; color:var(--sc-ink-soft);">
+          Nos diferenciamos en el sector gracias al servicio que damos a los
+          clientes, al empleo de los mejores materiales y al trabajo realizado con
+          grandes profesionales y marcas. Hoy trabajamos en grandes proyectos y
+          empresas de gran solvencia, con diseños cuidados y acabados de excelente
+          calidad.
+        </p>
+        <p style="max-width:46ch; color:var(--sc-ink-soft); margin-top:var(--sc-4);">
+          Nuestra filosofía se basa en la calidad del producto, la excelencia en el
+          servicio, la profesionalidad de los empleados y la inversión constante en
+          I+D para mejorar el mueble que fabricamos.
+        </p>
+      </div>
+      <figure style="margin:0;">
+        <img src="/mundo/nave-materia.webp" alt="Tablas de madera maciza y planchas de latón en el taller" loading="lazy" style="width:100%;border-radius:2px;" />
+      </figure>
+    </div>
+
+    <section style="margin-top: var(--sc-9);">
+      <h2 class="paso__n" style="color:var(--sc-accent); margin-bottom:var(--sc-4);">CUATRO PILARES</h2>
+      <ol class="pasos">
+        {pilares.map((p) => (
+          <li class="paso">
+            <span class="paso__n">{p.n}</span>
+            <h3>{p.t}</h3>
+            <p>{p.d}</p>
+          </li>
+        ))}
+      </ol>
+    </section>
+
+    <section style="margin-top: var(--sc-9);">
+      <div class="dos">
+        <article class="tarjeta">
+          <h2>El entorno</h2>
+          <p>
+            Saber de dónde proviene cada producto que consumimos es primordial. Por
+            eso contamos con credenciales ecológicas que aseguran la tala y la
+            reforestación de bosques, para que el ecosistema perdure y se regenere
+            de forma óptima.
+          </p>
+        </article>
+        <article class="tarjeta">
+          <h2>Krion, desde 2018</h2>
+          <p>
+            La empresa está homologada por Porcelanosa para la realización de
+            proyectos con Krion Eco-Active Solid Technology.
+          </p>
+        </article>
+        <article class="tarjeta">
+          <h2>Acabados especiales</h2>
+          <p>
+            Colaboramos con expertos para resolver los acabados especiales:
+            {acabados.map((a, i) => (<>{i ? ", " : " "}{a.toLowerCase()}</>))}.
+          </p>
+        </article>
+        <article class="tarjeta">
+          <h2>Más de diez países</h2>
+          <p>
+            Gracias a nuestra vocación internacional y a un plan de expansión con un
+            amplio radio de acción, hemos desarrollado proyectos en más de diez
+            países en los últimos diez años.
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <section style="margin-top: var(--sc-9);">
+      <h2 class="paso__n" style="color:var(--sc-accent); margin-bottom:var(--sc-4);">PRENSA</h2>
+      <ul class="pasos" style="list-style:none; padding:0;">
+        {prensa.map((m) => (
+          <li class="paso">
+            <span class="paso__n">·</span>
+            <h3>{m.medio}</h3>
+            <p>{m.t}</p>
+          </li>
+        ))}
+      </ul>
+      <p style="margin-top:var(--sc-4); color:var(--sc-ink-soft); font-size:var(--sc-t-sm);">
+        Desde Televisión Española hasta La Vanguardia, distintos medios han hablado
+        de nuestra forma de ser y de hacer.
+      </p>
+    </section>
+
+    <Pie />
+  </main>
+</Base>

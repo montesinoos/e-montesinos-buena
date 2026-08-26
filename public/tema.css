@@ -1,0 +1,708 @@
+/* ============================================================================
+   Montesinos — tema y composición.
+   scrollcraft.css es el suelo. Aquí van los tokens de marca y el markup propio.
+   Ningún dispositivo del motor se reestiliza.
+   ========================================================================== */
+
+:root {
+  /* Galería blanca. El acento es el latón del mueble, no un color inventado. */
+  --sc-canvas:     #F4F3F0;
+  --sc-surface:    #FFFFFF;
+  --sc-ink:        #16171A;
+  --sc-ink-soft:   #6E6B66;
+  --sc-accent:     #A67C34;
+  --sc-accent-ink: #FFFFFF;
+
+  --sc-font-display: "Instrument Sans", system-ui, sans-serif;
+  --sc-font-text:    "Inter", system-ui, sans-serif;
+  --sc-font-mono:    "JetBrains Mono", ui-monospace, monospace;
+
+  --sc-shadow-color: 30 8% 55%;
+
+  --barra: 3.75rem;   /* alto del chrome fijo */
+}
+
+/* La página es clara: el suelo del motor asume oscuro en un par de sitios. */
+::selection { background: var(--sc-accent); color: #fff; }
+
+/* ============================================================ CHROME ======
+   Mapa de la nave + menú de páginas. La gramática de mundo continuo pide que
+   el nav sea un mapa y que se pueda saltar.
+   ========================================================================== */
+
+.chrome {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  height: var(--barra);
+  display: flex;
+  align-items: center;
+  gap: var(--sc-5);
+  padding-inline: var(--sc-gutter);
+  background: color-mix(in oklab, var(--sc-canvas) 82%, transparent);
+  backdrop-filter: blur(16px) saturate(1.15);
+  border-bottom: 1px solid var(--sc-hairline);
+}
+
+.chrome__marca {
+  font-family: var(--sc-font-display);
+  font-weight: 600;
+  font-size: var(--sc-t-sm);
+  letter-spacing: -0.01em;
+  color: var(--sc-ink);
+  text-decoration: none;
+  flex: 0 0 auto;
+}
+.chrome__marca span { color: var(--sc-ink-soft); font-weight: 400; }
+
+.chrome__menu {
+  margin-left: auto;
+  display: flex;
+  gap: 0.15rem;
+  list-style: none;
+  padding: 0; margin-block: 0;
+}
+.chrome__menu a {
+  display: block;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--sc-r-sm);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.02em;
+  color: var(--sc-ink-soft);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color var(--sc-d-fast) var(--sc-ease-out),
+              background var(--sc-d-fast) var(--sc-ease-out);
+}
+.chrome__menu a:hover { color: var(--sc-ink); background: var(--sc-surface); }
+.chrome__menu a[aria-current="page"] { color: var(--sc-ink); font-weight: 500; }
+
+/* ---- el mapa de la nave: solo en la home ---- */
+.mapa {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  list-style: none;
+  padding: 0; margin: 0;
+}
+.mapa button {
+  display: flex; align-items: center; gap: 0.4rem;
+  background: none; border: 0; padding: 0.3rem 0.15rem;
+  font-family: var(--sc-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sc-ink-soft);
+  cursor: pointer;
+  transition: color var(--sc-d-fast) var(--sc-ease-out);
+}
+.mapa button::before {
+  content: "";
+  width: 1.4rem; height: 2px;
+  background: currentColor;
+  opacity: 0.28;
+  transition: opacity var(--sc-d-base) var(--sc-ease-out),
+              background var(--sc-d-base) var(--sc-ease-out);
+}
+.mapa button:hover { color: var(--sc-ink); }
+.mapa button[aria-current="true"] { color: var(--sc-accent); }
+.mapa button[aria-current="true"]::before { opacity: 1; background: var(--sc-accent); }
+.mapa .txt { display: none; }
+@media (min-width: 1100px) { .mapa .txt { display: inline; } }
+
+@media (max-width: 860px) {
+  .chrome { gap: var(--sc-3); padding-inline: var(--sc-4); }
+  .chrome__menu { gap: 0; }
+  .chrome__menu a { padding: 0.4rem 0.4rem; font-size: 0.6875rem; }
+  .mapa { display: none; }
+}
+
+/* ============================================================ EL UMBRAL ===
+   Movimiento firma. Dos paneles DOM que giran sobre sus cantos exteriores,
+   gobernados por el scroll de página. No es vídeo y no es un acto del motor.
+   ========================================================================== */
+
+.umbral {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow: clip;
+  background: var(--sc-canvas);
+  perspective: 1700px;
+  perspective-origin: 50% 48%;
+  pointer-events: none;
+}
+.umbral[hidden] { display: none; }
+
+/* Caja de proporción idéntica a la foto, dimensionada a cubrir la pantalla.
+   Todos los porcentajes de dentro son porcentajes DE LA FOTO, no del viewport. */
+.umbral__escena {
+  position: absolute;
+  top: 50%; left: 50%;
+  translate: -50% -50%;
+  width: max(100vw, calc(100svh * 1.8));
+  aspect-ratio: 2736 / 1520;
+  transform-style: preserve-3d;
+}
+/* En vertical, cubrir dejaría el mueble tan ampliado que se saldría de cuadro
+   y perdería su lectura de objeto. Se encaja a lo ancho, un poco pasado, para
+   que se siga viendo suelo y techo de la sala. */
+@media (max-aspect-ratio: 1 / 1) {
+  .umbral__escena { width: 145vw; }
+}
+
+/* La sala donde está el armario. Se aleja un poco mientras entras. */
+.umbral__sala {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: fill;
+  will-change: transform, opacity;
+}
+
+/* Marco del hueco: recorta lo que se ve por la puerta abierta.
+   Coordenadas medidas sobre la foto real del mueble. */
+.umbral__hueco {
+  position: absolute;
+  left: 22.588%;
+  top: 7.368%;
+  width: 54.824%;
+  height: 85.0%;
+  overflow: clip;
+  background: #0d0d0e;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+/* La imagen del hueco se dimensiona contra la PANTALLA, no contra el hueco.
+   Así la nave se queda clavada mientras la abertura crece por encima de ella:
+   no avanza la cámara, se agranda el hueco. Ese es el efecto. */
+.umbral__hueco img {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 100vw; height: 100vh;
+  max-width: none;
+  object-fit: cover;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+}
+
+/* Pistas de scroll: le dan recorrido al umbral y al cierre sin meter bloques
+   dentro del mundo, que es lo que la gramática continua prohíbe. */
+.pista { pointer-events: none; }
+#pista-umbral { height: 175vh; }
+#pista-cierre { height: 180vh; }
+/* Sombra de la boca del mueble: da profundidad al hueco. */
+.umbral__hueco::after {
+  content: "";
+  position: absolute; inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 5rem 1.5rem rgba(0,0,0,0.55),
+              inset 0 0 1rem 0.15rem rgba(0,0,0,0.7);
+}
+
+.puerta {
+  position: absolute;
+  top: 7.368%;
+  height: 85.0%;
+  backface-visibility: hidden;
+  will-change: transform;
+  transform-style: preserve-3d;
+}
+.puerta img { width: 100%; height: 100%; object-fit: fill; display: block; }
+
+/* Giran sobre el canto exterior, que es donde están las bisagras reales. */
+.puerta--izq {
+  left: 22.588%;
+  width: 27.010%;
+  transform-origin: left center;
+}
+.puerta--der {
+  left: 49.598%;
+  width: 27.814%;
+  transform-origin: right center;
+}
+
+/* Sombra propagándose sobre la cara de la puerta según se abre. */
+.puerta__luz {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background: linear-gradient(to right, rgba(0,0,0,0.45), rgba(0,0,0,0));
+  opacity: 0;
+}
+.puerta--der .puerta__luz { background: linear-gradient(to left, rgba(0,0,0,0.45), rgba(0,0,0,0)); }
+
+/* ---- el rótulo del umbral ---- */
+.umbral__copia {
+  position: absolute;
+  left: 0; right: 0;
+  bottom: 0;
+  text-align: center;
+  padding: 0 var(--sc-gutter) clamp(2rem, 7vh, 4.5rem);
+  will-change: opacity, transform;
+}
+/* Velo SOLO bajo el texto. Un velo a pantalla completa aplanaría la foto
+   entera para arreglar el contraste de dos líneas. */
+.umbral__copia::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 30vh;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(to top,
+    var(--sc-canvas) 0%,
+    var(--sc-canvas) 46%,
+    color-mix(in oklab, var(--sc-canvas) 72%, transparent) 68%,
+    color-mix(in oklab, var(--sc-canvas) 30%, transparent) 86%,
+    transparent 100%);
+}
+.umbral__copia h1 {
+  font-family: var(--sc-font-display);
+  font-weight: 600;
+  font-size: var(--sc-t-xl);
+  line-height: var(--sc-leading-tight);
+  letter-spacing: var(--sc-track-tight);
+  margin: 0 0 var(--sc-3);
+  text-wrap: balance;
+  max-width: 26ch;
+  margin-inline: auto;
+}
+.umbral__copia p {
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sc-ink-soft);
+  margin: 0;
+}
+
+/* ============================================================ EL MUNDO ====
+   Worldflight con pósters. Nada de vídeo: el empuje lento sobre imagen fija
+   evita el decodificador del iPhone y baja el peso a una fracción.
+   ========================================================================== */
+
+.sc-world { background: var(--sc-canvas); }
+
+/* El motor escribe transform en [data-sc-copy], y un elemento transformado
+   pasa a ser el bloque contenedor de sus hijos absolutos. Ese div mide 0 de
+   alto, así que sin esto cualquier top/bottom en % resuelve contra cero y la
+   copia se va fuera de pantalla. Solo se le da caja: opacidad y transform
+   siguen siendo del motor. */
+[data-sc-copy] { position: absolute; inset: 0; }
+
+.copia {
+  position: absolute;
+  left: var(--sc-gutter);
+  bottom: clamp(3rem, 12vh, 8rem);
+  max-width: min(38rem, 76vw);
+}
+.copia--der {
+  left: auto;
+  right: var(--sc-gutter);
+  text-align: right;
+}
+.copia--centro {
+  left: 50%; right: auto;
+  top: 50%; bottom: auto;
+  translate: -50% -50%;
+  text-align: center;
+  max-width: min(44rem, 84vw);
+}
+
+/* Halo difuso bajo el texto. Blanco con transparencia, nunca opaco: tapa lo
+   justo para que el texto se lea y deja ver la foto por debajo.
+
+   REGLA DURA: los radios no pasan del 49%, y el centro se queda en el 50%.
+   `ellipse 50%` significa un radio igual a la MITAD de la caja, así que al 50%
+   el degradado llega a cero justo en el borde. Por encima de ahí la elipse se
+   sale de su propia caja y el navegador la corta en seco con opacidad todavía
+   visible: eso era el recorte duro. Desplazar el centro tiene el mismo efecto
+   por el lado hacia el que se mueve.
+
+   Para que el halo cubra el texto sin subir los radios, lo que crece es la
+   CAJA: con márgenes amplios, el 49% abarca de sobra el bloque y le sobra
+   recorrido para desvanecerse. */
+.copia::before {
+  content: "";
+  position: absolute;
+  inset: -9rem -12rem;
+  z-index: -1;
+  pointer-events: none;
+  transform-origin: 50% 50%;
+  background: radial-gradient(ellipse var(--halo-rx, 49%) var(--halo-ry, 49%) at 50% 50%,
+    rgba(255,255,255,0.72) 0%,
+    rgba(255,255,255,0.71) 38%,
+    rgba(255,255,255,0.62) 56%,
+    rgba(255,255,255,0.42) 70%,
+    rgba(255,255,255,0.20) 82%,
+    rgba(255,255,255,0.07) 91%,
+    rgba(255,255,255,0.015) 96%,
+    rgba(255,255,255,0)    100%);
+}
+.copia--centro::before { inset: -10rem -14rem; }
+
+@media (max-width: 860px) {
+  /* Los radios siguen sin pasar del 49%. Lo que se agranda es la caja. */
+  .copia::before,
+  .copia--centro::before { inset: -7rem -6.5rem; }
+}
+
+.copia__eti {
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sc-accent);
+  margin: 0 0 var(--sc-3);
+}
+.copia h2 {
+  font-family: var(--sc-font-display);
+  font-weight: 600;
+  font-size: var(--sc-t-2xl);
+  line-height: var(--sc-leading-tight);
+  letter-spacing: var(--sc-track-tight);
+  margin: 0 0 var(--sc-4);
+  text-wrap: balance;
+}
+.copia p {
+  font-size: var(--sc-t-base);
+  line-height: 1.6;
+  color: var(--sc-ink);
+  margin: 0;
+  max-width: 42ch;
+}
+.copia--der p { margin-left: auto; }
+.copia--centro p { margin-inline: auto; }
+
+/* Placa de datos del pico. */
+.placa {
+  display: inline-grid;
+  gap: 0.2rem;
+  margin-top: var(--sc-5);
+  padding: var(--sc-4) var(--sc-5);
+  background: color-mix(in oklab, var(--sc-surface) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-left: 2px solid var(--sc-accent);
+  text-align: left;
+}
+.placa b {
+  font-family: var(--sc-font-display);
+  font-size: var(--sc-t-lg);
+  font-weight: 600;
+  letter-spacing: var(--sc-track-snug);
+}
+.placa span {
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.06em;
+  color: var(--sc-ink-soft);
+}
+
+/* Un velo blanco solo bajo la copia, no sobre toda la imagen. */
+/* El velo de banda se retiró: cada bloque lleva ahora su propio halo, y dos
+   capas sobre la misma foto le quitaban valor a la imagen. */
+
+@media (max-width: 860px) {
+  .copia, .copia--der {
+    left: var(--sc-gutter); right: var(--sc-gutter);
+    text-align: left; max-width: none;
+  }
+  .copia--der p { margin-left: 0; }
+  .copia--centro { left: var(--sc-gutter); right: var(--sc-gutter); translate: 0 -50%; max-width: none; }
+}
+
+/* ============================================================ EL CIERRE ===
+   Las puertas vuelven a cerrarse y por dentro está la firma.
+   ========================================================================== */
+
+.cierre {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  overflow: clip;
+  background: transparent;
+  perspective: 1700px;
+  pointer-events: none;
+}
+.cierre[hidden] { display: none; }
+
+.hoja {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 50.4%;
+  background-image: url("/puertas/roble-liso.webp");
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+  display: grid;
+  align-content: center;
+  padding: var(--sc-6) clamp(1.5rem, 5vw, var(--sc-9));
+  box-shadow: 0 0 6rem 1rem rgba(0,0,0,0.28);
+}
+.hoja--izq { left: 0;  transform-origin: left center;  }
+.hoja--der { right: 0; transform-origin: right center; width: 49.6%; }
+
+/* El grabado. Texto HTML real, nunca pintado en la imagen. */
+.grabado { color: #3A2E1C; pointer-events: auto; }
+.grabado__eti {
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.62;
+  margin: 0 0 var(--sc-4);
+}
+.grabado h2 {
+  font-family: var(--sc-font-display);
+  font-weight: 600;
+  font-size: var(--sc-t-xl);
+  line-height: 1.1;
+  letter-spacing: var(--sc-track-tight);
+  margin: 0 0 var(--sc-5);
+  text-wrap: balance;
+}
+.grabado a { color: inherit; text-decoration-color: rgba(58,46,28,0.4); }
+.grabado a:hover { text-decoration-color: currentColor; }
+
+.grabado__sedes { display: grid; gap: var(--sc-4); margin: 0; }
+.grabado__sedes div { display: grid; gap: 0.1rem; }
+.grabado__sedes dt {
+  font-family: var(--sc-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+.grabado__sedes dd { margin: 0; font-size: var(--sc-t-sm); line-height: 1.5; }
+
+.grabado .grabado__cta {
+  display: inline-block;
+  margin-top: var(--sc-5);
+  padding: 0.8rem 1.6rem;
+  background: #3A2E1C;
+  color: #F0E7D8;
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background var(--sc-d-fast) var(--sc-ease-out);
+}
+.grabado .grabado__cta:hover { background: #55442B; }
+
+@media (max-width: 860px) {
+  .hoja { padding: var(--sc-5) var(--sc-4); }
+  .hoja--der .grabado { font-size: 0.9em; }
+}
+
+/* ============================================================ PÁGINAS =====
+   Las otras cuatro. Mismo sistema, sin mundo.
+   ========================================================================== */
+
+.pagina { padding-top: calc(var(--barra) + var(--sc-8)); }
+
+.titular { max-width: 52rem; margin-bottom: var(--sc-8); }
+.titular .eti {
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sc-accent);
+  margin: 0 0 var(--sc-4);
+}
+.titular h1 {
+  font-family: var(--sc-font-display);
+  font-weight: 600;
+  font-size: var(--sc-t-3xl);
+  line-height: 1.02;
+  letter-spacing: var(--sc-track-tight);
+  margin: 0 0 var(--sc-5);
+  text-wrap: balance;
+}
+.titular p {
+  font-size: var(--sc-t-lg);
+  line-height: 1.45;
+  color: var(--sc-ink-soft);
+  margin: 0;
+  max-width: 46ch;
+}
+
+/* ---- rejilla de proyectos ---- */
+.filtros {
+  display: flex; flex-wrap: wrap; gap: 0.4rem;
+  margin-bottom: var(--sc-6);
+  padding: 0; list-style: none;
+}
+.filtros button {
+  padding: 0.5rem 0.95rem;
+  border: 1px solid var(--sc-hairline-strong);
+  border-radius: var(--sc-r-pill);
+  background: none;
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.04em;
+  color: var(--sc-ink-soft);
+  cursor: pointer;
+  transition: all var(--sc-d-fast) var(--sc-ease-out);
+}
+.filtros button:hover { color: var(--sc-ink); border-color: var(--sc-ink); }
+.filtros button[aria-pressed="true"] {
+  background: var(--sc-ink); border-color: var(--sc-ink); color: var(--sc-canvas);
+}
+
+.rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  gap: var(--sc-5);
+}
+.obra { display: grid; gap: var(--sc-3); }
+.obra[hidden] { display: none; }
+.obra__media {
+  aspect-ratio: 4 / 3;
+  overflow: clip;
+  background: var(--sc-surface);
+  border-radius: 2px;
+}
+.obra__media img {
+  width: 100%; height: 100%; object-fit: cover;
+  transition: scale 700ms var(--sc-ease-out);
+}
+.obra:hover .obra__media img { scale: 1.04; }
+/* Ficha apilada: con nombre y sector en la misma línea, "Christian Louboutin"
+   partía en dos y descuadraba la fila entera. */
+.obra figcaption { display: grid; gap: 0.15rem; }
+.obra h2 {
+  font-family: var(--sc-font-display);
+  font-size: var(--sc-t-base);
+  font-weight: 500;
+  letter-spacing: var(--sc-track-snug);
+  margin: 0;
+}
+.obra .sect {
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.05em;
+  color: var(--sc-ink-soft);
+  white-space: nowrap;
+}
+
+/* ---- listas numeradas (proceso, pilares) ---- */
+.pasos { border-top: 1px solid var(--sc-hairline); margin: 0; padding: 0; list-style: none; }
+.paso {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 16rem) minmax(0, 1fr);
+  gap: var(--sc-5);
+  align-items: baseline;
+  padding: var(--sc-5) 0;
+  border-bottom: 1px solid var(--sc-hairline);
+}
+.paso__n {
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.08em;
+  color: var(--sc-accent);
+}
+.paso h2, .paso h3 {
+  font-family: var(--sc-font-display);
+  font-size: var(--sc-t-lg);
+  font-weight: 500;
+  letter-spacing: var(--sc-track-snug);
+  margin: 0;
+}
+.paso p { margin: 0; color: var(--sc-ink-soft); }
+.paso--pico { background: color-mix(in oklab, var(--sc-accent) 7%, transparent); }
+.paso--pico .paso__n { font-weight: 600; }
+
+@media (max-width: 860px) {
+  .paso { grid-template-columns: 2.5rem 1fr; gap: var(--sc-2) var(--sc-4); }
+  .paso__n { grid-row: 1 / span 2; }
+}
+
+/* ---- dos columnas ---- */
+.dos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: var(--sc-6);
+}
+.tarjeta {
+  padding: var(--sc-6);
+  background: var(--sc-surface);
+  border: 1px solid var(--sc-hairline);
+  border-radius: 2px;
+}
+.tarjeta h2, .tarjeta h3 {
+  font-family: var(--sc-font-display);
+  font-size: var(--sc-t-lg);
+  font-weight: 500;
+  letter-spacing: var(--sc-track-snug);
+  margin: 0 0 var(--sc-3);
+}
+.tarjeta p { margin: 0; color: var(--sc-ink-soft); }
+
+/* ---- formulario ---- */
+.form { display: grid; gap: var(--sc-4); max-width: 34rem; }
+.campo { display: grid; gap: 0.35rem; }
+.campo label {
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sc-ink-soft);
+}
+.campo :is(input, textarea, select) {
+  padding: 0.75rem 0.9rem;
+  border: 1px solid var(--sc-hairline-strong);
+  border-radius: 2px;
+  background: var(--sc-surface);
+  color: var(--sc-ink);
+  font-size: var(--sc-t-sm);
+}
+.campo :is(input, textarea):focus { outline: none; border-color: var(--sc-accent); }
+.campo textarea { resize: vertical; min-height: 7rem; }
+.opcion { display: flex; align-items: center; gap: 0.6rem; }
+.opcion label { text-transform: none; letter-spacing: 0; font-family: var(--sc-font-text); font-size: var(--sc-t-sm); }
+
+.enviar {
+  justify-self: start;
+  padding: 0.85rem 1.8rem;
+  border: 0; border-radius: 2px;
+  background: var(--sc-ink); color: var(--sc-canvas);
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background var(--sc-d-fast) var(--sc-ease-out);
+}
+.enviar:hover { background: var(--sc-accent); }
+.recado { font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); color: var(--sc-accent); min-height: 1.2em; margin: 0; }
+
+/* ---- pie ---- */
+.pie {
+  margin-top: var(--sc-10);
+  padding: var(--sc-6) 0 var(--sc-7);
+  border-top: 1px solid var(--sc-hairline);
+  display: flex; flex-wrap: wrap; gap: var(--sc-4);
+  justify-content: space-between;
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.04em;
+  color: var(--sc-ink-soft);
+}
+.pie a { color: inherit; }
+.pie a:hover { color: var(--sc-accent); }
+
+/* ---- utilidades ---- */
+.saltar {
+  position: absolute; top: 0.5rem; left: 0.5rem; z-index: 200;
+  padding: 0.6rem 1rem;
+  background: var(--sc-ink); color: var(--sc-canvas);
+  border-radius: 2px; text-decoration: none;
+  transform: translateY(-250%);
+}
+.saltar:focus { transform: none; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+@media (prefers-reduced-motion: reduce) {
+  .puerta, .hoja, .umbral__sala, .umbral__hueco img { transition: none !important; }
+}

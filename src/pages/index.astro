@@ -1,0 +1,166 @@
+---
+import Base from "../layouts/Base.astro";
+import { sedes } from "../data/montesinos.js";
+
+const titulo = "Ebanistería Montesinos — Más de 40 años fabricando mobiliario a medida";
+const desc =
+  "Ebanistería Montesinos fabrica mobiliario e interiorismo para retail, hostelería, oficinas y particulares. Premontaje a escala 1:1 en nuestra nave de Sabadell antes de enviar.";
+---
+
+<Base titulo={titulo} desc={desc} ruta="/" mapa={true}>
+  <!-- ===================================================== EL UMBRAL ======
+       Movimiento firma. Las hojas giran sobre sus cantos exteriores y detrás
+       no hay baldas: hay una nave. El hueco crece hasta tragarse la pantalla
+       mientras la nave se queda quieta.
+  -->
+  <div class="umbral" id="umbral">
+    <!-- La escena tiene la proporción EXACTA de la foto y se dimensiona a
+         cubrir. Así los porcentajes de las puertas caen siempre sobre el mueble,
+         sea cual sea la pantalla. Con la foto en object-fit:cover directamente
+         sobre el viewport, en vertical las hojas se despegaban del mueble. -->
+    <div class="umbral__escena">
+      <img class="umbral__sala" src="/puertas/sala.webp" alt="" fetchpriority="high" />
+
+      <div class="umbral__hueco">
+        <img src="/mundo/nave-entrada.webp" alt="" />
+      </div>
+
+      <div class="puerta puerta--izq">
+        <img src="/puertas/puerta-izq.webp" alt="" />
+        <span class="puerta__luz"></span>
+      </div>
+      <div class="puerta puerta--der">
+        <img src="/puertas/puerta-der.webp" alt="" />
+        <span class="puerta__luz"></span>
+      </div>
+    </div>
+
+    <div class="umbral__copia">
+      <h1>Un armario de Montesinos por fuera.<br />Una fábrica entera por dentro.</h1>
+      <p>Sabadell · Madrid · Bilbao · Londres</p>
+    </div>
+  </div>
+
+  <main id="principal">
+    <!-- Recorrido del umbral. No lleva contenido: solo scroll. -->
+    <div class="pista" id="pista-umbral" aria-hidden="true"></div>
+
+    <!-- ==================================================== EL MUNDO =======
+         Un único lienzo fijo. Lo único que hay en el flujo del documento es
+         el espaciador. Sin actos, sin secciones, sin costuras.
+    -->
+    <div data-sc-mode="worldflight" data-sc-seam="0.16">
+      <div data-sc-world>
+        <div data-sc-segment data-sc-w="1.5" data-sc-linger="0.25" data-sc-waypoint="Nave">
+          <img class="sc-world__poster" src="/mundo/nave-entrada.webp" alt="Nave de Ebanistería Montesinos, vacía, con luz de los ventanales industriales" />
+        </div>
+        <div data-sc-segment data-sc-w="1.5" data-sc-linger="0.3" data-sc-waypoint="Materia">
+          <img class="sc-world__poster" src="/mundo/nave-materia.webp" alt="Tablas de madera maciza apiladas en rack, planchas de latón apoyadas en la pared" />
+        </div>
+        <div data-sc-segment data-sc-w="1.4" data-sc-linger="0.35" data-sc-waypoint="Banco">
+          <img class="sc-world__poster" src="/mundo/nave-banco.webp" alt="Banco de ebanista con herramienta de mano y un panel de roble a prueba en seco" />
+        </div>
+        <div data-sc-segment data-sc-w="2.2" data-sc-linger="0.2" data-sc-waypoint="Uno a uno">
+          <img class="sc-world__poster" src="/mundo/nave-uno-a-uno.webp" alt="Un interior comercial completo, montado a escala real, de pie en mitad de la nave" />
+        </div>
+        <div data-sc-segment data-sc-w="1.4" data-sc-linger="0.25" data-sc-waypoint="Salida">
+          <img class="sc-world__poster" src="/mundo/nave-embalaje.webp" alt="Piezas terminadas, embaladas y flejadas junto al portón de carga" />
+        </div>
+      </div>
+
+      <div data-sc-world-copy>
+        <div data-sc-copy data-sc-window="0 0.175 0 0.40">
+          <div class="copia" data-entrada="sube">
+            <p class="copia__eti">La nave · Sabadell</p>
+            <h2>Más de cuarenta años en el mismo oficio.</h2>
+            <p>
+              La identidad propia, el buen hacer y la calidad nos han llevado a tener
+              reconocimiento nacional e internacional. Hoy trabajamos en grandes
+              proyectos con diseños cuidados y acabados de excelente calidad.
+            </p>
+          </div>
+        </div>
+
+        <div data-sc-copy data-sc-window="0.165 0.365 0.34 0.28">
+          <div class="copia copia--der" data-entrada="derecha">
+            <p class="copia__eti">Materia</p>
+            <h2>Saber de dónde viene cada cosa.</h2>
+            <p>
+              Contamos con credenciales ecológicas que aseguran la tala y la
+              reforestación, para que el ecosistema perdure y se regenere. Los
+              acabados especiales, latón, acero inoxidable, lacados y barnizados,
+              los resolvemos con expertos.
+            </p>
+          </div>
+        </div>
+
+        <!-- Silencio deliberado entre 0.505 y 0.565: el banco sin una palabra
+             encima, para que el 1:1 llegue sin competencia. -->
+        <div data-sc-copy data-sc-window="0.375 0.505 0.36 0.30">
+          <div class="copia" data-entrada="baja">
+            <p class="copia__eti">Banco</p>
+            <h2>Se prueba en seco antes de acabar.</h2>
+          </div>
+        </div>
+
+        <div data-sc-copy data-sc-window="0.565 0.805 0.30 0.20">
+          <div class="copia copia--centro" data-entrada="abre">
+            <p class="copia__eti">Escala 1:1</p>
+            <h2>Tu tienda, montada entera aquí dentro, antes de existir.</h2>
+            <p>
+              Premontamos el mobiliario a escala 1:1 en nuestras instalaciones y
+              espacios comerciales. El cliente ve el producto finalizado, con sus
+              acabados y su montaje, antes de que salga de la nave hacia su destino.
+            </p>
+          </div>
+        </div>
+
+        <div data-sc-copy data-sc-window="0.825 1 0.34 0.06">
+          <div class="copia" data-entrada="izquierda">
+            <p class="copia__eti">Salida</p>
+            <h2>Más de diez países en los últimos diez años.</h2>
+            <p>
+              Gracias a nuestra vocación internacional y a un plan de expansión con
+              un amplio radio de acción, hemos desarrollado proyectos en más de diez
+              países.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div data-sc-spacer aria-hidden="true"></div>
+    </div>
+
+    <!-- Recorrido del cierre. -->
+    <div class="pista" id="pista-cierre" aria-hidden="true"></div>
+  </main>
+
+  <!-- ===================================================== EL CIERRE ======
+       Las puertas vuelven a cerrarse por delante. En su cara interior, la que
+       solo ve quien ha estado dentro, está grabada la firma.
+  -->
+  <div class="cierre" id="cierre" hidden>
+    <div class="hoja hoja--izq">
+      <div class="grabado">
+        <p class="grabado__eti">Ebanistería Montesinos</p>
+        <h2>Cuéntanos qué hay que resolver y te damos un presupuesto orientativo.</h2>
+        <a class="grabado__cta" href="/contacto">Pedir presupuesto</a>
+      </div>
+    </div>
+    <div class="hoja hoja--der">
+      <div class="grabado">
+        <dl class="grabado__sedes">
+          {sedes.map((s) => (
+            <div>
+              <dt>{s.ciudad} · {s.rol}</dt>
+              <dd>
+                {s.dir}, {s.cp}
+                {s.tel && (<><br /><a href={`tel:${s.telHref}`}>{s.tel}</a></>)}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </div>
+  </div>
+</Base>

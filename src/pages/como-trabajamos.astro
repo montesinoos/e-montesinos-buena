@@ -1,0 +1,67 @@
+---
+import Base from "../layouts/Base.astro";
+import Pie from "../components/Pie.astro";
+import { proceso, vias, sectores } from "../data/montesinos.js";
+---
+
+<Base
+  titulo="Cómo trabajamos — Ebanistería Montesinos"
+  desc="Asesoramiento, desarrollo, premontaje a escala 1:1 en nuestras instalaciones y entrega. Fabricación sobre planos de la marca o con prototipo previo."
+  ruta="/como-trabajamos"
+>
+  <main id="principal" class="pagina sc-wrap">
+    <div class="titular">
+      <p class="eti">Cómo trabajamos</p>
+      <h1>Lo ves montado antes de que salga de la nave.</h1>
+      <p>
+        Actuamos desde diferentes puntos según lo que pida cada proyecto. El paso
+        que nos distingue es el tercero.
+      </p>
+    </div>
+
+    <ol class="pasos">
+      {proceso.map((f) => (
+        <li class={`paso${f.n === "03" ? " paso--pico" : ""}`}>
+          <span class="paso__n">{f.n}</span>
+          <h2>{f.t}</h2>
+          <p>{f.d}</p>
+        </li>
+      ))}
+    </ol>
+
+    <figure style="margin: var(--sc-9) 0 0;">
+      <img
+        src="/mundo/nave-uno-a-uno.webp"
+        alt="Un interior comercial completo montado a escala real en mitad de la nave del taller"
+        loading="lazy"
+        style="width:100%; border-radius:2px;"
+      />
+      <figcaption class="copia__eti" style="margin-top: var(--sc-3); color: var(--sc-ink-soft);">
+        Premontaje a escala 1:1 en las instalaciones de Sabadell
+      </figcaption>
+    </figure>
+
+    <section style="margin-top: var(--sc-9);">
+      <h2 class="paso__n" style="color:var(--sc-accent); margin-bottom:var(--sc-4);">DOS VÍAS DE ENCARGO</h2>
+      <div class="dos">
+        {vias.map((v) => (
+          <article class="tarjeta">
+            <h3>{v.t}</h3>
+            <p>{v.d}</p>
+          </article>
+        ))}
+      </div>
+    </section>
+
+    <section style="margin-top: var(--sc-9);">
+      <h2 class="paso__n" style="color:var(--sc-accent); margin-bottom:var(--sc-4);">PARA QUIÉN</h2>
+      <div class="dos">
+        {sectores.map((s) => (
+          <article class="tarjeta"><h3>{s.nombre}</h3></article>
+        ))}
+      </div>
+    </section>
+
+    <Pie />
+  </main>
+</Base>

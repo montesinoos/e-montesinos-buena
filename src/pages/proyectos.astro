@@ -1,0 +1,54 @@
+---
+import Base from "../layouts/Base.astro";
+import Pie from "../components/Pie.astro";
+import { proyectos, sectores } from "../data/montesinos.js";
+
+const nombreSector = (id) => sectores.find((s) => s.id === id)?.nombre ?? id;
+---
+
+<Base
+  titulo="Proyectos — Ebanistería Montesinos"
+  desc="Obra de Ebanistería Montesinos para Christian Louboutin, Harrods Loewe, Andrés Sardá, h10 Waterloo, Cercle Sabadellès, EGISA y particulares."
+  ruta="/proyectos"
+>
+  <main id="principal" class="pagina sc-wrap">
+    <div class="titular">
+      <p class="eti">Proyectos</p>
+      <h1>Marcas que no admiten un milímetro de error.</h1>
+      <p>
+        Una selección de la obra publicada por el taller. Cada pieza salió de la
+        nave de Sabadell montada a escala 1:1 antes de viajar a su destino.
+      </p>
+    </div>
+
+    <ul class="filtros" id="filtros" aria-label="Filtrar por sector">
+      <li><button type="button" data-sector="todos" aria-pressed="true">Todos</button></li>
+      {sectores.map((s) => (
+        <li><button type="button" data-sector={s.id} aria-pressed="false">{s.nombre}</button></li>
+      ))}
+    </ul>
+
+    <p class="sr" aria-live="polite"><span id="cuenta-obras">{proyectos.length}</span> proyectos</p>
+
+    <div class="rejilla">
+      {proyectos.map((p) => (
+        <figure class="obra" data-sector={p.sector}>
+          <div class="obra__media">
+            <img
+              src={`/proyectos-web/${p.img}.webp`}
+              alt={`Proyecto de Ebanistería Montesinos para ${p.nombre}`}
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <figcaption>
+            <h2>{p.nombre}</h2>
+            <span class="sect">{nombreSector(p.sector)}</span>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+
+    <Pie />
+  </main>
+</Base>

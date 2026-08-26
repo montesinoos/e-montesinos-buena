@@ -1,0 +1,8 @@
+---
+import { sedes } from "../data/montesinos.js";
+const sabadell = sedes[0];
+---
+<footer class="pie">
+  <p>Ebanistería Montesinos · {sabadell.dir}, {sabadell.cp}</p>
+  <p><a href={`tel:${sabadell.telHref}`}>{sabadell.tel}</a> · <a href="/contacto">Pedir presupuesto</a></p>
+</footer>
