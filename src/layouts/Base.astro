@@ -23,20 +23,25 @@ const { titulo, desc, ruta, mapa = false } = Astro.props;
   <body>
     <a class="saltar" href="#principal">Saltar al contenido</a>
 
-    <header class="chrome">
-      <a class="chrome__marca" href="/">Montesinos <span>· Ebanistería</span></a>
+    <header class:list={["chrome", mapa && "chrome--home"]} data-menu="cerrado">
+      <a class="chrome__marca" href="/" aria-label="Ebanistería Montesinos, ir al inicio">
+        <img src="/logo-montesinos.png" alt="" />
+      </a>
 
-      {mapa && (
-        <ul class="mapa" id="mapa" aria-label="Recorrido por la nave">
-          <li><button type="button" aria-current="true"><span class="txt">Nave</span></button></li>
-          <li><button type="button" aria-current="false"><span class="txt">Materia</span></button></li>
-          <li><button type="button" aria-current="false"><span class="txt">Banco</span></button></li>
-          <li><button type="button" aria-current="false"><span class="txt">1:1</span></button></li>
-          <li><button type="button" aria-current="false"><span class="txt">Salida</span></button></li>
-        </ul>
-      )}
+      <!-- Solo se ve en móvil y solo en la home, donde la barra la ocupa el mapa
+           de la nave. En el resto el menú va suelto y este botón no existe. -->
+      <button
+        class="chrome__hamb"
+        type="button"
+        id="abrir-menu"
+        aria-controls="menu-paginas"
+        aria-expanded="false"
+      >
+        <span class="sr">Menú de páginas</span>
+        <span class="chrome__hamb-i" aria-hidden="true"></span>
+      </button>
 
-      <nav aria-label="Páginas">
+      <nav aria-label="Páginas" id="menu-paginas">
         <ul class="chrome__menu">
           {paginas.map((p) => (
             <li>
@@ -45,6 +50,15 @@ const { titulo, desc, ruta, mapa = false } = Astro.props;
           ))}
         </ul>
       </nav>
+
+      {mapa && (
+        <ul class="mapa" id="mapa" aria-label="Recorrido por la nave">
+          <li><button type="button" aria-current="true"><span class="txt">Nave</span></button></li>
+          <li><button type="button" aria-current="false"><span class="txt">Materia</span></button></li>
+          <li><button type="button" aria-current="false"><span class="txt">1:1</span></button></li>
+          <li><button type="button" aria-current="false"><span class="txt">Salida</span></button></li>
+        </ul>
+      )}
     </header>
 
     <slot />

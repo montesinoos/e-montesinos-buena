@@ -1,4 +1,7 @@
-// Todo lo de este archivo está tomado de themontesinos.com. Nada inventado.
+// Todo lo de este archivo está tomado de themontesinos.com, salvo los roles de
+// las sedes, que los corrigió el cliente: el taller y la sede principal están en
+// Sabadell, en Madrid está la oficina técnica y en Londres la red de
+// distribución. En Bilbao ya no se trabaja, así que esa sede ya no figura.
 // Regla dura: de los proyectos solo consta el nombre y el sector. La web oficial
 // no publica año, materiales ni superficie, así que aquí tampoco. Una ficha con
 // datos supuestos sobre obra de Louboutin o Harrods sería una invención.
@@ -13,7 +16,7 @@ export const sedes = [
   {
     pais: "España · Cataluña",
     ciudad: "Sabadell",
-    rol: "Taller y sede",
+    rol: "Taller y sede principal",
     dir: "C/ de Manso, 93-95",
     cp: "08205 Sabadell, Barcelona",
     tel: "+34 937 107 722",
@@ -22,25 +25,16 @@ export const sedes = [
   {
     pais: "España",
     ciudad: "Madrid",
-    rol: "Oficina",
+    rol: "Oficina técnica",
     dir: "C/ Serrano, 93 3ºE",
     cp: "28006 Madrid",
     tel: "+34 915 902 963",
     telHref: "+34915902963",
   },
   {
-    pais: "España",
-    ciudad: "Bilbao",
-    rol: "Distribuidor oficial",
-    dir: "C/ Rodríguez Arias, 17",
-    cp: "48011 Bilbao",
-    tel: null,
-    telHref: null,
-  },
-  {
     pais: "United Kingdom",
     ciudad: "Londres",
-    rol: "Distribuidor oficial",
+    rol: "Red de distribución",
     dir: "Wells House, 80 Upper Street",
     cp: "London N1 0NU",
     tel: "+07 4730291 06",

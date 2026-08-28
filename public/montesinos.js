@@ -166,7 +166,6 @@
   var CAMARA = [
     { esc: [1.13, 1.05], x: 0,    y:  1.2 },  // nave: entras, se abre el espacio
     { esc: [1.11, 1.11], x: -2.6, y:  0   },  // materia: recorres el rack
-    { esc: [1.05, 1.13], x: 0,    y: -0.8 },  // banco: te acercas a la pieza
     { esc: [1.17, 1.05], x: 0,    y:  0.6 },  // 1:1 el pico: el mayor gesto
     { esc: [1.09, 1.14], x: 1.8,  y:  0   }   // salida: te retiras hacia el portón
   ];
@@ -275,6 +274,107 @@
   pintarCierre();
   pintarCamara();
   pintarCopias();
+
+  /* ------------------------------------------- la inclinación del sello ---
+     El motor trae `data-sc-tilt`, pero apaga TODOS sus dispositivos de puntero
+     cuando el sistema pide movimiento reducido, y aquí se pidió que la pieza se
+     vea igual en cualquier equipo sin tocar ajustes. Así que la inclinación va
+     aquí, sin consultar esa preferencia. El motor no se toca.
+
+     La perspectiva la pone el CSS en el padre; esto solo escribe los grados.
+  */
+  var selloEje = document.querySelector('.sello__eje');
+
+  if (selloEje && matchMedia('(hover: hover) and (pointer: fine)').matches) {
+    var GRADOS = 26;
+    var okX = 0, okY = 0;   // objetivo
+    var enX = 0, enY = 0;   // valor actual
+    var vivo = false;
+
+    addEventListener('pointermove', function (e) {
+      if (e.pointerType === 'touch') return;
+      var r = selloEje.getBoundingClientRect();
+      // Oculto (móvil/tablet) o fuera de pantalla: ni se calcula ni se pinta.
+      if (!r.width || r.bottom < -200 || r.top > innerHeight + 200) {
+        okX = 0; okY = 0;
+        return;
+      }
+      var nx = (e.clientX - (r.left + r.width / 2)) / (r.width / 2);
+      var ny = (e.clientY - (r.top + r.height / 2)) / (r.height / 2);
+      // Zona de reacción algo mayor que la pieza: si empezara justo en el canto,
+      // el giro daría un salto al entrar en vez de crecer.
+      var cerca = Math.abs(nx) < 1.8 && Math.abs(ny) < 1.8;
+      okX = cerca ? clamp(ny, -1, 1) * -GRADOS : 0;
+      okY = cerca ? clamp(nx, -1, 1) *  GRADOS : 0;
+      if (!vivo) { vivo = true; requestAnimationFrame(girar); }
+    }, { passive: true });
+
+    function girar() {
+      // Interpolar en vez de seguir al puntero al milímetro: el seguimiento
+      // directo no lleva inercia y se lee como algo sin peso.
+      enX += (okX - enX) * 0.09;
+      enY += (okY - enY) * 0.09;
+      var quieto = Math.abs(okX - enX) < 0.01 && Math.abs(okY - enY) < 0.01 &&
+                   Math.abs(enX) < 0.01 && Math.abs(enY) < 0.01;
+      if (quieto) {
+        // Ya está plano y no hay nada pendiente: se para el bucle en vez de
+        // dejar un rAF girando en vacío toda la visita.
+        selloEje.style.transform = '';
+        vivo = false;
+        return;
+      }
+      selloEje.style.transform =
+        'rotateX(' + enX.toFixed(2) + 'deg) rotateY(' + enY.toFixed(2) + 'deg)';
+      requestAnimationFrame(girar);
+    }
+  }
+
+  /* --------------------------------------------- el desplegable de páginas -
+     Solo tiene sentido en móvil y solo en la home, que es donde el menú de
+     páginas cede la barra al recorrido de la nave. El CSS decide cuándo se
+     ve; aquí solo se abre y se cierra, y se cierra por todas las vías por las
+     que un usuario espera que se cierre.
+  */
+  var barra = document.querySelector('.chrome');
+  var hamb  = document.getElementById('abrir-menu');
+  var menuP = document.getElementById('menu-paginas');
+
+  if (barra && hamb && menuP) {
+    var abrir = function (si) {
+      barra.setAttribute('data-menu', si ? 'abierto' : 'cerrado');
+      hamb.setAttribute('aria-expanded', si ? 'true' : 'false');
+    };
+
+    hamb.addEventListener('click', function () {
+      abrir(hamb.getAttribute('aria-expanded') !== 'true');
+    });
+
+    // Un enlace a la página en la que ya estás no recarga nada: sin esto el
+    // desplegable se quedaría abierto encima.
+    menuP.addEventListener('click', function (e) {
+      if (e.target.closest('a')) abrir(false);
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape') return;
+      if (hamb.getAttribute('aria-expanded') !== 'true') return;
+      abrir(false);
+      hamb.focus();
+    });
+
+    document.addEventListener('pointerdown', function (e) {
+      if (hamb.getAttribute('aria-expanded') !== 'true') return;
+      if (e.target.closest('#menu-paginas') || e.target.closest('#abrir-menu')) return;
+      abrir(false);
+    });
+
+    // Al pasar a escritorio el menú vuelve a la barra: dejarlo marcado como
+    // abierto deja el botón mintiendo a los lectores de pantalla.
+    var ancho = matchMedia('(min-width: 861px)');
+    var alCambiar = function () { if (ancho.matches) abrir(false); };
+    if (ancho.addEventListener) ancho.addEventListener('change', alCambiar);
+    else ancho.addListener(alCambiar);
+  }
 
   /* ------------------------------------------------------------ formulario */
   var form = document.getElementById('form-contacto');

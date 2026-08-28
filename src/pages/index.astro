@@ -4,7 +4,7 @@ import { sedes } from "../data/montesinos.js";
 
 const titulo = "Ebanistería Montesinos — Más de 40 años fabricando mobiliario a medida";
 const desc =
-  "Ebanistería Montesinos fabrica mobiliario e interiorismo para retail, hostelería, oficinas y particulares. Premontaje a escala 1:1 en nuestra nave de Sabadell antes de enviar.";
+  "Ebanistería Montesinos fabrica mobiliario e interiorismo para retail, hostelería, oficinas y particulares. Taller y sede principal en Sabadell, oficina técnica en Madrid y red de distribución en Londres. Premontaje a escala 1:1 antes de enviar.";
 ---
 
 <Base titulo={titulo} desc={desc} ruta="/" mapa={true}>
@@ -36,8 +36,8 @@ const desc =
     </div>
 
     <div class="umbral__copia">
-      <h1>Un armario de Montesinos por fuera.<br />Una fábrica entera por dentro.</h1>
-      <p>Sabadell · Madrid · Bilbao · Londres</p>
+      <h1>Un armario de <img class="umbral__logo" src="/logo-montesinos.png" alt="Montesinos" /> por fuera.<br />Una fábrica entera por dentro.</h1>
+      <p>Taller en Sabadell · Oficina técnica en Madrid · Distribución en Londres</p>
     </div>
   </div>
 
@@ -57,9 +57,6 @@ const desc =
         <div data-sc-segment data-sc-w="1.5" data-sc-linger="0.3" data-sc-waypoint="Materia">
           <img class="sc-world__poster" src="/mundo/nave-materia.webp" alt="Tablas de madera maciza apiladas en rack, planchas de latón apoyadas en la pared" />
         </div>
-        <div data-sc-segment data-sc-w="1.4" data-sc-linger="0.35" data-sc-waypoint="Banco">
-          <img class="sc-world__poster" src="/mundo/nave-banco.webp" alt="Banco de ebanista con herramienta de mano y un panel de roble a prueba en seco" />
-        </div>
         <div data-sc-segment data-sc-w="2.2" data-sc-linger="0.2" data-sc-waypoint="Uno a uno">
           <img class="sc-world__poster" src="/mundo/nave-uno-a-uno.webp" alt="Un interior comercial completo, montado a escala real, de pie en mitad de la nave" />
         </div>
@@ -69,7 +66,22 @@ const desc =
       </div>
 
       <div data-sc-world-copy>
-        <div data-sc-copy data-sc-window="0 0.175 0 0.40">
+        <div data-sc-copy data-sc-window="0 0.212 0 0.40">
+          <!-- Tres capas a propósito: la caja coloca, montesinos.js inclina en 3D
+               la capa de en medio hacia el cursor, y la flotación va en la
+               imagen. Si todo fuera al mismo elemento se pisarían el
+               `transform`. La inclinación NO usa el data-sc-tilt del motor
+               porque el motor apaga sus dispositivos de puntero cuando el
+               sistema pide movimiento reducido, y aquí tiene que verse siempre. -->
+          <div class="sello" aria-hidden="true">
+            <div class="sello__eje">
+              <picture>
+                <source srcset="/logo-disco.webp" type="image/webp" />
+                <img class="sello__img" src="/logo-disco.png" alt="" decoding="async" />
+              </picture>
+            </div>
+          </div>
+
           <div class="copia" data-entrada="sube">
             <p class="copia__eti">La nave · Sabadell</p>
             <h2>Más de cuarenta años en el mismo oficio.</h2>
@@ -81,7 +93,7 @@ const desc =
           </div>
         </div>
 
-        <div data-sc-copy data-sc-window="0.165 0.365 0.34 0.28">
+        <div data-sc-copy data-sc-window="0.200 0.415 0.34 0.28">
           <div class="copia copia--der" data-entrada="derecha">
             <p class="copia__eti">Materia</p>
             <h2>Saber de dónde viene cada cosa.</h2>
@@ -94,16 +106,9 @@ const desc =
           </div>
         </div>
 
-        <!-- Silencio deliberado entre 0.505 y 0.565: el banco sin una palabra
+        <!-- Silencio deliberado entre 0.415 y 0.473: la nave sin una palabra
              encima, para que el 1:1 llegue sin competencia. -->
-        <div data-sc-copy data-sc-window="0.375 0.505 0.36 0.30">
-          <div class="copia" data-entrada="baja">
-            <p class="copia__eti">Banco</p>
-            <h2>Se prueba en seco antes de acabar.</h2>
-          </div>
-        </div>
-
-        <div data-sc-copy data-sc-window="0.565 0.805 0.30 0.20">
+        <div data-sc-copy data-sc-window="0.473 0.764 0.30 0.20">
           <div class="copia copia--centro" data-entrada="abre">
             <p class="copia__eti">Escala 1:1</p>
             <h2>Tu tienda, montada entera aquí dentro, antes de existir.</h2>
@@ -115,7 +120,7 @@ const desc =
           </div>
         </div>
 
-        <div data-sc-copy data-sc-window="0.825 1 0.34 0.06">
+        <div data-sc-copy data-sc-window="0.788 1 0.34 0.06">
           <div class="copia" data-entrada="izquierda">
             <p class="copia__eti">Salida</p>
             <h2>Más de diez países en los últimos diez años.</h2>
