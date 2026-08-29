@@ -452,7 +452,7 @@
 }
 /* ---- el sello de la nave ----
    Vive dentro del bloque de copia de "La nave", así que el motor lo enciende y
-   lo apaga con ese acto: al llegar a Materia ya no está.
+   lo apaga con ese acto: al llegar a Material ya no está.
 
    Tres capas, cada una con su dueño del `transform`, porque si compartieran
    elemento se pisarían entre ellas:
@@ -915,6 +915,297 @@
 }
 .pie a { color: inherit; }
 .pie a:hover { color: var(--sc-accent); }
+
+/* ============================================================ EL BANCO ====
+   La librería de materiales. Comparte parada con el texto de Material: el
+   banco a la izquierda, el texto a la derecha, un solo bloque de copia y una
+   sola ventana de scroll.
+
+   El tablero tiene proporción FIJA (16:9) y se dimensiona a lo que quepa. Por
+   eso las coordenadas de cada muestra pueden ser porcentajes: caen siempre en
+   el mismo punto de la escena, sea cual sea el monitor. Si el tablero se
+   estirase con la ventana, las tablas se despegarían del banco, que es
+   exactamente lo que le pasaba a las puertas del umbral.
+
+   OJO con `max-height` aquí: no respeta `aspect-ratio`. Recorta el alto y deja
+   el ancho intacto, y entonces el tablero sale en 2.6:1 y las dos filas de
+   muestras se montan una sobre otra. Lo que se limita es el ANCHO, también en
+   unidades de alto de pantalla.
+
+   FASE 1: colores planos. Cada muestra son dos cajas pintadas, la cara y el
+   canto. Cuando entren las texturas generadas, la cara pasa a ser una imagen y
+   nada de esta geometría cambia.
+   ========================================================================== */
+
+.material { position: absolute; inset: 0; }
+
+.banco {
+  position: absolute;
+  /* La mitad izquierda de la pantalla. El 46% de la derecha queda para el
+     texto, que se estrecha en .copia--material para no invadir el banco. */
+  inset: var(--barra) 46% 0 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(0.75rem, 2vh, 1.25rem);
+  padding: clamp(1rem, 3vh, 2rem) 0 clamp(1.5rem, 5vh, 3rem) var(--sc-gutter);
+}
+
+/* El texto de esta parada convive con el banco, así que no puede ocupar el
+   ancho de las demás copias: se estrecha hasta dejarle la mitad izquierda
+   libre, y se centra en vertical para que las dos piezas se miren de frente.
+   `translate` es propiedad propia: no pisa el `transform` que montesinos.js
+   escribe aquí para la entrada por la derecha. */
+.copia--material {
+  top: 50%;
+  bottom: auto;
+  translate: 0 -50%;
+  max-width: min(28rem, 34vw);
+}
+
+/* ---- el tablero ----
+   Vista cenital con algo de ángulo: el degradado vertical deja el canto de
+   delante más claro que el fondo, y la sombra interior de arriba cierra la
+   escena. No hay transform 3D a propósito: cuando llegue la foto real del
+   banco ya vendrá con su perspectiva dentro y no habría que deshacer nada. */
+.banco__tablero {
+  position: relative;
+  width: min(100%, 112vh);
+  aspect-ratio: 16 / 9;
+  border-radius: 3px;
+  background:
+    linear-gradient(to bottom,
+      #6E5535 0%, #8A6A42 6%, #A9855C 34%, #B79567 72%, #9C7B52 96%, #7A5D3B 100%);
+  box-shadow:
+    inset 0 1.6rem 2.4rem rgba(40, 26, 12, 0.34),
+    inset 0 -0.5rem 1.2rem rgba(40, 26, 12, 0.20),
+    0 2rem 3.5rem rgba(22, 23, 26, 0.32);
+}
+/* Las vetas del propio banco, muy tenues: un tablero de color liso se lee como
+   un rectángulo pintado, no como madera. */
+.banco__tablero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.5;
+  background: repeating-linear-gradient(
+    91deg,
+    rgba(72, 50, 26, 0.00) 0px,
+    rgba(72, 50, 26, 0.14) 2px,
+    rgba(72, 50, 26, 0.00) 7px,
+    rgba(255, 236, 205, 0.07) 11px,
+    rgba(72, 50, 26, 0.00) 18px);
+}
+.banco__muestras {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* ---- una muestra ----
+   La caja lleva la posición y el giro y no se toca más. Quien se levanta al
+   pasar el ratón es el botón de dentro: si fueran el mismo elemento, el giro y
+   el levantamiento se pisarían. */
+.muestra {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 18%;
+  aspect-ratio: 3 / 3.4;
+  translate: -50% -50%;
+  rotate: var(--giro);
+}
+
+.muestra__pieza {
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: translate var(--sc-d-base) var(--sc-ease-out);
+}
+.muestra__cara {
+  position: absolute;
+  inset: 0;
+  border-radius: 2px;
+  background:
+    repeating-linear-gradient(
+      88deg,
+      rgba(0,0,0,0) 0px,
+      var(--veta) 1px,
+      rgba(0,0,0,0) 4px,
+      rgba(255,255,255,0.10) 8px,
+      rgba(0,0,0,0) 13px),
+    linear-gradient(to bottom, color-mix(in oklab, var(--tono) 88%, white) 0%, var(--tono) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.16),
+    0 0.9rem 1.6rem rgba(22, 23, 26, 0.32);
+  transition: box-shadow var(--sc-d-base) var(--sc-ease-out);
+}
+/* El grosor de la tabla. Sin canto, la muestra es una pegatina sobre el banco;
+   con canto, es una tabla apoyada encima. */
+.muestra__canto {
+  position: absolute;
+  left: 1.5%;
+  right: 1.5%;
+  bottom: -0.55rem;
+  height: 0.6rem;
+  border-radius: 0 0 2px 2px;
+  background: color-mix(in oklab, var(--tono) 62%, black);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .muestra__pieza:hover { translate: 0 -0.55rem; }
+  .muestra__pieza:hover .muestra__cara {
+    box-shadow:
+      inset 0 0 0 1px rgba(0, 0, 0, 0.16),
+      0 1.6rem 2.4rem rgba(22, 23, 26, 0.38);
+  }
+}
+.muestra__pieza:focus-visible {
+  outline: 2px solid var(--sc-accent);
+  outline-offset: 5px;
+}
+/* La elegida se queda levantada y con cerco de latón. Como la cartela está en
+   un sitio fijo y no cuelga de la tabla, este cerco es lo ÚNICO que dice a qué
+   muestra corresponde el texto: sin él, el nombre no tendría dueño. */
+.muestra__pieza[aria-pressed="true"] { translate: 0 -0.55rem; }
+.muestra__pieza[aria-pressed="true"] .muestra__cara {
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.16),
+    inset 0 0 0 2px var(--sc-accent),
+    0 1.6rem 2.4rem rgba(22, 23, 26, 0.38);
+}
+
+/* ---- la cartela ----
+   Una etiqueta de taller, no una ficha técnica: nombre y una frase. Está
+   SIEMPRE en el canto del banco, ocupada o vacía, y por eso el bloque no da
+   ningún salto al abrirse. Anclarla a cada muestra era lo natural sobre el
+   papel, pero las cuatro tablas de la fila de atrás abrían encima de las
+   cuatro de delante y el texto quedaba ilegible. */
+.banco__cartela {
+  position: relative;
+  min-height: 4.75rem;
+  padding: var(--sc-3) var(--sc-4);
+  border-left: 2px solid var(--sc-accent);
+  background: color-mix(in oklab, var(--sc-surface) 90%, transparent);
+  box-shadow: 0 0.6rem 1.6rem rgba(22, 23, 26, 0.18);
+}
+.cartela__nombre {
+  font-family: var(--sc-font-display);
+  font-weight: 600;
+  font-size: var(--sc-t-sm);
+  margin: 0;
+  color: var(--sc-ink);
+}
+.cartela__nombre:empty { display: none; }
+.cartela__frase {
+  font-size: var(--sc-t-xs);
+  line-height: 1.5;
+  margin: 0;
+  color: var(--sc-ink-soft);
+}
+/* Sin nada elegido, la cartela es la instrucción: dice qué hacer con el banco.
+   En cuanto hay una madera elegida, el nombre entra y la frase pasa a ser la
+   suya. Es la misma caja: no aparece ni desaparece nada. */
+.banco__cartela[data-estado="vacio"] .cartela__frase {
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.06em;
+}
+.banco__cartela[data-estado="lleno"] .cartela__nombre { margin-bottom: 0.35rem; }
+.banco__cartela[data-estado="lleno"] {
+  animation: cartela-entra var(--sc-d-base) var(--sc-ease-out);
+}
+@keyframes cartela-entra {
+  from { opacity: 0.4; }
+  to   { opacity: 1; }
+}
+
+/* ---- pantallas medianas ----
+   Portátiles estrechos y tablets apaisadas. El banco cede algo de ancho y el
+   texto se estrecha con él; por debajo de 860 se apilan. */
+@media (max-width: 1200px) {
+  .banco { inset: var(--barra) 44% 0 0; }
+  .copia--material { max-width: min(22rem, 32vw); }
+}
+
+/* ---- móvil ----
+   Aquí no caben dos columnas, así que el texto se va arriba y el banco debajo.
+   Y sobre todo: se abandona el posicionamiento absoluto y las tres piezas
+   pasan a FLUJO normal, apiladas. Con posiciones absolutas había que adivinar
+   cuánto mide el párrafo para saber dónde empieza el banco, y en cuanto el
+   teléfono era corto o la tipografía grande, el texto y el tablero se pisaban.
+   En flujo se reparten solos y eso no puede pasar.
+
+   La colocación sobre el tablero también se abandona: en vertical, ocho tablas
+   repartidas por una escena apaisada quedan del tamaño de un sello. El banco
+   sigue de fondo, pero las muestras pasan a rejilla de cuatro por dos, con la
+   MISMA proporción que tienen en escritorio, todas visibles de un vistazo y sin
+   scroll horizontal. Mismo toque, misma cartela. */
+@media (max-width: 860px) {
+  .material {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.75rem, 2.5vh, 1.5rem);
+    padding: calc(var(--barra) + 0.75rem) var(--sc-gutter) clamp(1rem, 4vh, 2rem);
+  }
+  .copia--material {
+    position: relative;
+    inset: auto;
+    translate: none;
+    max-width: none;
+    text-align: left;
+  }
+  .copia--material h2 { font-size: var(--sc-t-lg); }
+  .copia--material p { font-size: var(--sc-t-sm); max-width: none; }
+
+  .banco {
+    position: relative;
+    inset: auto;
+    padding: 0;
+    gap: 0.75rem;
+  }
+  /* El tablero se ajusta a las muestras en vez de estirarse: el aire que sobre
+     es mejor que quede entre el texto y el banco, como aire de página, y no
+     dentro del tablero como madera vacía. */
+  .banco__tablero {
+    width: 100%;
+    aspect-ratio: auto;
+    padding: 0.9rem;
+  }
+  .banco__muestras {
+    position: static;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.7rem;
+  }
+  /* La proporción la sigue marcando la muestra, no la celda: así una tabla en
+     el móvil se ve como la misma pieza que en escritorio, no como una tira. */
+  .muestra {
+    position: relative;
+    left: auto; top: auto;
+    width: auto;
+    aspect-ratio: 3 / 3.4;
+    translate: none;
+    rotate: none;
+  }
+  .muestra__canto { display: none; }
+  /* Alta de sobra para la frase mas larga: si la banda creciera al elegir una
+     madera, el tablero daria un tironcito cada vez. */
+  .banco__cartela { min-height: 5.75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .muestra__pieza, .muestra__cara { transition: none; }
+  .banco__cartela[data-estado="lleno"] { animation: none; }
+}
 
 /* ---- utilidades ---- */
 .saltar {

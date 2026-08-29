@@ -133,7 +133,9 @@
     for (var k = 0; k < i; k++) run += parseFloat(tramos[k].getAttribute('data-sc-w')) || 1.3;
     // Un pelín dentro del tramo, para caer donde la copia ya está abierta.
     var w = parseFloat(tramos[i].getAttribute('data-sc-w')) || 1.3;
-    return Math.round(top + (run + w * 0.34) * innerHeight);
+    var parada = parseFloat(tramos[i].getAttribute('data-sc-parada'));
+    if (isNaN(parada)) parada = 0.34;
+    return Math.round(top + (run + w * parada) * innerHeight);
   }
 
   botones.forEach(function (b, i) {
@@ -165,7 +167,7 @@
   // traslación (escala >= 1 + 2*|desplazamiento|), o asoma el borde del lienzo.
   var CAMARA = [
     { esc: [1.13, 1.05], x: 0,    y:  1.2 },  // nave: entras, se abre el espacio
-    { esc: [1.11, 1.11], x: -2.6, y:  0   },  // materia: recorres el rack
+    { esc: [1.11, 1.11], x: -1.6, y:  0   },  // material: la escena casi quieta, que el banco manda
     { esc: [1.17, 1.05], x: 0,    y:  0.6 },  // 1:1 el pico: el mayor gesto
     { esc: [1.09, 1.14], x: 1.8,  y:  0   }   // salida: te retiras hacia el portón
   ];
@@ -374,6 +376,86 @@
     var alCambiar = function () { if (ancho.matches) abrir(false); };
     if (ancho.addEventListener) ancho.addEventListener('change', alCambiar);
     else ancho.addListener(alCambiar);
+  }
+
+  /* ----------------------------------------------------------- el banco --
+     La librería de materiales. Una sola muestra elegida a la vez y UNA sola
+     cartela, siempre en el canto del banco. Colgar el texto de cada tabla era
+     lo natural sobre el papel, pero la fila de atrás abría encima de la de
+     delante y no había forma de leerlo; en un sitio fijo se lee siempre.
+
+     Los botones son botones de verdad, así que Enter y Espacio ya funcionan
+     sin escribir una línea. Aquí solo se elige, se suelta y se avisa: los
+     botones llevan aria-pressed (están elegidos o no) y la cartela es una
+     región aria-live, que es lo que hace que el lector de pantalla lea el
+     nombre y la frase al cambiar de madera.
+  */
+  var banco = document.getElementById('banco');
+  if (banco) {
+    var cartela = document.getElementById('cartela-banco');
+    var cNombre = cartela && cartela.querySelector('.cartela__nombre');
+    var cFrase  = cartela && cartela.querySelector('.cartela__frase');
+    // La instrucción de partida se toma del HTML, no se repite aquí: si se
+    // reescribe en la plantilla, esto la sigue sin tocar nada.
+    var textoVacio = cFrase ? cFrase.textContent : '';
+    var elegida = null;
+
+    var soltar = function () {
+      if (!elegida) return;
+      elegida.setAttribute('aria-pressed', 'false');
+      elegida = null;
+      if (!cartela) return;
+      cartela.setAttribute('data-estado', 'vacio');
+      cNombre.textContent = '';
+      cFrase.textContent = textoVacio;
+    };
+
+    var elegir = function (b) {
+      if (elegida === b) { soltar(); return; }
+      if (elegida) elegida.setAttribute('aria-pressed', 'false');
+      elegida = b;
+      b.setAttribute('aria-pressed', 'true');
+      if (!cartela) return;
+      cartela.setAttribute('data-estado', 'lleno');
+      cNombre.textContent = b.getAttribute('data-nombre') || '';
+      cFrase.textContent = b.getAttribute('data-frase') || '';
+    };
+
+    banco.addEventListener('click', function (e) {
+      var b = e.target.closest('.muestra__pieza');
+      if (b) elegir(b);
+    });
+
+    // Escape suelta y devuelve el foco a la tabla, que es de donde salió. Sin
+    // esto el foco se quedaría en el aire después de cerrar con teclado.
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || !elegida) return;
+      var b = elegida;
+      soltar();
+      b.focus();
+    });
+
+    // Un toque en cualquier otro sitio suelta. Incluye el propio tablero: si
+    // solo cambiara al tocar otra muestra, la cartela se quedaría puesta el
+    // resto del recorrido.
+    document.addEventListener('pointerdown', function (e) {
+      if (!elegida) return;
+      // El objetivo de un evento no siempre es un elemento (el propio document
+      // lo es de los eventos sintéticos), y ahí `closest` no existe.
+      var t = e.target;
+      if (t && t.closest && t.closest('.muestra')) return;
+      soltar();
+    });
+
+    // Al salir del tramo de Material, el motor apaga el bloque y le quita los
+    // eventos de puntero. Una madera elegida debajo de una capa invisible es
+    // basura de estado: cuando el visitante vuelva, se la encontraría puesta.
+    var mundoBanco = document.querySelector('[data-sc-mode="worldflight"]');
+    if (mundoBanco) {
+      mundoBanco.addEventListener('sc:waypoint', function (e) {
+        if (e.detail.index !== 1) soltar();
+      });
+    }
   }
 
   /* ------------------------------------------------------------ formulario */

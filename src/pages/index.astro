@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { sedes } from "../data/montesinos.js";
+import { maderas } from "../data/maderas.js";
 
 const titulo = "Ebanistería Montesinos — Más de 40 años fabricando mobiliario a medida";
 const desc =
@@ -54,7 +55,7 @@ const desc =
         <div data-sc-segment data-sc-w="1.5" data-sc-linger="0.25" data-sc-waypoint="Nave">
           <img class="sc-world__poster" src="/mundo/nave-entrada.webp" alt="Nave de Ebanistería Montesinos, vacía, con luz de los ventanales industriales" />
         </div>
-        <div data-sc-segment data-sc-w="1.5" data-sc-linger="0.3" data-sc-waypoint="Materia">
+        <div data-sc-segment data-sc-w="3.4" data-sc-linger="0.3" data-sc-parada="0.16" data-sc-waypoint="Material">
           <img class="sc-world__poster" src="/mundo/nave-materia.webp" alt="Tablas de madera maciza apiladas en rack, planchas de latón apoyadas en la pared" />
         </div>
         <div data-sc-segment data-sc-w="2.2" data-sc-linger="0.2" data-sc-waypoint="Uno a uno">
@@ -66,7 +67,7 @@ const desc =
       </div>
 
       <div data-sc-world-copy>
-        <div data-sc-copy data-sc-window="0 0.212 0 0.40">
+        <div data-sc-copy data-sc-window="0 0.1647 0 0.40">
           <!-- Tres capas a propósito: la caja coloca, montesinos.js inclina en 3D
                la capa de en medio hacia el cursor, y la flotación va en la
                imagen. Si todo fuera al mismo elemento se pisarían el
@@ -93,22 +94,85 @@ const desc =
           </div>
         </div>
 
-        <div data-sc-copy data-sc-window="0.200 0.415 0.34 0.28">
-          <div class="copia copia--der" data-entrada="derecha">
-            <p class="copia__eti">Materia</p>
-            <h2>Saber de dónde viene cada cosa.</h2>
-            <p>
-              Contamos con credenciales ecológicas que aseguran la tala y la
-              reforestación, para que el ecosistema perdure y se regenere. Los
-              acabados especiales, latón, acero inoxidable, lacados y barnizados,
-              los resolvemos con expertos.
-            </p>
+        <!-- ============================================== MATERIAL =======
+             El texto y la librería comparten UN SOLO bloque de copia, y por
+             tanto una sola ventana de scroll: son la misma parada del
+             recorrido, no dos. En escritorio el banco ocupa la mitad
+             izquierda y el texto la derecha; en móvil se apilan.
+
+             El tramo de Material dura 3.4 alturas de pantalla justamente por
+             esto: el bloque está a plena presencia durante 2.7 pantallas de
+             scroll, que es la pausa donde da tiempo a tocar las muestras. Si
+             el visitante sigue bajando, el viaje continúa. Nadie queda
+             retenido.
+
+             FASE 1: colores planos. Las muestras son cajas pintadas con dos
+             tonos. Cuando entren las texturas generadas se sustituye la cara
+             de cada muestra por su imagen y la geometría (posiciones, giros,
+             cartela) no se toca. -->
+        <div data-sc-copy data-sc-window="0.1553 0.5824 0.13 0.11">
+          <div class="material">
+            <div class="copia copia--der copia--material" data-entrada="derecha">
+              <p class="copia__eti">Material</p>
+              <h2>Saber de dónde viene cada cosa.</h2>
+              <p>
+                Contamos con credenciales ecológicas que aseguran la tala y la
+                reforestación, para que el ecosistema perdure y se regenere. Los
+                acabados especiales, latón, acero inoxidable, lacados y barnizados,
+                los resolvemos con expertos.
+              </p>
+            </div>
+            <div class="banco" id="banco">
+              <div class="banco__tablero">
+                <ul class="banco__muestras">
+                  {maderas.map((m) => (
+                    <li
+                      class="muestra"
+                      style={`--x:${m.x}%;--y:${m.y}%;--giro:${m.giro}deg;--tono:${m.tono};--veta:${m.veta}`}
+                    >
+                      <button
+                        type="button"
+                        class="muestra__pieza"
+                        aria-pressed="false"
+                        aria-controls="cartela-banco"
+                        data-nombre={m.nombre}
+                        data-frase={m.frase}
+                      >
+                        <span class="muestra__cara" aria-hidden="true"></span>
+                        <span class="muestra__canto" aria-hidden="true"></span>
+                        {/* El texto de cada madera vive en el HTML, no solo en
+                            el data-. Asi esta ahi para quien navega con lector
+                            de pantalla y para quien lo indexa, haya o no JS. */}
+                        <span class="sr">{m.nombre}. {m.frase}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <!-- La cartela es UNA y esta siempre en el mismo sitio: la banda
+                   del canto del banco. Colgarla de cada muestra era lo natural
+                   sobre el papel, pero las cuatro de la fila de atras abrian
+                   encima de las cuatro de delante y no habia forma de leerlas.
+                   Un sitio fijo se lee siempre y el ojo aprende donde mirar.
+                   La banda esta reservada aunque no haya nada abierto, para que
+                   el tablero no de un salto al aparecer el texto. -->
+              <div
+                class="banco__cartela"
+                id="cartela-banco"
+                data-estado="vacio"
+                aria-live="polite"
+              >
+                <p class="cartela__nombre"></p>
+                <p class="cartela__frase">Toca una muestra para ver cuál es.</p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- Silencio deliberado entre 0.415 y 0.473: la nave sin una palabra
+        <!-- Silencio deliberado entre 0.5824 y 0.5908: la nave sin una palabra
              encima, para que el 1:1 llegue sin competencia. -->
-        <div data-sc-copy data-sc-window="0.473 0.764 0.30 0.20">
+        <div data-sc-copy data-sc-window="0.5908 0.8168 0.30 0.20">
           <div class="copia copia--centro" data-entrada="abre">
             <p class="copia__eti">Escala 1:1</p>
             <h2>Tu tienda, montada entera aquí dentro, antes de existir.</h2>
@@ -120,7 +184,7 @@ const desc =
           </div>
         </div>
 
-        <div data-sc-copy data-sc-window="0.788 1 0.34 0.06">
+        <div data-sc-copy data-sc-window="0.8354 1 0.34 0.06">
           <div class="copia" data-entrada="izquierda">
             <p class="copia__eti">Salida</p>
             <h2>Más de diez países en los últimos diez años.</h2>
