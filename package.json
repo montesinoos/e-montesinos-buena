@@ -14,7 +14,9 @@
   "type": "module",
   "dependencies": {
     "astro": "^7.2.8",
-    "playwright-core": "^1.62.1"
+    "globe.gl": "^2.46.2",
+    "playwright-core": "^1.62.1",
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "wrangler": "^4.126.0"

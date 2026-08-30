@@ -116,3 +116,26 @@ export const paginas = [
   { href: "/estudio", t: "Estudio" },
   { href: "/contacto", t: "Contacto" },
 ];
+
+// Los doce países del globo de la sección "Salida".
+//
+// DATOS DE EJEMPLO. Las coordenadas son las de la capital de cada país, no las
+// de la obra: sirven para colocar el marcador mientras no lleguen las ciudades
+// reales. Y la foto es la misma para los doce a propósito — colgar de Qatar una
+// foto de Louboutin sería inventarse un proyecto, que es justo lo que prohíbe la
+// regla dura de la cabecera de este archivo. Cuando lleguen ciudades y fotos
+// reales se sustituyen `ciudad` e `img` y no hay que tocar nada más.
+export const paisesGlobo = [
+  { pais: "España",          ciudad: "Madrid",      lat: 40.4168, lng: -3.7038 },
+  { pais: "Portugal",        ciudad: "Lisboa",      lat: 38.7223, lng: -9.1393 },
+  { pais: "Francia",         ciudad: "París",       lat: 48.8566, lng:  2.3522 },
+  { pais: "Reino Unido",     ciudad: "Londres",     lat: 51.5074, lng: -0.1278 },
+  { pais: "Países Bajos",    ciudad: "Ámsterdam",   lat: 52.3676, lng:  4.9041 },
+  { pais: "Alemania",        ciudad: "Berlín",      lat: 52.5200, lng: 13.4050 },
+  { pais: "Luxemburgo",      ciudad: "Luxemburgo",  lat: 49.6116, lng:  6.1319 },
+  { pais: "Suiza",           ciudad: "Berna",       lat: 46.9480, lng:  7.4474 },
+  { pais: "Suecia",          ciudad: "Estocolmo",   lat: 59.3293, lng: 18.0686 },
+  { pais: "Rusia",           ciudad: "Moscú",       lat: 55.7558, lng: 37.6173 },
+  { pais: "Qatar",           ciudad: "Doha",        lat: 25.2854, lng: 51.5310 },
+  { pais: "Emiratos Árabes", ciudad: "Abu Dabi",    lat: 24.4539, lng: 54.3773 },
+].map((p) => ({ ...p, img: "/proyectos-web/showroom-1.webp" }));

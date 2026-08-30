@@ -1221,3 +1221,244 @@
 @media (prefers-reduced-motion: reduce) {
   .puerta, .hoja, .umbral__sala, .umbral__hueco img { transition: none !important; }
 }
+
+/* ============================================================= EL GLOBO ===
+   Modulo 1. La parada de Salida pasa a tener dos piezas: el texto abajo a la
+   izquierda, como estaba, y el globo ocupando la mitad derecha.
+
+   El texto NO se toca: sigue siendo el .copia de siempre, con su ancho y su
+   posicion. El globo se limita al hueco que ya quedaba libre a su derecha, y
+   por eso puede ser grande sin robarle nada.
+   ========================================================================== */
+
+.globo {
+  position: absolute;
+  /* Mitad derecha, por debajo del chrome fijo. El 48% de la izquierda queda
+     para el texto. */
+  inset: var(--barra) 0 0 48%;
+
+  /* `inherit`, no `auto`. El globo se arrastra, pero solo cuando esta parada
+     esta en pantalla: el motor pone pointer-events 'auto' en el bloque de
+     copia activo y 'none' en los demas, y heredando de el la caja se apaga
+     sola cuando el visitante ya ha pasado de largo. Con `auto` fijo, media
+     pantalla se quedaria capturando el raton durante todo el recorrido.
+     pointer-events se hereda, asi que el canvas de dentro va incluido. */
+  pointer-events: inherit;
+  cursor: grab;
+}
+/* La clase la pone y la quita el 'start'/'end' de OrbitControls. Se hace asi y
+   no con :active porque el gesto puede acabar fuera de la caja (se arrastra
+   hasta media pantalla) y :active se soltaria antes de tiempo. */
+/* Manita sobre un marcador. Va antes que --agarrado a proposito: misma
+   especificidad, asi que si se empieza a girar desde encima de un punto gana
+   el puno cerrado, que es lo que esta pasando de verdad. */
+.globo--senalando { cursor: pointer; }
+.globo--agarrado { cursor: grabbing; }
+
+/* globe.gl inyecta su propia estructura dentro del div. Se le fuerza a llenar
+   la caja: por defecto se dimensiona a la ventana entera y desbordaria. */
+.globo > div,
+.globo canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* El canvas es transparente (alpha en el renderer + backgroundColor rgba 0),
+   asi que no hay caja ni fondo propio que recorte: la esfera flota sobre la
+   foto de la nave igual que el sello flota sobre la de la entrada. */
+
+@media (max-width: 860px) {
+  /* En vertical el globo no cabe al lado sin quedarse enano: se apila. El
+     orden es el de la lectura, primero el texto y despues el globo, asi que
+     esta es la unica parada donde la copia sube arriba en lugar de quedarse
+     abajo. Solo aqui: por eso la clase .copia--salida y no un cambio en
+     .copia, que se lo comeria a las otras tres paradas.
+
+     El texto manda: se ancla arriba y ocupa lo que necesite. El globo se
+     cuelga del borde de abajo y su alto se corta en 46vh para que la esfera
+     entre entera y quede aire entre las dos piezas en pantallas cortas. */
+  .copia--salida {
+    top: calc(var(--barra) + clamp(1rem, 4vh, 2.5rem));
+    bottom: auto;
+  }
+  .globo {
+    inset: auto 0 0 0;
+    height: min(46vh, 100vw);
+  }
+}
+
+/* ====================================================== LA FICHA DEL GLOBO ===
+   Modulo 3. Al tocar un marcador, la obra de ese pais aparece aqui: en el
+   hueco de arriba a la izquierda de "Salida", que estaba vacio. No es un globo
+   con un bocadillo encima; es una foto enmarcada apoyada en la pared de la
+   nave, y el globo se queda entero.
+   ========================================================================== */
+
+.ficha {
+  position: absolute;
+  top: calc(var(--barra) + clamp(1rem, 5vh, 3rem));
+  left: var(--sc-gutter);
+  /* Solo escritorio: en movil manda la regla de mas abajo, donde la ficha es
+     una banda y el ancho lo pone el hueco entre los margenes. */
+  width: clamp(15rem, 29vw, 30rem);
+  margin: 0;
+
+  /* Tarjeta, no imagen suelta. La primera version dejaba la foto a pelo y el
+     pie caia sobre la chapa ondulada de la nave: no habia forma de leer
+     "Paris, Francia". Una lamina blanca translucida le da suelo al texto y de
+     paso hace que la pieza se lea apoyada delante de la foto. */
+  padding: clamp(0.4rem, 0.9vw, 0.6rem);
+  background: color-mix(in oklab, var(--sc-surface) 90%, transparent);
+  backdrop-filter: blur(12px);
+  border-radius: 3px;
+  box-shadow:
+    0 0.15rem 0.4rem hsl(var(--sc-shadow-color) / 0.16),
+    0 1.4rem 2.6rem hsl(var(--sc-shadow-color) / 0.28);
+  /* Recibe el clic aunque el resto de la copia no: el bloque activo esta en
+     'auto' y la ficha lo hereda. Sin esto no se podria ni seleccionar el pie. */
+  pointer-events: inherit;
+
+  /* Estado inicial: ni se ve ni ocupa. `visibility` ademas la saca del orden
+     de tabulacion, que con opacity 0 a secas seguiria ahi. */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(0.75rem);
+  transition: opacity 320ms ease, transform 320ms ease, visibility 0s linear 320ms;
+}
+.ficha[data-estado="llena"] {
+  opacity: 1;
+  visibility: visible;
+  transform: none;
+  transition: opacity 320ms ease, transform 320ms ease, visibility 0s;
+}
+
+/* El marco: proporcion fija, asi que la ficha no pega un salto de alto al
+   cambiar de un retrato a un apaisado. Lo que se adapta es la foto, con cover. */
+.ficha__marco {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;                 /* las laminas entran y salen por aqui */
+  background: color-mix(in oklab, var(--sc-ink) 8%, transparent);
+  border-radius: 2px;
+}
+/* Filo oscuro finisimo: sin el, una foto clara se derrama sobre el blanco de
+   la tarjeta y el marco desaparece. */
+.ficha__marco::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 1px solid hsl(var(--sc-shadow-color) / 0.22);
+  border-radius: inherit;
+}
+
+/* Una lamina = una foto. Durante el cambio hay dos a la vez, la que se va y la
+   que entra, y por eso van en absoluto una encima de otra. */
+.ficha__lamina {
+  position: absolute;
+  inset: 0;
+  transition: transform 380ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+.ficha__lamina img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* Posiciones de la coreografia. El JS mueve la clase, el CSS pone el sitio. */
+.ficha__lamina--entra { transform: translateX(100%); }
+.ficha__lamina--sale  { transform: translateX(-100%); }
+
+.ficha__pie {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin: var(--sc-3) 0.15rem calc(var(--sc-2) - 0.1rem);
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sc-ink);
+  /* El pie viaja con su foto: se desvanece y vuelve en el mismo tiempo que
+     dura el deslizamiento, para que ciudad y foto cambien a la vez. */
+  transition: opacity 190ms ease;
+}
+.ficha__pie b { font-weight: 500; }
+.ficha__pie span { color: var(--sc-accent); }
+.ficha[data-cambiando="si"] .ficha__pie { opacity: 0; }
+
+/* Quien pide menos movimiento no ve deslizarse nada: la foto se cambia y ya. */
+@media (prefers-reduced-motion: reduce) {
+  .ficha,
+  .ficha__lamina,
+  .ficha__pie { transition: none; }
+  .ficha__lamina--entra,
+  .ficha__lamina--sale { transform: none; }
+}
+
+/* La lista de los doce paises: invisible, pero enfocable con el tabulador.
+   Mismo patron que .sr, con la diferencia de que al recibir el foco el boton
+   sale a la vista — un foco que no se ve no sirve de nada. */
+.globo__indice {
+  position: absolute;
+  /* Justo por debajo del chrome. En 0,0 el boton enfocado salia detras de la
+     barra fija y el anillo de foco no se veia: un foco invisible es lo mismo
+     que no tener foco. */
+  top: calc(var(--barra) + 0.5rem);
+  left: var(--sc-gutter);
+  margin: 0; padding: 0;
+  list-style: none;
+  pointer-events: inherit;
+  z-index: 2;
+}
+.globo__indice span,
+.globo__indice button {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.globo__indice button:focus-visible {
+  position: static;
+  width: auto; height: auto;
+  clip-path: none;
+  display: inline-block;
+  margin: 0 0 0.25rem;
+  padding: 0.45rem 0.8rem;
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.06em;
+  color: var(--sc-ink);
+  background: var(--sc-surface);
+  border: 1px solid var(--sc-accent);
+  border-radius: 2px;
+  outline: 2px solid var(--sc-accent);
+  outline-offset: 2px;
+  cursor: pointer;
+}
+
+@media (max-width: 860px) {
+  /* En vertical no hay hueco al lado: la ficha se mete en la franja que queda
+     entre el texto y el globo, y para eso deja de ser una tarjeta vertical y
+     pasa a ser una banda con la foto a la izquierda. */
+  /* Se ancla por ARRIBA, no al borde del globo. Colgarla del globo la hacia
+     subir cuando la tarjeta crecia, y en pantallas cortas se metia dentro del
+     parrafo. Anclada arriba, lo que nunca se pisa es el texto; si en un movil
+     muy bajo hay que ceder algo, cede contra el aire que el globo tiene sobre
+     la esfera, que es espacio vacio. */
+  .ficha {
+    top: clamp(20rem, 40vh, 22rem);
+    bottom: auto;
+    left: var(--sc-gutter);
+    right: var(--sc-gutter);
+    width: auto;
+    display: grid;
+    grid-template-columns: clamp(4.5rem, 22vw, 6rem) 1fr;
+    align-items: center;
+    gap: var(--sc-4);
+  }
+  .ficha__marco { aspect-ratio: 1 / 1; }
+  .ficha__pie { margin: 0; }
+}

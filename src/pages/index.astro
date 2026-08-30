@@ -2,6 +2,7 @@
 import Base from "../layouts/Base.astro";
 import { sedes } from "../data/montesinos.js";
 import { maderas } from "../data/maderas.js";
+import { paisesGlobo } from "../data/montesinos.js";
 
 const titulo = "Ebanistería Montesinos — Más de 40 años fabricando mobiliario a medida";
 const desc =
@@ -175,7 +176,7 @@ const desc =
         <div data-sc-copy data-sc-window="0.5908 0.8168 0.30 0.20">
           <div class="copia copia--centro" data-entrada="abre">
             <p class="copia__eti">Escala 1:1</p>
-            <h2>Tu tienda, montada entera aquí dentro, antes de existir.</h2>
+            <h2>Tu tienda, montada entera en el taller, antes de existir</h2>
             <p>
               Premontamos el mobiliario a escala 1:1 en nuestras instalaciones y
               espacios comerciales. El cliente ve el producto finalizado, con sus
@@ -185,7 +186,44 @@ const desc =
         </div>
 
         <div data-sc-copy data-sc-window="0.8354 1 0.34 0.06">
-          <div class="copia" data-entrada="izquierda">
+          <!-- El globo vive DENTRO del bloque de copia de Salida, igual que el
+               sello vive dentro del de la nave: asi el motor lo enciende y lo
+               apaga con esta parada y no hay que sincronizar nada aparte.
+               El div esta vacio a proposito: globe.gl le cuelga dentro su
+               propio <canvas>. -->
+          <div class="globo" id="globo-salida" aria-hidden="true"></div>
+
+          <!-- La ficha del proyecto. Vive en el hueco de arriba a la izquierda,
+               que hasta ahora estaba vacio: el texto ocupa la banda de abajo y
+               el globo la mitad derecha.
+
+               Nace vacia y sin ocupar sitio (data-estado="vacio"), y no se
+               llena hasta que alguien toca un marcador.
+
+               aria-live va en el pie y no en toda la ficha: si envolviera
+               tambien las laminas, cada entrada y salida de la animacion
+               contaria como un cambio y el lector de pantalla leeria dos veces
+               por clic. -->
+          <figure class="ficha" id="ficha-globo" data-estado="vacio">
+            <div class="ficha__marco" id="ficha-laminas"></div>
+            <figcaption class="ficha__pie" id="ficha-pie" aria-live="polite"></figcaption>
+          </figure>
+
+          <!-- globe.gl pinta los marcadores dentro de un <canvas>: no hay nada
+               que tabular. Esta lista es el mismo mapa en HTML, invisible pero
+               enfocable, y dispara exactamente la misma funcion que el clic. -->
+          <ul class="globo__indice">
+            <li><span id="globo-indice-t">Proyectos en el globo</span></li>
+            {paisesGlobo.map((q) => (
+              <li>
+                <button type="button" data-pais={q.pais}>
+                  Ver el proyecto de {q.ciudad}, {q.pais}
+                </button>
+              </li>
+            ))}
+          </ul>
+
+          <div class="copia copia--salida" data-entrada="izquierda">
             <p class="copia__eti">Salida</p>
             <h2>Más de diez países en los últimos diez años.</h2>
             <p>
@@ -203,6 +241,490 @@ const desc =
     <!-- Recorrido del cierre. -->
     <div class="pista" id="pista-cierre" aria-hidden="true"></div>
   </main>
+
+
+  <!-- ===================================================== EL GLOBO ======
+       El globo de la parada "Salida": gira solo, se arrastra, lleva los doce
+       marcadores y la ficha de cada obra.
+
+       Va en un <script> de Astro (no en public/montesinos.js) porque globe.gl
+       es una dependencia npm y necesita pasar por el bundler.
+  -->
+  <script>
+    import { paisesGlobo } from "../data/montesinos.js";
+
+    const caja = document.getElementById("globo-salida");
+
+    // ------------------------------------------------- cuando se carga ----
+    // globe.gl + three + las texturas son, con diferencia, lo mas pesado de
+    // esta pagina. Con un import estatico se descargaban al abrir la home,
+    // aunque el visitante no bajara del armario de la portada. Con import()
+    // dinamico, Astro los saca a su propio trozo y no se pide hasta que hace
+    // falta.
+    //
+    // El disparo NO es "cuando la seccion se ve": la seccion vive en un lienzo
+    // fijo, siempre esta tecnicamente en pantalla, y ademas llegar con el globo
+    // a medio formar seria justo lo que se quiere evitar. Se dispara al entrar
+    // en el recorrido del mundo, con el umbral pasado: desde ahi quedan varias
+    // pantallas de scroll hasta Salida, tiempo de sobra para que llegue el
+    // codigo y las texturas. Quien no baja del armario no descarga nada.
+    const mundo = document.querySelector('[data-sc-mode="worldflight"]');
+
+    const tocaCargar = () => {
+      if (!mundo) return true;                 // sin recorrido, se monta y ya
+      const r = mundo.getBoundingClientRect();
+      // Un poco antes de que el mundo toque el borde inferior de la ventana.
+      return r.top < innerHeight * 1.5;
+    };
+
+    const arrancar = () => {
+      if (tocaCargar()) {
+        removeEventListener("scroll", arrancar);
+        // El navegador decide el hueco: si esta ocupado pintando el scroll, la
+        // descarga y el arranque esperan a que respire. Sin pasarse: 2 s de
+        // techo bajo, 600 ms: el caso malo es que alguien salte de golpe a
+        // Salida con el mapa de la cabecera, y ahi cada decima cuenta.
+        //
+        // Hay que envolverla, no pasarla suelta: requestIdleCallback perdida su
+        // ventana (`this`) revienta con "Illegal invocation", y estos modulos
+        // van en modo estricto.
+        if (window.requestIdleCallback) requestIdleCallback(montar, { timeout: 600 });
+        else setTimeout(montar, 0);
+        return true;
+      }
+      return false;
+    };
+
+    async function montar() {
+      // Los dos trozos gordos, en paralelo.
+      const [{ default: Globe }, THREE] = await Promise.all([
+        import("globe.gl"),
+        import("three"),
+      ]);
+      // WebGL puede no estar disponible (equipos viejos, ajustes del
+      // navegador). Si no lo esta, la seccion se queda como estaba: el hueco
+      // del globo no pinta nada y el texto no se entera.
+      const globo = new Globe(caja, {
+        // alpha es lo que deja pasar la foto de la nave por detras. Sin esto
+        // el canvas pinta un rectangulo negro sobre la escena.
+        rendererConfig: { alpha: true, antialias: true },
+        animateIn: false,
+      })
+        .backgroundColor("rgba(0,0,0,0)")
+        // Blue marble: la de dia con color real de la NASA. Se sirve desde
+        // public/ y no desde el CDN de jsdelivr: es el mismo archivo (viene en
+        // el paquete three-globe) y el resto del sitio no pide nada a terceros.
+        //
+        // Reescaladas a 2048 y pasadas a webp. Las originales venian a 4096 de
+        // ancho y pesaban 1,8 MB entre las dos; la esfera ocupa como mucho unos
+        // 540 px en pantalla (1080 en una pantalla de densidad doble), o sea
+        // que del hemisferio que se ve caian ya mas de dos texels por pixel.
+        // Era el doble de resolucion de la que puede llegar a verse.
+        .globeImageUrl("/globo/earth-blue-marble-2k.webp")
+        // El relieve es lo que evita que la esfera se lea como una pegatina:
+        // le da un microsombreado a las cordilleras al girar.
+        .bumpImageUrl("/globo/earth-topology-2k.webp")
+        .showAtmosphere(true)
+        // Azul de serie. Se probo antes que el tono madera, tal como se pidio:
+        // sobre el fondo claro el halo frio despega la esfera del fondo, y en
+        // madera se confundia con la foto de la nave.
+        .atmosphereColor("lightskyblue")
+        .atmosphereAltitude(0.16);
+
+      // El relieve solo se ve si el material le da altura: bumpScale 0 (el
+      // valor de serie) deja la textura de topologia cargada pero plana.
+      //
+      // El 5-10 de los ejemplos clasicos de globe.gl aqui no hace practicamente
+      // nada: three cambio la normalizacion de bumpScale y con la r185 que
+      // trae el paquete hace falta un valor bastante mas alto. Probado a 0, 6,
+      // 12, 20, 28 y 40 sobre esta misma escena: hasta 12 apenas se distingue
+      // del plano, a 40 el Sahara y las dorsales oceanicas se pasan de
+      // repujado. 28 es donde el Atlas, los Alpes y los Andes se leen con el
+      // globo quieto y siguen pareciendo terreno y no picos de pizza.
+      globo.globeMaterial().bumpScale = 28;
+
+      // Encuadre: Europa y el Golfo de frente, que es donde caen los doce
+      // marcadores. Antes miraba al Atlantico (lat 18, lng -10) y con los
+      // puntos puestos se quedaban amontonados contra el limbo de arriba a la
+      // derecha, medio de canto. La altitude NO se toca: es la que fija el
+      // tamano de la esfera dentro de la caja.
+      globo.pointOfView({ lat: 42, lng: 16, altitude: 2.35 });
+
+      const VELOCIDAD = 0.45;  // media vuelta lenta, no un ventilador
+      const ESPERA = 3500;     // ms parado antes de retomar el giro solo
+      const RAMPA = 1400;      // ms que tarda en llegar a velocidad de crucero
+
+      const mandos = globo.controls();
+
+      // OJO con `mandos.enabled = false`: el bucle de globe.gl solo llama a
+      // controls.update() si enabled es true, y ese update() es quien apunta
+      // la camara al centro del globo Y quien aplica la autorrotacion. Con los
+      // mandos apagados del todo la esfera sale descentrada y quieta. Lo que
+      // se apaga es cada gesto por separado.
+      mandos.enableRotate = true;
+      mandos.enableZoom = false;  // ni acercar ni alejar: el globo no se mueve de su sitio
+      mandos.enablePan = false;   // ni desplazar el centro
+      // Inercia: al soltar el globo no se para en seco, sigue un poco. Es lo
+      // que hace que el gesto se sienta fisico en vez de una polea.
+      mandos.enableDamping = true;
+      mandos.dampingFactor = 0.09;
+
+      // La rueda del raton NO la captura OrbitControls mientras enableZoom sea
+      // false (sale del handler antes del preventDefault), asi que la pagina
+      // sigue haciendo scroll aunque el puntero este encima del globo.
+      //
+      // El tacto si hay que corregirlo: OrbitControls pone touchAction:'none'
+      // al conectarse, y eso dejaria media pantalla del movil sin poder pasar
+      // de seccion con el dedo. Con 'pan-y' el navegador se queda los gestos
+      // verticales (scroll de la pagina) y al globo le llegan los
+      // horizontales, que es justo como se gira un globo.
+      globo.renderer().domElement.style.touchAction = "pan-y";
+
+      // La autorrotacion nunca se apaga: lo que se mueve es su VELOCIDAD. Un
+      // interruptor daria el arranque brusco que se queria evitar; una rampa
+      // de 0 a 0.45 no se nota empezar.
+      mandos.autoRotate = true;
+      mandos.autoRotateSpeed = VELOCIDAD;
+
+      let espera = 0;   // temporizador de los 3,5 s
+      let rampa = 0;    // rAF de la rampa de velocidad
+
+      const parar = () => {
+        clearTimeout(espera);
+        cancelAnimationFrame(rampa);
+        mandos.autoRotateSpeed = 0;
+      };
+
+      const acelerar = () => {
+        const t0 = performance.now();
+        const paso = (t) => {
+          const k = Math.min(1, (t - t0) / RAMPA);
+          // easeInOutCubic: sale de cero sin tiron y entra en crucero sin tope
+          const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+          mandos.autoRotateSpeed = VELOCIDAD * e;
+          if (k < 1) rampa = requestAnimationFrame(paso);
+        };
+        rampa = requestAnimationFrame(paso);
+      };
+
+      // OrbitControls emite 'start' al empezar cualquier gesto y 'end' al
+      // soltar. Se cuelga de ahi en vez de de los eventos de puntero del
+      // canvas porque asi vale igual para raton y para dedo, y no hay que
+      // adivinar cuando termina de verdad el gesto.
+      mandos.addEventListener("start", () => {
+        parar();
+        // El hover se congela mientras dura el gesto (hoverDuringDrag es false),
+        // asi que si no se limpia aqui la manita se quedaria pegada todo el
+        // arrastre.
+        caja.classList.remove("globo--senalando");
+        caja.classList.add("globo--agarrado");
+      });
+      mandos.addEventListener("end", () => {
+        caja.classList.remove("globo--agarrado");
+        clearTimeout(espera);
+        espera = setTimeout(acelerar, ESPERA);
+      });
+
+      // ---------------------------------------------------- LOS MARCADORES ---
+      // Sprites en `customLayerData`, no la capa `pointsData` de la libreria.
+      // El cambio lo obliga el halo: un punto de pointsData es un cilindro con
+      // MeshLambertMaterial y ahi no hay forma de poner un anillo ni un
+      // resplandor. Un sprite lleva su propia textura, asi que el nucleo, el
+      // aro y el degradado se dibujan de una vez en un canvas.
+      //
+      // De regalo, el sprite no lo toca la luz: antes los marcadores del
+      // terminador salian apagados porque el material Lambert los sombreaba
+      // como al resto del planeta. Ahora los doce tienen el mismo blanco
+      // esten donde esten.
+      //
+      // Lo que NO cambia: sigue siendo geometria 3D dentro del canvas, asi que
+      // el gesto de arrastre le llega igual a OrbitControls y la esfera sigue
+      // tapando los marcadores de la otra cara.
+      const NUCLEO = "255, 250, 242";  // marfil
+      const ALTURA = 0.010;            // despegado de la superficie: sin esto parpadea
+
+      // Tamano en unidades de mundo (el globo tiene radio 100). El sprite
+      // completo mide TAMANO; el nucleo solido ocupa solo su parte central,
+      // el resto es aro y desvanecido.
+      const TAMANO = 9.5;
+      const TAMANO_HOVER = 13;
+
+      // La textura: nucleo marfil de borde limpio, un aro fino pegado a el y un
+      // resplandor que se apaga hacia fuera.
+      //
+      // El borde del nucleo se deja DURO a proposito. Un degradado desde el
+      // centro haria el punto bonito pero impreciso, y estos marcadores dicen
+      // "aqui hay una obra": tienen que tener un sitio exacto. Lo difuso es
+      // solo el halo de alrededor, que no marca posicion, solo separa del
+      // terreno.
+      const hacerTextura = (nitidez, aro) => {
+        const L = 256, c = document.createElement("canvas");
+        c.width = c.height = L;
+        const g = c.getContext("2d");
+        const m = L / 2;
+
+        // 1. resplandor exterior
+        const brillo = g.createRadialGradient(m, m, L * 0.16, m, m, m);
+        brillo.addColorStop(0,    `rgba(${NUCLEO}, ${0.42 * nitidez})`);
+        brillo.addColorStop(0.45, `rgba(${NUCLEO}, ${0.16 * nitidez})`);
+        brillo.addColorStop(1,    `rgba(${NUCLEO}, 0)`);
+        g.fillStyle = brillo;
+        g.beginPath(); g.arc(m, m, m, 0, Math.PI * 2); g.fill();
+
+        // 2. sombra fina justo por fuera del nucleo. Es lo que separa el punto
+        //    cuando el terreno de detras tambien es claro (el Sahara, el hielo):
+        //    contra el mar bastaba el resplandor, contra la arena no.
+        g.strokeStyle = "rgba(38, 30, 18, 0.30)";
+        g.lineWidth = L * 0.035;
+        g.beginPath(); g.arc(m, m, L * 0.175, 0, Math.PI * 2); g.stroke();
+
+        // 3. aro. Marfil de serie; en el marcador elegido pasa al laton de la
+        //    marca, que es lo que dice "este es el que estas viendo" sin tocar
+        //    el nucleo blanco que da el contraste.
+        g.strokeStyle = aro || `rgba(${NUCLEO}, ${0.85 * nitidez})`;
+        g.lineWidth = L * 0.030;
+        g.beginPath(); g.arc(m, m, L * 0.150, 0, Math.PI * 2); g.stroke();
+
+        // 4. nucleo solido
+        g.fillStyle = `rgba(${NUCLEO}, 1)`;
+        g.beginPath(); g.arc(m, m, L * 0.128, 0, Math.PI * 2); g.fill();
+
+        const t = new THREE.CanvasTexture(c);
+        t.colorSpace = THREE.SRGBColorSpace;
+        return t;
+      };
+
+      const TAMANO_ELEGIDO = 13.5;
+
+      // Tres texturas y no una con el color cambiado: entre reposo y hover no
+      // solo cambia el tamano, tambien sube el halo, y eso no se consigue
+      // escalando. La tercera lleva el aro de laton del elegido.
+      const texReposo = hacerTextura(1);
+      const texHover = hacerTextura(1.5);
+      const texElegido = hacerTextura(1.5, "rgba(214, 158, 66, 0.98)");
+
+      let marcado = null;              // el marcador bajo el cursor, o null
+      let elegido = null;              // el marcador cuya obra esta en la ficha
+      const spriteDe = new Map();      // dato -> su sprite, para vestirlo al vuelo
+
+      const vestir = (sprite, d) => {
+        // El elegido manda sobre el senalado: si se pasa el cursor por encima
+        // de otro, el que esta en la ficha no debe perder su aro.
+        const esElegido = d === elegido;
+        const esMarcado = d === marcado;
+        sprite.material.map = esElegido ? texElegido : esMarcado ? texHover : texReposo;
+        sprite.material.needsUpdate = true;
+        const t = esElegido ? TAMANO_ELEGIDO : esMarcado ? TAMANO_HOVER : TAMANO;
+        sprite.scale.set(t, t, 1);
+      };
+
+      const revestir = (...datos) => {
+        for (const d of datos) {
+          const sprite = d && spriteDe.get(d);
+          if (sprite) vestir(sprite, d);
+        }
+      };
+
+      globo
+        .customLayerData([])     // se rellenan cuando el globo esta listo
+        .customThreeObject((d) => {
+          const sprite = new THREE.Sprite(new THREE.SpriteMaterial({
+            map: texReposo,
+            transparent: true,
+            depthWrite: false,  // el halo translucido no debe tapar a su vecino
+          }));
+          spriteDe.set(d, sprite);
+          vestir(sprite, d);
+          return sprite;
+        })
+        .customThreeObjectUpdate((sprite, d) => {
+          spriteDe.set(d, sprite);
+          Object.assign(sprite.position, globo.getCoords(d.lat, d.lng, ALTURA));
+          vestir(sprite, d);
+        })
+        .customLayerLabel(() => "")  // sin tooltip: el popup es el modulo 3
+        .onCustomLayerHover((obj) => {
+          if (obj === marcado) return;
+          const previo = marcado;
+          marcado = obj;
+          // Se toca solo el sprite que entra y el que sale, por su referencia.
+          // La via "oficial" seria reasignar el accesor para que la capa se
+          // repase entera, pero kapsule compara por identidad y devolverle la
+          // MISMA funcion no le parece un cambio: no repintaba nada. Ademas
+          // rearmar los doce para encender uno es tirar trabajo.
+          revestir(previo, obj);
+          // 'pointer' sobre el marcador, 'grab' sobre el resto del globo: se
+          // distingue a simple vista girar de senalar. Va por clase y no por
+          // style.cursor porque un estilo en linea le ganaria a
+          // .globo--agarrado, y al empezar a girar desde encima de un punto el
+          // cursor se quedaria en manita en vez de pasar a puno cerrado.
+          caja.classList.toggle("globo--senalando", !!obj);
+        });
+
+      // El hover no se dispara mientras se arrastra: three-render-objects trae
+      // `hoverDuringDrag` a false de serie, asi que girar el globo pasando por
+      // encima de los puntos no los enciende ni cambia el cursor.
+
+      // Los doce entran cuando la textura del planeta ya esta puesta, no antes:
+      // apareciendo sobre una esfera todavia gris se leerian como un error de
+      // carga.
+      // ------------------------------------------------------- LA FICHA ----
+      const ficha = document.getElementById("ficha-globo");
+      const laminas = document.getElementById("ficha-laminas");
+      const pie = document.getElementById("ficha-pie");
+      const SUAVE = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+      const hacerLamina = (d) => {
+        const lamina = document.createElement("div");
+        lamina.className = "ficha__lamina";
+        const img = document.createElement("img");
+        img.src = d.img;
+        img.alt = `Proyecto de Ebanistería Montesinos en ${d.ciudad}, ${d.pais}`;
+        img.decoding = "async";
+        lamina.append(img);
+        return lamina;
+      };
+
+      const mostrar = (d) => {
+        if (!d || d === elegido) return;
+
+        const previo = elegido;
+        elegido = d;
+        revestir(previo, d);
+
+        const saliente = laminas.lastElementChild;
+        const entrante = hacerLamina(d);
+
+        const escribirPie = () => {
+          pie.replaceChildren();
+          pie.append(Object.assign(document.createElement("b"), { textContent: d.ciudad }));
+          pie.append(Object.assign(document.createElement("span"), { textContent: d.pais }));
+        };
+
+        if (SUAVE.matches || !saliente) {
+          // Sin deslizamiento: la lamina vieja se va y la nueva ya esta puesta.
+          laminas.replaceChildren(entrante);
+          escribirPie();
+          ficha.dataset.estado = "llena";
+          return;
+        }
+
+        // La que se va deja de contar para el lector de pantalla en cuanto
+        // empieza a salir: durante 380 ms hay dos fotos en el DOM y solo una
+        // es la actual.
+        saliente.setAttribute("aria-hidden", "true");
+
+        entrante.classList.add("ficha__lamina--entra");
+        laminas.append(entrante);
+        ficha.dataset.cambiando = "si";   // el pie se desvanece
+
+        // Dos fotogramas de margen: uno no basta para que el navegador
+        // registre la posicion de partida, y sin posicion de partida no hay
+        // transicion, hay salto.
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          entrante.classList.remove("ficha__lamina--entra");
+          saliente.classList.add("ficha__lamina--sale");
+          // A mitad del recorrido, cuando el pie ya se ha ido, se cambia el
+          // texto y vuelve: asi ciudad y foto cambian a la vez y no se lee el
+          // pie viejo sobre la foto nueva.
+          setTimeout(() => {
+            escribirPie();
+            ficha.dataset.cambiando = "no";
+          }, 190);
+        }));
+
+        saliente.addEventListener("transitionend", () => saliente.remove(), { once: true });
+        ficha.dataset.estado = "llena";
+      };
+
+      // El clic NO va por onCustomLayerClick. La libreria dispara ese callback
+      // con el objeto que tenia bajo el cursor la ultima vez que paso el
+      // raycaster, y ese raycaster va a 50 ms: haciendo clic nada mas llegar
+      // encima de un marcador se abria la ficha del ANTERIOR. Y en tactil es
+      // peor, porque sin cursor no hay hover que precargar y un toque podia no
+      // abrir nada.
+      //
+      // Asi que la diana se decide aqui, con la geometria en la mano: se
+      // proyectan los doce a pantalla y gana el mas cercano al punto tocado.
+      // Doce proyecciones por clic no le cuestan nada a nadie.
+      const RADIO_TOQUE = 26; // px de holgura alrededor del centro del marcador
+
+      const marcadorEn = (x, y) => {
+        const caj = caja.getBoundingClientRect();
+        const cam = globo.camera().position;
+        let mejor = null, mejorDist = RADIO_TOQUE;
+        for (const d of globo.customLayerData()) {
+          const w = globo.getCoords(d.lat, d.lng, 0);
+          // Solo el hemisferio que mira a la camara. Sin este filtro, un
+          // marcador de la cara oculta se proyecta igual sobre la pantalla y
+          // podria robarle el clic al que se ve de verdad.
+          if (w.x * cam.x + w.y * cam.y + w.z * cam.z <= 100 * 100) continue;
+          const s = globo.getScreenCoords(d.lat, d.lng, ALTURA);
+          const dist = Math.hypot(caj.left + s.x - x, caj.top + s.y - y);
+          if (dist < mejorDist) { mejorDist = dist; mejor = d; }
+        }
+        return mejor;
+      };
+
+      // Un toque es un toque solo si el dedo (o el raton) no se ha movido: si
+      // se ha movido, el visitante estaba girando el globo, no senalando.
+      let origenToque = null;
+      caja.addEventListener("pointerdown", (e) => { origenToque = { x: e.clientX, y: e.clientY }; });
+      caja.addEventListener("pointerup", (e) => {
+        if (!origenToque) return;
+        const arrastro = Math.hypot(e.clientX - origenToque.x, e.clientY - origenToque.y) > 6;
+        origenToque = null;
+        if (!arrastro) mostrar(marcadorEn(e.clientX, e.clientY));
+      });
+
+      // El mismo disparo desde el teclado. La lista de botones esta pintada por
+      // Astro con los mismos datos, asi que basta con casar por nombre de pais.
+      //
+      // Y antes de nada, llevar al visitante hasta la parada. Esta seccion vive
+      // en un recorrido de scroll: sus botones se pueden enfocar desde
+      // cualquier punto de la pagina, y sin esto alguien que navega con el
+      // tabulador estaria abriendo fichas de un globo que no tiene delante. Al
+      // recibir el foco se dispara el mismo salto que el "Salida" del mapa de
+      // la cabecera; se reutiliza ese boton en vez de recalcular la posicion,
+      // que ya la sabe montesinos.js.
+      const bloque = ficha.closest("[data-sc-copy]");
+      const irASalida = [...document.querySelectorAll("#mapa button")]
+        .find((b) => b.textContent.trim().toLowerCase() === "salida");
+
+      for (const boton of document.querySelectorAll(".globo__indice button")) {
+        boton.addEventListener("focus", () => {
+          if (irASalida && +getComputedStyle(bloque).opacity < 0.9) irASalida.click();
+        });
+        boton.addEventListener("click", () =>
+          mostrar(paisesGlobo.find((q) => q.pais === boton.dataset.pais)));
+      }
+
+      globo.onGlobeReady(() => {
+        globo.customLayerData(paisesGlobo);
+        // Senal de "ya esta formado y responde". No la usa ningun estilo: esta
+        // para poder medir desde fuera cuanto tarda el globo en estar listo sin
+        // tener que instrumentar el codigo cada vez (ver PENDIENTES.md).
+        caja.dataset.listo = "si";
+      });
+
+      // globe.gl arranca con el tamano de la ventana, no con el del div. Aqui
+      // el div es media pantalla, asi que hay que medirlo y volver a medirlo
+      // cada vez que cambie (rotar el movil, redimensionar la ventana).
+      const medir = () => {
+        const r = caja.getBoundingClientRect();
+        if (r.width > 0 && r.height > 0) {
+          globo.width(r.width).height(r.height);
+        }
+      };
+      medir();
+      new ResizeObserver(medir).observe(caja);
+      // Gancho para los scripts de lab/ (getScreenCoords de cada marcador,
+      // estado de los mandos...). Astro lo elimina del build de produccion.
+      if (import.meta.env.DEV) window.__globo = globo;
+    }
+
+    if (caja && !arrancar()) addEventListener("scroll", arrancar, { passive: true });
+  </script>
 
   <!-- ===================================================== EL CIERRE ======
        Las puertas vuelven a cerrarse por delante. En su cara interior, la que
