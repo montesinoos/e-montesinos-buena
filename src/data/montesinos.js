@@ -109,6 +109,19 @@ export const acabados = [
   "Barnizados",
 ];
 
+// El contacto directo. El CTA del chrome y el botón flotante de WhatsApp salen
+// de aquí, para que el número y el mensaje se toquen en un solo sitio.
+//
+// ⚠️ DATO PENDIENTE: el móvil de WhatsApp no lo tenemos. Los teléfonos de las
+// sedes son fijos y wa.me no funciona con un fijo, así que aquí va un número de
+// ejemplo hasta que el cliente dé el bueno.
+export const contactoDirecto = {
+  ctaTexto: "Pedir presupuesto",
+  ctaHref: "/contacto#nombre",
+  whatsappTel: "34600000000",
+  whatsappMensaje: "Hola, me gustaría pedir un presupuesto orientativo para un proyecto de mueble a medida.",
+};
+
 export const paginas = [
   { href: "/", t: "Inicio" },
   { href: "/proyectos", t: "Proyectos" },

@@ -119,9 +119,40 @@
 .chrome[data-menu="abierto"] .chrome__hamb-i::before { transform: translateY(6px) rotate(45deg); }
 .chrome[data-menu="abierto"] .chrome__hamb-i::after  { transform: translateY(-6px) rotate(-45deg); }
 
+/* ---- la punta derecha: recorrido (si lo hay) + CTA ---- */
+.chrome__fin {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: var(--sc-4);
+  min-width: 0;
+}
+
+/* El CTA. Es el único botón de la barra: se lee como botón, no como un enlace
+   más del menú. Va siempre, haya recorrido o no. */
+.chrome__cta {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: var(--sc-r-pill);
+  background: var(--sc-ink);
+  color: var(--sc-canvas);
+  font-family: var(--sc-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--sc-d-fast) var(--sc-ease-out),
+              transform var(--sc-d-fast) var(--sc-ease-out);
+}
+.chrome__cta:hover { background: var(--sc-accent); color: var(--sc-accent-ink); }
+.chrome__cta:active { transform: translateY(1px); }
+
 /* ---- el mapa de la nave: solo en la home ---- */
 .mapa {
-  justify-self: end;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -151,7 +182,9 @@
 .mapa button[aria-current="true"] { color: var(--sc-accent); }
 .mapa button[aria-current="true"]::before { opacity: 1; background: var(--sc-accent); }
 .mapa .txt { display: none; }
-@media (min-width: 1200px) { .mapa .txt { display: inline; } }
+/* Los rótulos del recorrido esperan a que la barra tenga ancho de sobra:
+   la punta derecha la comparten ahora con el CTA. */
+@media (min-width: 1400px) { .mapa .txt { display: inline; } }
 
 @media (max-width: 860px) {
   /* Aquí no hay ancho para centrar nada: el menú vuelve a la derecha y, si aun
@@ -159,10 +192,15 @@
      minmax(0,1fr) es lo que deja encoger la columna: 1fr a secas tiene un
      mínimo automático del tamaño del contenido y desborda la barra. */
   .chrome {
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
     gap: var(--sc-3);
     padding-inline: var(--sc-4);
   }
+  /* Aquí no cabe "Pedir presupuesto" entero, pero el botón no se esconde en el
+     desplegable: se queda en la barra con el rótulo corto. */
+  .chrome__fin { gap: var(--sc-3); max-width: 100%; }
+  .chrome__cta { padding: 0.45rem 0.7rem; font-size: 0.5625rem; letter-spacing: 0.06em; }
+  .chrome__cta-larga { display: none; }
   .chrome nav {
     justify-self: end;
     min-width: 0;
@@ -186,11 +224,19 @@
   .chrome--home { grid-template-columns: auto minmax(0, 1fr) auto; }
   .chrome--home .chrome__marca { grid-area: 1 / 1; }
   .chrome--home .chrome__hamb  { grid-area: 1 / 3; display: flex; }
+  /* La punta derecha ocupa toda la columna del medio: si se dejara al ancho
+     de su contenido, el recorrido se montaría sobre el logotipo en vez de
+     deslizarse. El CTA se queda pegado al borde y el recorrido encoge. */
+  .chrome--home .chrome__fin {
+    grid-area: 1 / 2;
+    justify-self: stretch;
+    justify-content: flex-end;
+    min-width: 0;
+  }
 
   .chrome--home .mapa {
-    grid-area: 1 / 2;
     display: flex;
-    justify-self: end;
+    flex: 0 1 auto;
     min-width: 0;
     max-width: 100%;
     gap: 0.15rem;
@@ -255,6 +301,47 @@
 @media (max-width: 860px) and (prefers-reduced-motion: reduce) {
   .chrome--home nav { transition: none; }
   .chrome--home[data-menu="cerrado"] nav { transform: none; }
+}
+
+/* ---- el botón flotante de WhatsApp ----
+   Va por encima del umbral y del cierre (40 y 50): esos dos son pantalla
+   completa, y un botón de contacto que desaparece media web no sirve. */
+.wasap {
+  position: fixed;
+  right: var(--sc-4);
+  bottom: var(--sc-4);
+  z-index: 61;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 0.95rem;
+  border-radius: var(--sc-r-pill);
+  border: 1px solid var(--sc-hairline);
+  background: color-mix(in oklab, var(--sc-canvas) 94%, transparent);
+  backdrop-filter: blur(12px) saturate(1.15);
+  color: var(--sc-ink);
+  font-family: var(--sc-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 0.4rem 1.4rem rgba(0,0,0,0.14);
+  transition: transform var(--sc-d-base) var(--sc-ease-out),
+              border-color var(--sc-d-fast) var(--sc-ease-out);
+}
+.wasap:hover { transform: translateY(-2px); border-color: var(--sc-accent); }
+/* El verde de WhatsApp es el único color de fuera de la paleta que había en
+   toda la web. El icono se reconoce por su silueta, así que va en el latón. */
+.wasap svg { width: 1.15rem; height: 1.15rem; flex-shrink: 0; color: var(--sc-accent); }
+
+/* En móvil se queda en icono: ahí abajo el ancho es del contenido. */
+@media (max-width: 640px) {
+  .wasap { padding: 0.7rem; }
+  .wasap__txt { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .wasap { transition: none; }
+  .wasap:hover { transform: none; }
 }
 
 /* ============================================================ EL UMBRAL ===

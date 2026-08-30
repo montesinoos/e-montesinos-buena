@@ -1,5 +1,6 @@
 ---
-import { paginas } from "../data/montesinos.js";
+import { paginas, contactoDirecto } from "../data/montesinos.js";
+import BotonWhatsApp from "../components/BotonWhatsApp.astro";
 interface Props { titulo: string; desc: string; ruta: string; mapa?: boolean; }
 const { titulo, desc, ruta, mapa = false } = Astro.props;
 ---
@@ -11,6 +12,7 @@ const { titulo, desc, ruta, mapa = false } = Astro.props;
     <meta name="description" content={desc} />
     <meta name="theme-color" content="#F4F3F0" />
     <title>{titulo}</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -51,17 +53,28 @@ const { titulo, desc, ruta, mapa = false } = Astro.props;
         </ul>
       </nav>
 
-      {mapa && (
-        <ul class="mapa" id="mapa" aria-label="Recorrido por la nave">
-          <li><button type="button" aria-current="true"><span class="txt">Nave</span></button></li>
-          <li><button type="button" aria-current="false"><span class="txt">Material</span></button></li>
-          <li><button type="button" aria-current="false"><span class="txt">1:1</span></button></li>
-          <li><button type="button" aria-current="false"><span class="txt">Salida</span></button></li>
-        </ul>
-      )}
+      <!-- La punta derecha de la barra: el recorrido de la nave (solo en la
+           home, donde existen esas secciones) y, detrás de él, el CTA. El CTA
+           no depende del recorrido: cuando no hay recorrido, ocupa la zona él
+           solo. -->
+      <div class="chrome__fin">
+        {mapa && (
+          <ul class="mapa" id="mapa" aria-label="Recorrido por la nave">
+            <li><button type="button" aria-current="true"><span class="txt">Nave</span></button></li>
+            <li><button type="button" aria-current="false"><span class="txt">Material</span></button></li>
+            <li><button type="button" aria-current="false"><span class="txt">1:1</span></button></li>
+            <li><button type="button" aria-current="false"><span class="txt">Salida</span></button></li>
+          </ul>
+        )}
+        <a class="chrome__cta" href={contactoDirecto.ctaHref} aria-label={contactoDirecto.ctaTexto}>
+          <span class="chrome__cta-larga">Pedir&nbsp;</span>presupuesto
+        </a>
+      </div>
     </header>
 
     <slot />
+
+    <BotonWhatsApp />
 
     <script src="/scrollcraft.js" is:inline></script>
     <script src="/montesinos.js" is:inline></script>

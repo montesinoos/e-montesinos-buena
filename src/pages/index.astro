@@ -57,8 +57,14 @@ const desc =
         <div data-sc-segment data-sc-w="1.5" data-sc-linger="0.25" data-sc-waypoint="Nave">
           <img class="sc-world__poster" src="/mundo/nave-entrada.webp" alt="Nave de Ebanistería Montesinos, vacía, con luz de los ventanales industriales" />
         </div>
+        <!-- El fondo de Material es una superficie lisa a propósito. Aquí el
+             protagonista es el banco de muestras, que ya es madera: una foto de
+             tablones detrás ponía dos texturas de veta a competir y el widget
+             perdía. Este archivo es un MARCADOR DE POSICIÓN generado
+             (lab/gen-fondo.mjs) hasta que llegue la foto real de pared o suelo
+             del taller. Instrucciones de encuadre en README-FOTOS.md. -->
         <div data-sc-segment data-sc-w="3.4" data-sc-linger="0.3" data-sc-parada="0.16" data-sc-waypoint="Material">
-          <img class="sc-world__poster" src="/mundo/nave-materia.webp" alt="Tablas de madera maciza apiladas en rack, planchas de latón apoyadas en la pared" />
+          <img class="sc-world__poster" src="/mundo/nave-fondo-liso.webp" alt="Pared lisa del taller, sin objetos: fondo neutro para las muestras de madera" />
         </div>
         <div data-sc-segment data-sc-w="2.2" data-sc-linger="0.2" data-sc-waypoint="Uno a uno">
           <img class="sc-world__poster" src="/mundo/nave-uno-a-uno.webp" alt="Un interior comercial completo, montado a escala real, de pie en mitad de la nave" />
@@ -296,15 +302,51 @@ const desc =
       return false;
     };
 
+    // WebGL puede no estar disponible: equipos viejos, aceleracion apagada,
+    // politica de empresa. Se pregunta con un contexto de usar y tirar, que se
+    // devuelve acto seguido porque los contextos vivos estan limitados por
+    // pestana.
+    const hayWebGL = () => {
+      try {
+        if (!window.WebGLRenderingContext) return false;
+        const c = document.createElement("canvas");
+        const g = c.getContext("webgl") || c.getContext("experimental-webgl");
+        if (!g) return false;
+        const ext = g.getExtension("WEBGL_lose_context");
+        if (ext) ext.loseContext();
+        return true;
+      } catch (e) { return false; }
+    };
+
     async function montar() {
+      // La pregunta va ANTES de los import(), no despues: en una maquina sin
+      // WebGL descargar globe.gl y three seria megabyte y medio para no pintar
+      // nada. Y three escribe en consola por su cuenta antes de lanzar, asi que
+      // dejarle intentarlo ensuciaria la consola aunque se capture el fallo.
+      if (!hayWebGL()) {
+        caja.dataset.estado = "sin-webgl";
+        return;
+      }
+
       // Los dos trozos gordos, en paralelo.
       const [{ default: Globe }, THREE] = await Promise.all([
         import("globe.gl"),
         import("three"),
       ]);
-      // WebGL puede no estar disponible (equipos viejos, ajustes del
-      // navegador). Si no lo esta, la seccion se queda como estaba: el hueco
-      // del globo no pinta nada y el texto no se entera.
+
+      // El try/catch es la red de debajo, para lo que la comprobacion no puede
+      // prever: la GPU que pierde el contexto a mitad, una textura que no
+      // llega. El fallo tiene que acabar igual, con la seccion entera en pie
+      // (el texto y la lista de doce paises siguen ahi) y sin una excepcion
+      // suelta.
+      try {
+        montarGlobo(Globe, THREE);
+      } catch (e) {
+        caja.dataset.estado = "sin-webgl";
+      }
+    }
+
+    function montarGlobo(Globe, THREE) {
       const globo = new Globe(caja, {
         // alpha es lo que deja pasar la foto de la nave por detras. Sin esto
         // el canvas pinta un rectangulo negro sobre la escena.

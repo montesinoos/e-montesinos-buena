@@ -476,6 +476,20 @@
     });
   }
 
+  /* ------------------------------------------ el CTA cae en el formulario --
+     El CTA de la barra apunta a /contacto#nombre. El navegador baja hasta el
+     campo, pero no lo enfoca: quien llega pidiendo presupuesto ya puede
+     escribir sin tener que hacer clic. */
+  if (location.hash === '#nombre') {
+    var campoNombre = document.getElementById('nombre');
+    if (campoNombre) {
+      // Tras el salto del navegador, para no pelearnos con su propio scroll.
+      requestAnimationFrame(function () {
+        campoNombre.focus({ preventScroll: true });
+      });
+    }
+  }
+
   /* ------------------------------------------------- filtros de proyectos */
   var filtros = document.getElementById('filtros');
   if (filtros) {

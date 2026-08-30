@@ -1,0 +1,13 @@
+---
+// Botón flotante de WhatsApp. Va en el layout, así que sale en todas las
+// páginas sin que cada una tenga que acordarse de ponerlo.
+import { contactoDirecto } from "../data/montesinos.js";
+const href =
+  `https://wa.me/${contactoDirecto.whatsappTel}?text=` +
+  encodeURIComponent(contactoDirecto.whatsappMensaje);
+---
+
+<a class="wasap" href={href} target="_blank" rel="noopener" aria-label="Escribir por WhatsApp">
+  <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.29-1.39a9.9 9.9 0 0 0 4.75 1.21h.01c5.46 0 9.9-4.45 9.9-9.91C21.96 6.45 17.5 2 12.04 2zm5.8 14.02c-.24.68-1.4 1.32-1.93 1.4-.5.08-1.12.11-1.8-.11a13 13 0 0 1-1.86-.68c-3.27-1.42-5.4-4.69-5.56-4.91-.16-.22-1.33-1.76-1.33-3.36 0-1.6.84-2.38 1.14-2.71.3-.32.65-.4.87-.4h.63c.2 0 .47-.08.73.56.27.65.9 2.25.98 2.41.08.16.13.35.02.57-.1.22-.16.35-.31.54-.16.19-.33.42-.47.56-.16.16-.32.33-.14.65.19.32.83 1.37 1.79 2.22 1.23 1.1 2.27 1.44 2.59 1.6.32.16.5.13.69-.08.19-.22.8-.93 1.02-1.25.22-.32.44-.27.73-.16.3.11 1.9.9 2.22 1.06.32.16.54.24.62.38.08.14.08.79-.16 1.48z"/></svg>
+  <span class="wasap__txt">WhatsApp</span>
+</a>
