@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import { sedes } from "../data/montesinos.js";
+const sabadell = sedes[0];
 import { maderas } from "../data/maderas.js";
 import { paisesGlobo } from "../data/montesinos.js";
 
@@ -735,22 +736,38 @@ const desc =
       <div class="grabado">
         <p class="grabado__eti">Ebanistería Montesinos</p>
         <h2>Cuéntanos qué hay que resolver y te damos un presupuesto orientativo.</h2>
-        <a class="grabado__cta" href="/contacto">Pedir presupuesto</a>
+        <div class="grabado__ctas">
+          <a class="grabado__cta" href="/contacto">Pedir presupuesto</a>
+          <a class="grabado__cta grabado__cta--fantasma" href="/proyectos">Ver proyectos</a>
+        </div>
       </div>
     </div>
     <div class="hoja hoja--der">
       <div class="grabado">
         <dl class="grabado__sedes">
-          {sedes.map((s) => (
-            <div>
-              <dt>{s.ciudad} · {s.rol}</dt>
-              <dd>
-                {s.dir}, {s.cp}
-                {s.tel && (<><br /><a href={`tel:${s.telHref}`}>{s.tel}</a></>)}
-              </dd>
-            </div>
-          ))}
+          <div>
+            <dt>{sabadell.ciudad} · {sabadell.rol}</dt>
+            <dd>
+              {sabadell.dir}, {sabadell.cp}
+              {sabadell.tel && (<><br /><a href={`tel:${sabadell.telHref}`}>{sabadell.tel}</a></>)}
+            </dd>
+          </div>
         </dl>
+        <div class="grabado__mapa">
+          <iframe
+            title="Mapa de la sede de Ebanistería Montesinos en Sabadell"
+            src="https://www.google.com/maps?q=Carrer%20de%20Manso%2093-95%2C%2008205%20Sabadell%2C%20Barcelona&hl=es&z=16&output=embed"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen
+          ></iframe>
+        </div>
+        <a
+          class="grabado__mapa-enlace"
+          href="https://www.google.com/maps/search/?api=1&query=Carrer%20de%20Manso%2093-95%2C%2008205%20Sabadell%2C%20Barcelona"
+          target="_blank"
+          rel="noopener"
+        >Cómo llegar</a>
       </div>
     </div>
   </div>
