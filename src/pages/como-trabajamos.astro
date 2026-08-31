@@ -1,7 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import Pie from "../components/Pie.astro";
-import { proceso, vias, sectores } from "../data/montesinos.js";
+import { proceso, vias, sectores, contactoDirecto } from "../data/montesinos.js";
 ---
 
 <Base
@@ -9,59 +9,161 @@ import { proceso, vias, sectores } from "../data/montesinos.js";
   desc="Asesoramiento, desarrollo, premontaje a escala 1:1 en nuestras instalaciones y entrega. Fabricación sobre planos de la marca o con prototipo previo."
   ruta="/como-trabajamos"
 >
-  <main id="principal" class="pagina sc-wrap">
-    <div class="titular">
-      <p class="eti">Cómo trabajamos</p>
-      <h1>Lo ves montado antes de que salga de la nave.</h1>
-      <p>
-        Actuamos desde diferentes puntos según lo que pida cada proyecto. El paso
-        que nos distingue es el tercero.
-      </p>
-    </div>
+  <main id="principal" class="ct">
+    <!-- ------------------------------------------------------- cabecera -->
+    <section class="sc-wrap ct-cab" data-bloque="cabecera">
+      <p class="ct-eti" style="--i: 0">Cómo trabajamos · Cuatro pasos</p>
+      <h1 class="ct-cab__h">
+        <span style="--i: 1">Lo ves montado</span>
+        <span style="--i: 2">antes de que salga</span>
+        <span style="--i: 3">de la nave.</span>
+      </h1>
+      <div class="ct-cab__pie">
+        <p style="--i: 4">El proceso cambia según el encargo; el oficio, no.</p>
+      </div>
+    </section>
 
-    <ol class="pasos">
-      {proceso.map((f) => (
-        <li class={`paso${f.n === "03" ? " paso--pico" : ""}`}>
-          <span class="paso__n">{f.n}</span>
-          <h2>{f.t}</h2>
-          <p>{f.d}</p>
-        </li>
-      ))}
-    </ol>
+    <!-- -------------------------------------------------------- diagrama -->
+    <section class="sc-wrap ct-seccion" data-bloque="diagrama">
+      <h2 class="ct-eti">El proceso</h2>
+      <!-- Un solo trazo del nodo 01 al 04: cada paso tiende su tramo hasta el
+           siguiente y el disco del icono, opaco, lo tapa a su paso. En móvil la
+           rejilla se pone en vertical y el trazo con ella. -->
+      <ol class="ct-diagrama" data-diagrama data-anima>
+        {proceso.map((f, i) => (
+          <li class="ct-paso" data-paso style={`--i: ${i}`}>
+            <span class="ct-paso__icono" data-icono>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                {f.icono.map((d) => <path d={d} />)}
+              </svg>
+            </span>
+            <div class="ct-paso__texto" data-ent>
+              <span class="ct-paso__n">{f.n}</span>
+              <h3>{f.t}</h3>
+              <p>{f.d}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </section>
 
-    <figure style="margin: var(--sc-9) 0 0;">
-      <img
-        src="/mundo/nave-uno-a-uno.webp"
-        alt="Un interior comercial completo montado a escala real en mitad de la nave del taller"
-        loading="lazy"
-        style="width:100%; border-radius:2px;"
-      />
-      <figcaption class="copia__eti" style="margin-top: var(--sc-3); color: var(--sc-ink-soft);">
-        Premontaje a escala 1:1 en las instalaciones de Sabadell
-      </figcaption>
-    </figure>
-
-    <section style="margin-top: var(--sc-9);">
-      <h2 class="paso__n" style="color:var(--sc-accent); margin-bottom:var(--sc-4);">DOS VÍAS DE ENCARGO</h2>
-      <div class="dos">
-        {vias.map((v) => (
-          <article class="tarjeta">
+    <!-- ------------------------------------------------------- dos vías -->
+    <section class="sc-wrap ct-seccion" data-bloque="dos-vias">
+      <h2 class="ct-eti">Dos vías de encargo</h2>
+      <div class="ct-vias" data-anima>
+        {vias.map((v, i) => (
+          <article class="ct-via" data-via data-ent style={`--i: ${i}`}>
+            <div class="ct-via__cab">
+              <span class="ct-via__icono">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  {v.icono.map((d) => <path d={d} />)}
+                </svg>
+              </span>
+              <p class="ct-via__n">{v.n}</p>
+            </div>
             <h3>{v.t}</h3>
-            <p>{v.d}</p>
+            <p class="ct-via__d">{v.d}</p>
           </article>
         ))}
       </div>
     </section>
 
-    <section style="margin-top: var(--sc-9);">
-      <h2 class="paso__n" style="color:var(--sc-accent); margin-bottom:var(--sc-4);">PARA QUIÉN</h2>
-      <div class="dos">
-        {sectores.map((s) => (
-          <article class="tarjeta"><h3>{s.nombre}</h3></article>
+    <!-- ------------------------------------------------------ para quién -->
+    <section class="sc-wrap ct-seccion" data-bloque="para-quien">
+      <h2 class="ct-eti">Para quién</h2>
+      <ul class="ct-sectores" data-anima>
+        {sectores.map((s, i) => (
+          <li class="ct-sector" data-ent style={`--i: ${i}`} data-sector={s.img} data-rotulo={s.nombre}>
+            <span>{s.nombre}</span>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
 
-    <Pie />
+    <!-- ---------------------------------------------------------- cierre -->
+    <section class="sc-wrap ct-seccion" data-bloque="cierre">
+      <div class="ct-cierre" data-anima>
+        <p data-ent style="--i: 0">Cuéntanos el proyecto y te decimos desde qué paso entramos.</p>
+        <!-- La entrada va en el envoltorio y no en el propio botón: si el
+             botón cargara las dos cosas, la transición de entrada le ganaría en
+             especificidad al hover y lo dejaría sin elevación y con 620ms. -->
+        <span class="ct-cierre__accion" data-ent style="--i: 1">
+          <a class="ct-cierre__boton" href={contactoDirecto.ctaHref}>{contactoDirecto.ctaTexto}</a>
+        </span>
+      </div>
+
+      <Pie />
+    </section>
+
+    <!-- La vista previa que persigue al cursor en "Para quién". Vive fuera de
+         la lista porque va fija a la ventana, no al flujo. -->
+    <div class="ct-visor" data-visor aria-hidden="true">
+      <div class="ct-visor__marco">
+        <img data-visor-img alt="" />
+        <span class="ct-visor__rotulo" data-visor-rotulo></span>
+      </div>
+    </div>
   </main>
 </Base>
+
+<script>
+  // Vista previa de "Para quién": la foto de un proyecto real de esa categoría
+  // sigue al cursor con retardo, que es lo que la lee como un objeto con peso y
+  // no como un tooltip. Solo con cursor de verdad: en táctil no hay puntero al
+  // que seguir, así que no se monta nada. Con movimiento reducido aparece, pero
+  // pegada al cursor, sin persecución.
+  const visor = document.querySelector("[data-visor]");
+  const filas = [...document.querySelectorAll("[data-sector]")];
+  const conCursor = () => matchMedia("(hover: hover) and (pointer: fine)").matches;
+
+  if (visor && filas.length && conCursor()) {
+    const img = visor.querySelector("[data-visor-img]");
+    const rotulo = visor.querySelector("[data-visor-rotulo]");
+    const quieto = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const desf = { x: 26, y: 22 };
+    let destino = { x: 0, y: 0 };
+    let actual = { x: 0, y: 0 };
+    let dentro = false;
+    let raf = 0;
+
+    const colocar = () => {
+      visor.style.transform = `translate3d(${actual.x}px, ${actual.y}px, 0)`;
+    };
+    const bucle = () => {
+      actual.x += (destino.x - actual.x) * 0.14;
+      actual.y += (destino.y - actual.y) * 0.14;
+      colocar();
+      raf = dentro ? requestAnimationFrame(bucle) : 0;
+    };
+    const raton = (e) => (e.pointerType ? e.pointerType === "mouse" : true) && conCursor();
+
+    const mover = (e) => {
+      if (!raton(e)) return;
+      destino = { x: e.clientX + desf.x, y: e.clientY + desf.y };
+      if (quieto) { actual = { ...destino }; colocar(); }
+    };
+    const entrar = (e) => {
+      if (!raton(e)) return;
+      const fila = e.currentTarget;
+      const src = fila.getAttribute("data-sector");
+      rotulo.textContent = fila.getAttribute("data-rotulo") || "";
+      if (src) { img.src = src; img.style.opacity = "1"; }
+      else { img.removeAttribute("src"); img.style.opacity = "0"; }
+      destino = { x: e.clientX + desf.x, y: e.clientY + desf.y };
+      if (!dentro) { actual = { ...destino }; colocar(); }
+      dentro = true;
+      visor.classList.add("es-visible");
+      if (!quieto && !raf) raf = requestAnimationFrame(bucle);
+    };
+    const salir = () => {
+      dentro = false;
+      visor.classList.remove("es-visible");
+    };
+
+    filas.forEach((f) => {
+      f.addEventListener("pointerenter", entrar);
+      f.addEventListener("pointermove", mover);
+      f.addEventListener("pointerleave", salir);
+    });
+  }
+</script>

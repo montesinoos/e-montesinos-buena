@@ -23,6 +23,14 @@ const { titulo, desc, ruta, mapa = false } = Astro.props;
     <link rel="stylesheet" href="/tema.css" />
   </head>
   <body>
+    <script is:inline>
+      // Marca que hay JS para animar. El estado inicial de las entradas cuelga
+      // de esta clase, así que sin JS no hay clase, no hay estado inicial y la
+      // página se ve entera. Va en línea y lo antes posible para que ningún
+      // bloque llegue a pintarse en su estado final antes de esconderse.
+      document.documentElement.classList.add("mov");
+    </script>
+
     <a class="saltar" href="#principal">Saltar al contenido</a>
 
     <header class:list={["chrome", mapa && "chrome--home"]} data-menu="cerrado">
@@ -75,6 +83,32 @@ const { titulo, desc, ruta, mapa = false } = Astro.props;
     <slot />
 
     <BotonWhatsApp />
+
+    <script>
+      // Entradas por scroll, comunes a todas las páginas: cualquier bloque con
+      // [data-anima] se enciende al entrar en pantalla y se apaga al salir.
+      // El observador NO se desconecta a propósito: al salir del todo el bloque
+      // vuelve a su estado inicial, así que al pasar otra vez —bajando o
+      // subiendo— entra igual. El escalonado y las duraciones viven en el CSS,
+      // con transiciones y no keyframes: si el usuario sube y baja rápido, una
+      // transición se retoma desde donde está en vez de reiniciarse y acumular
+      // saltos. El observador no toca el scroll ni lo retrasa.
+      const bloques = [...document.querySelectorAll("[data-anima]")];
+
+      if (bloques.length) {
+        if ("IntersectionObserver" in window) {
+          const io = new IntersectionObserver(
+            (entradas) => {
+              entradas.forEach((e) => e.target.classList.toggle("es-dentro", e.isIntersecting));
+            },
+            { threshold: 0.15 }
+          );
+          bloques.forEach((b) => io.observe(b));
+        } else {
+          bloques.forEach((b) => b.classList.add("es-dentro"));
+        }
+      }
+    </script>
 
     <script src="/scrollcraft.js" is:inline></script>
     <script src="/montesinos.js" is:inline></script>

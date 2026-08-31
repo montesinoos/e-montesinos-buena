@@ -20,6 +20,12 @@
   --sc-shadow-color: 30 8% 55%;
 
   --barra: 3.75rem;   /* alto del chrome fijo */
+
+  /* Entradas de página. El suelo trae --sc-d-fast/base/slow, pensadas para UI
+     (bajo 300ms). Una entrada por scroll en una página de marca se lee mejor
+     algo más larga, y el bloque de cierre, algo más que el resto. */
+  --sc-d-entrada: 700ms;
+  --sc-d-cierre:  950ms;
 }
 
 /* La página es clara: el suelo del motor asume oscuro en un par de sitios. */
@@ -997,6 +1003,53 @@
   .paso__n { grid-row: 1 / span 2; }
 }
 
+/* ---- prensa: la fila entera es el enlace ----
+   Va sobre .paso, así que la retícula, el borde y el ritmo son los mismos que
+   en cualquier otra lista; lo único que cambia es que el elemento es un <a>.
+   Se marca como enlace toda la fila y no solo el nombre del medio para que la
+   diana sea grande y el cursor no obligue a apuntar a una palabra.
+   La URL no aparece nunca en pantalla: vive solo en el href. */
+.prensa {
+  color: inherit;
+  text-decoration: none;
+  border-radius: 2px;
+  transition: background var(--sc-d-fast) var(--sc-ease-out);
+}
+.prensa h3 { transition: color var(--sc-d-fast) var(--sc-ease-out); }
+
+/* El mismo tono que .paso--pico, para que el realce de una fila sea siempre el
+   mismo gesto en toda la casa. */
+@media (hover: hover) and (pointer: fine) {
+  .prensa:hover { background: color-mix(in oklab, var(--sc-accent) 7%, transparent); }
+  .prensa:hover h3 { color: var(--sc-accent); }
+}
+
+/* El foco de teclado rodea la fila completa, no la palabra: quien tabula ve la
+   misma diana que quien apunta con el ratón. */
+.prensa:focus-visible {
+  outline: 2px solid var(--sc-accent);
+  outline-offset: 3px;
+}
+
+/* El aviso de que detrás hay un documento, no una página. Discreto: es un dato
+   de servicio, no una etiqueta de contenido. */
+.prensa__pdf {
+  display: inline-block;
+  margin-left: 0.55rem;
+  padding: 0.1rem 0.35rem;
+  border: 1px solid var(--sc-hairline-strong);
+  border-radius: 2px;
+  font-family: var(--sc-font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.08em;
+  vertical-align: 0.08em;
+  color: var(--sc-ink-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prensa, .prensa h3 { transition-duration: 100ms; }
+}
+
 /* ---- dos columnas ---- */
 .dos {
   display: grid;
@@ -1070,6 +1123,442 @@
 }
 .pie a { color: inherit; }
 .pie a:hover { color: var(--sc-accent); }
+
+/* ====================================================== CÓMO TRABAJAMOS ===
+   Página propia: cabecera, diagrama del proceso, dos vías, para quién y
+   cierre. Cada bloque lleva su `data-bloque` en el markup para poder
+   referenciarlo desde fuera. Sin animaciones todavía: aquí solo está el
+   estado final.
+   ========================================================================== */
+
+.ct { padding-top: var(--barra); }
+.ct-eti {
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sc-accent);
+  margin: 0 0 var(--sc-5);
+}
+.ct-seccion { padding-top: clamp(4rem, 8vw, 7rem); }
+
+/* ---- cabecera ---- */
+.ct-cab { padding-block: clamp(4.5rem, 9vw, 9rem) clamp(1rem, 2vw, 2rem); }
+.ct-cab__h {
+  font-family: var(--sc-font-display);
+  font-weight: 600;
+  font-size: clamp(2.8rem, 1.9rem + 4.6vw, 5.6rem);
+  line-height: 0.98;
+  letter-spacing: var(--sc-track-tight);
+  margin: 0 0 var(--sc-6);
+  max-width: 26ch;
+}
+.ct-cab__h span { display: block; }
+.ct-cab__pie {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--sc-6) var(--sc-8);
+  align-items: end;
+  border-top: 1px solid var(--sc-hairline);
+  padding-top: var(--sc-6);
+}
+.ct-cab__pie p {
+  font-size: var(--sc-t-lg);
+  line-height: 1.45;
+  color: var(--sc-ink-soft);
+  margin: 0;
+  max-width: 46ch;
+}
+
+/* ---- diagrama del proceso ----
+   Cuatro columnas mientras quepan. El trazo no es un SVG: cada paso tiende su
+   tramo hasta el icono del siguiente, y el disco del icono, opaco y por
+   encima, lo interrumpe al pasar. */
+.ct-diagrama {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sc-6) 2.5rem;
+  margin: 0 0 clamp(1rem, 3vw, 2rem);
+  padding: 0;
+  list-style: none;
+}
+.ct-paso {
+  position: relative;
+  display: grid;
+  gap: 1.15rem;
+  align-content: start;
+}
+.ct-paso:not(:last-child)::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: 1.375rem;
+  left: 1.375rem;
+  width: calc(100% + 2.5rem);
+  height: 1px;
+  background: var(--sc-accent);
+}
+.ct-paso__icono {
+  position: relative;
+  z-index: 1;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--sc-hairline-strong);
+  border-radius: var(--sc-r-pill);
+  background: var(--sc-canvas);
+  color: var(--sc-ink);
+}
+.ct-paso__icono svg { width: 1.3rem; height: 1.3rem; }
+.ct-paso__texto { display: grid; gap: var(--sc-2); max-width: 34ch; }
+.ct-paso__n {
+  font-family: var(--sc-font-mono);
+  font-size: 0.92rem;
+  letter-spacing: 0.12em;
+  color: var(--sc-accent);
+}
+.ct-paso h3 {
+  font-family: var(--sc-font-display);
+  font-size: var(--sc-t-lg);
+  font-weight: 500;
+  letter-spacing: var(--sc-track-snug);
+  line-height: 1.12;
+  margin: 0;
+}
+.ct-paso p {
+  margin: 0;
+  font-size: var(--sc-t-sm);
+  line-height: 1.55;
+  color: var(--sc-ink-soft);
+}
+
+/* En vertical la secuencia es la misma; el trazo baja por su propio canalón y
+   el texto se aparta para dejarlo pasar. */
+@media (max-width: 900px) {
+  .ct-diagrama { grid-template-columns: minmax(0, 1fr); gap: var(--sc-6); }
+  .ct-paso:not(:last-child)::before {
+    width: 1px;
+    height: calc(100% + var(--sc-6));
+  }
+  .ct-paso__texto { padding-left: 3.25rem; max-width: none; }
+}
+
+/* ---- dos vías de encargo ---- */
+.ct-vias {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: clamp(2rem, 5vw, 4.5rem);
+}
+.ct-via {
+  display: grid;
+  gap: var(--sc-5);
+  padding: clamp(1.75rem, 3vw, 2.5rem) 0 0;
+  border-top: 1px solid var(--sc-hairline-strong);
+}
+.ct-via__cab { display: flex; align-items: center; gap: var(--sc-4); }
+.ct-via__icono {
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--sc-hairline);
+  border-radius: 2px;
+  color: var(--sc-ink);
+}
+.ct-via__icono svg { width: 1.35rem; height: 1.35rem; }
+.ct-via__n {
+  font-family: var(--sc-font-mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sc-accent);
+  margin: 0;
+}
+.ct-via h3 {
+  font-family: var(--sc-font-display);
+  font-size: var(--sc-t-xl);
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1.06;
+  margin: 0;
+  max-width: 20ch;
+}
+.ct-via__d {
+  margin: 0;
+  font-size: var(--sc-t-sm);
+  line-height: 1.6;
+  color: var(--sc-ink-soft);
+  max-width: 42ch;
+}
+
+/* ---- para quién ---- */
+.ct-sectores {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--sc-hairline-strong);
+}
+.ct-sector {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: var(--sc-5);
+  padding: clamp(1.25rem, 2.2vw, 1.9rem) 0;
+  border-bottom: 1px solid var(--sc-hairline);
+}
+.ct-sector span {
+  font-family: var(--sc-font-display);
+  font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+}
+
+/* La vista previa que persigue al cursor. Va fija a la ventana y no recibe
+   puntero: solo la mueve el script de la página. */
+.ct-visor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 55;
+  width: 31rem;
+  max-width: 42vw;
+  pointer-events: none;
+  opacity: 0;
+  scale: 0.95;
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+  transition: opacity var(--sc-d-base) var(--sc-ease-out),
+              scale var(--sc-d-base) var(--sc-ease-out);
+}
+.ct-visor.es-visible { opacity: 1; scale: 1; }
+.ct-visor__marco {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: clip;
+  border-radius: 2px;
+  background: color-mix(in oklab, var(--sc-accent) 12%, var(--sc-canvas));
+  box-shadow: 0 0.5rem 2rem hsl(var(--sc-shadow-color) / 0.25);
+}
+.ct-visor__marco img { width: 100%; height: 100%; object-fit: cover; }
+.ct-visor__rotulo {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  padding: 0.4rem 0.6rem;
+  background: color-mix(in oklab, var(--sc-canvas) 92%, transparent);
+  font-family: var(--sc-font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--sc-ink);
+}
+
+/* ---- cierre ---- */
+.ct-cierre {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sc-5);
+  padding: clamp(2rem, 4vw, 3rem);
+  background: color-mix(in oklab, var(--sc-accent) 7%, transparent);
+  border-radius: 2px;
+}
+.ct-cierre p {
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-size: var(--sc-t-xl);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  max-width: 32ch;
+}
+.ct-cierre__accion { flex: 0 0 auto; display: inline-flex; }
+.ct-cierre__boton {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.9rem 1.5rem;
+  border-radius: var(--sc-r-pill);
+  background: var(--sc-ink);
+  color: var(--sc-canvas);
+  font-family: var(--sc-font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background var(--sc-d-fast) var(--sc-ease-out),
+              transform var(--sc-d-fast) var(--sc-ease-out),
+              box-shadow var(--sc-d-fast) var(--sc-ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .ct-cierre__boton:hover {
+    background: var(--sc-accent);
+    color: var(--sc-accent-ink);
+    transform: translateY(-2px);
+    box-shadow: 0 0.4rem 1.1rem hsl(var(--sc-shadow-color) / 0.22);
+  }
+  .ct-cierre__boton:active { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ct-cierre__boton { transition-duration: 100ms; }
+  .ct-cierre__boton:hover { transform: none; box-shadow: none; }
+}
+
+
+/* ---- entradas ------------------------------------------------------------
+   Dos mecanismos distintos y a propósito:
+
+   · La cabecera entra UNA vez, al cargar, con `animation`. Ya está en pantalla
+     cuando se carga la página, así que no hay nada que observar: solo se evita
+     el corte seco del primer pintado.
+   · Todo lo demás entra por scroll con `transition` conmutada por una clase.
+     Transición y no keyframes porque el observador no se desconecta: si el
+     usuario sube y baja rápido, una transición se retoma desde donde está y
+     una animación se reiniciaría desde cero, acumulando saltos.
+
+   El estado inicial cuelga de `html.mov`, que pone un script en línea antes de
+   pintar. Sin JS no hay clase, no hay estado inicial y la página se ve entera.
+   ------------------------------------------------------------------------ */
+
+@keyframes sc-alza {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes sc-aparece {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.ct-cab .ct-eti,
+.ct-cab__h span,
+.ct-cab__pie p {
+  animation: sc-alza var(--sc-d-entrada) var(--sc-ease-out) both;
+  animation-delay: calc(var(--i, 0) * 110ms);
+}
+
+/* El reset instantáneo al salir (duración 0) es deliberado: el bloque ya está
+   fuera de pantalla, así que nadie ve el corte, y evita que una salida a medio
+   camino se cruce con la siguiente entrada. */
+html.mov [data-anima] [data-ent] {
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0s, transform 0s;
+}
+html.mov [data-anima].es-dentro [data-ent] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--ct-d, var(--sc-d-entrada)) var(--sc-ease-out) calc(var(--i, 0) * var(--sc-paso-ent, 110ms)),
+    transform var(--ct-d, var(--sc-d-entrada)) var(--sc-ease-out) calc(var(--i, 0) * var(--sc-paso-ent, 110ms));
+}
+
+/* El cierre es el momento de conversión: misma curva y mismas propiedades, solo
+   más pausado. El botón llega detrás de la frase, como su consecuencia. */
+.ct-cierre [data-ent] { --ct-d: var(--sc-d-cierre); }
+
+/* El dibujado del diagrama. El trazo es el `::before` de cada paso, así que se
+   dibuja por tramos: aparece el nodo, sale el tramo hacia el siguiente, aparece
+   el nodo siguiente. `linear` porque un trazo que se tiende es movimiento
+   constante, no una entrada. */
+html.mov .ct-diagrama .ct-paso__icono {
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0s, transform 0s;
+}
+html.mov .ct-diagrama.es-dentro .ct-paso__icono {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 460ms var(--sc-ease-out) calc(var(--i, 0) * 540ms),
+    transform 460ms var(--sc-ease-out) calc(var(--i, 0) * 540ms);
+}
+html.mov .ct-paso::before {
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0s;
+}
+html.mov .ct-diagrama.es-dentro .ct-paso::before {
+  transform: scaleX(1);
+  transition: transform 460ms linear calc(var(--i, 0) * 540ms + 60ms);
+}
+
+@media (max-width: 900px) {
+  html.mov .ct-paso::before {
+    transform: scaleY(0);
+    transform-origin: center top;
+  }
+  html.mov .ct-diagrama.es-dentro .ct-paso::before { transform: scaleY(1); }
+}
+
+/* Movimiento reducido: el contenido sigue entrando, pero solo con fundido.
+   Ningún desplazamiento, ninguna escala, tampoco en el trazo. */
+@media (prefers-reduced-motion: reduce) {
+  .ct-cab .ct-eti,
+  .ct-cab__h span,
+  .ct-cab__pie p { animation-name: sc-aparece; }
+
+  html.mov [data-anima] [data-ent],
+  html.mov .ct-diagrama .ct-paso__icono { transform: none; }
+  html.mov [data-anima].es-dentro [data-ent],
+  html.mov .ct-diagrama.es-dentro .ct-paso__icono { transform: none; }
+
+  html.mov .ct-paso::before { transform: none; opacity: 0; }
+  html.mov .ct-diagrama.es-dentro .ct-paso::before {
+    transform: none;
+    opacity: 1;
+    transition: opacity 320ms ease calc(var(--i, 0) * 110ms);
+  }
+}
+
+/* ================================================================ TALLER ===
+   Entradas de la página del taller. No hay estilos nuevos de composición: la
+   página ya estaba montada y esto solo añade el movimiento, con el mismo
+   mecanismo que "Cómo trabajamos" (html.mov + [data-anima]/[data-ent]) para no
+   tener dos sistemas de entradas conviviendo.
+
+   Aquí el escalonado es más corto que el de allí: son listas de renglones y
+   tarjetas, no un diagrama que se dibuja paso a paso, así que 110ms se hacía
+   largo y la lista se leía como cuatro entradas sueltas en vez de como una.
+   ========================================================================== */
+
+.taller { --sc-paso-ent: 60ms; }
+
+/* La cabecera ya está en pantalla cuando se carga la página: no hay nada que
+   observar, solo que evitar el corte seco del primer pintado. Por eso entra con
+   `animation` una sola vez, como la de "Cómo trabajamos", y no por scroll. */
+.taller .titular > * {
+  animation: sc-alza var(--sc-d-entrada) var(--sc-ease-out) both;
+  animation-delay: calc(var(--i, 0) * var(--sc-paso-ent));
+}
+
+/* La foto de los materiales es la prueba de lo que acaba de contar el texto,
+   así que llega detrás de él y con un punto de escala: se asienta, no aparece.
+   Nunca desde scale(0) — arranca en 0.965, que es un acercamiento, no un
+   nacimiento. */
+html.mov [data-anima] [data-ent="foto"] {
+  transform: translateY(10px) scale(0.965);
+}
+html.mov [data-anima].es-dentro [data-ent="foto"] {
+  transform: none;
+}
+
+/* Movimiento reducido: la foto sigue entrando, pero solo con fundido. Va aquí
+   y no arriba porque el bloque genérico está antes en el archivo y a igualdad
+   de peso mandaría el último. */
+@media (prefers-reduced-motion: reduce) {
+  html.mov [data-anima] [data-ent="foto"],
+  html.mov [data-anima].es-dentro [data-ent="foto"] { transform: none; }
+
+  .taller .titular > * { animation-name: sc-aparece; }
+}
 
 /* ============================================================ EL BANCO ====
    La librería de materiales. Comparte parada con el texto de Material: el

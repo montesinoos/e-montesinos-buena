@@ -5,45 +5,45 @@ import { pilares, prensa, acabados } from "../data/montesinos.js";
 ---
 
 <Base
-  titulo="Estudio — Ebanistería Montesinos"
+  titulo="Taller — Ebanistería Montesinos"
   desc="Más de 40 años de ebanistería. Cuatro pilares, credenciales ecológicas, acabados especiales y proyectos en más de diez países."
-  ruta="/estudio"
+  ruta="/taller"
 >
-  <main id="principal" class="pagina sc-wrap">
+  <main id="principal" class="pagina sc-wrap taller">
     <div class="titular">
-      <p class="eti">Estudio</p>
-      <h1>Más de cuarenta años en el mismo oficio.</h1>
-      <p>
+      <p class="eti" style="--i: 0">Taller</p>
+      <h1 style="--i: 1">Más de cuarenta años en el mismo oficio.</h1>
+      <p style="--i: 2">
         La identidad propia, el buen hacer y la calidad nos han llevado a tener
         reconocimiento nacional e internacional.
       </p>
     </div>
 
-    <div class="dos" style="align-items:start;">
+    <div class="dos" style="align-items:start;" data-anima>
       <div>
-        <p style="max-width:46ch; color:var(--sc-ink-soft);">
+        <p data-ent style="--i: 0; max-width:46ch; color:var(--sc-ink-soft);">
           Nos diferenciamos en el sector gracias al servicio que damos a los
           clientes, al empleo de los mejores materiales y al trabajo realizado con
           grandes profesionales y marcas. Hoy trabajamos en grandes proyectos y
           empresas de gran solvencia, con diseños cuidados y acabados de excelente
           calidad.
         </p>
-        <p style="max-width:46ch; color:var(--sc-ink-soft); margin-top:var(--sc-4);">
+        <p data-ent style="--i: 1; max-width:46ch; color:var(--sc-ink-soft); margin-top:var(--sc-4);">
           Nuestra filosofía se basa en la calidad del producto, la excelencia en el
           servicio, la profesionalidad de los empleados y la inversión constante en
           I+D para mejorar el mueble que fabricamos.
         </p>
       </div>
-      <figure style="margin:0;">
+      <figure data-ent="foto" style="--i: 3; margin:0;">
         <img src="/mundo/nave-materia.webp" alt="Tablas de madera maciza y planchas de latón en el taller" loading="lazy" style="width:100%;border-radius:2px;" />
       </figure>
     </div>
 
-    <section style="margin-top: var(--sc-9);">
-      <h2 class="paso__n" style="color:var(--sc-accent); margin-bottom:var(--sc-4);">CUATRO PILARES</h2>
+    <section style="margin-top: var(--sc-9);" data-anima>
+      <h2 class="paso__n" data-ent style="--i: 0; color:var(--sc-accent); margin-bottom:var(--sc-4);">CUATRO PILARES</h2>
       <ol class="pasos">
-        {pilares.map((p) => (
-          <li class="paso">
+        {pilares.map((p, i) => (
+          <li class="paso" data-ent style={`--i: ${i + 1}`}>
             <span class="paso__n">{p.n}</span>
             <h3>{p.t}</h3>
             <p>{p.d}</p>
@@ -52,9 +52,9 @@ import { pilares, prensa, acabados } from "../data/montesinos.js";
       </ol>
     </section>
 
-    <section style="margin-top: var(--sc-9);">
+    <section style="margin-top: var(--sc-9);" data-anima>
       <div class="dos">
-        <article class="tarjeta">
+        <article class="tarjeta" data-ent style="--i: 0">
           <h2>El entorno</h2>
           <p>
             Saber de dónde proviene cada producto que consumimos es primordial. Por
@@ -63,43 +63,46 @@ import { pilares, prensa, acabados } from "../data/montesinos.js";
             de forma óptima.
           </p>
         </article>
-        <article class="tarjeta">
+        <article class="tarjeta" data-ent style="--i: 1">
           <h2>Krion, desde 2018</h2>
           <p>
             La empresa está homologada por Porcelanosa para la realización de
             proyectos con Krion Eco-Active Solid Technology.
           </p>
         </article>
-        <article class="tarjeta">
+        <article class="tarjeta" data-ent style="--i: 2">
           <h2>Acabados especiales</h2>
           <p>
             Colaboramos con expertos para resolver los acabados especiales:
             {acabados.map((a, i) => (<>{i ? ", " : " "}{a.toLowerCase()}</>))}.
           </p>
         </article>
-        <article class="tarjeta">
-          <h2>Más de diez países</h2>
-          <p>
-            Gracias a nuestra vocación internacional y a un plan de expansión con un
-            amplio radio de acción, hemos desarrollado proyectos en más de diez
-            países en los últimos diez años.
-          </p>
-        </article>
       </div>
     </section>
 
-    <section style="margin-top: var(--sc-9);">
-      <h2 class="paso__n" style="color:var(--sc-accent); margin-bottom:var(--sc-4);">PRENSA</h2>
+    <section style="margin-top: var(--sc-9);" data-anima>
+      <h2 class="paso__n" data-ent style="--i: 0; color:var(--sc-accent); margin-bottom:var(--sc-4);">PRENSA</h2>
       <ul class="pasos" style="list-style:none; padding:0;">
-        {prensa.map((m) => (
-          <li class="paso">
-            <span class="paso__n">·</span>
-            <h3>{m.medio}</h3>
-            <p>{m.t}</p>
+        {prensa.map((m, i) => (
+          <li data-ent style={`--i: ${i + 1}`}>
+            <a
+              class="paso prensa"
+              href={m.url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span class="paso__n" aria-hidden="true">·</span>
+              <h3>{m.medio}</h3>
+              <p>
+                {m.t}
+                {m.pdf && <span class="prensa__pdf">PDF</span>}
+                <span class="sr"> · se abre en una pestaña nueva</span>
+              </p>
+            </a>
           </li>
         ))}
       </ul>
-      <p style="margin-top:var(--sc-4); color:var(--sc-ink-soft); font-size:var(--sc-t-sm);">
+      <p data-ent style="--i: 4; margin-top:var(--sc-4); color:var(--sc-ink-soft); font-size:var(--sc-t-sm);">
         Desde Televisión Española hasta La Vanguardia, distintos medios han hablado
         de nuestra forma de ser y de hacer.
       </p>

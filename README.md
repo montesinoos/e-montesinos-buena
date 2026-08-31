@@ -42,7 +42,7 @@ src/
   data/montesinos.js       datos reales: sedes, proyectos, proceso, pilares
   layouts/Base.astro       <head>, chrome fijo, mapa de la nave, menú
   components/Pie.astro
-  pages/                   index, proyectos, como-trabajamos, estudio, contacto
+  pages/                   index, proyectos, como-trabajamos, taller, contacto
 public/
   scrollcraft.css / .js    motor scroll. NO editar: se tematiza con tokens
   tema.css                 tokens de marca y estilo del markup propio

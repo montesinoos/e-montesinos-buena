@@ -42,12 +42,15 @@ export const sedes = [
   },
 ];
 
+// `img` es la portada de un proyecto real ya publicado en /proyectos que
+// pertenece a ese sector: la usa la vista previa que sigue al cursor en
+// "Cómo trabajamos". Ninguna foto se atribuye a un sector al que no pertenece.
 export const sectores = [
-  { id: "retail", nombre: "Tiendas y retail" },
-  { id: "hosteleria", nombre: "Hoteles y restaurantes" },
-  { id: "oficinas", nombre: "Oficinas corporativas" },
-  { id: "particulares", nombre: "Particulares" },
-  { id: "stands", nombre: "Stands y escaparatismo" },
+  { id: "retail", nombre: "Tiendas y retail", img: "/proyectos-web/christian-louboutin-1.webp" },
+  { id: "hosteleria", nombre: "Hoteles y restaurantes", img: "/proyectos-web/cercle-sabadelles-1.webp" },
+  { id: "oficinas", nombre: "Oficinas corporativas", img: "/proyectos-web/egisa-1.webp" },
+  { id: "particulares", nombre: "Particulares", img: "/proyectos-web/particular-2.webp" },
+  { id: "stands", nombre: "Stands y escaparatismo", img: "/proyectos-web/andres-sarda-1.webp" },
 ];
 
 // Los 20 archivos son fotografías reales de su web oficial.
@@ -83,23 +86,83 @@ export const pilares = [
 ];
 
 // El proceso, literal de "Cómo y dónde".
+// `icono` son trazos de Lucide (MIT) copiados aquí como `path` sueltos: el
+// proyecto no depende de ningún paquete de iconos, se dibujan en el SVG.
 export const proceso = [
-  { n: "01", t: "Asesoramiento", d: "Asesoramiento al cliente, y visita al espacio si el proyecto la precisa." },
-  { n: "02", t: "Desarrollo", d: "Desarrollo de la necesidad del cliente, fabricación y customización del mueble." },
-  { n: "03", t: "Premontaje 1:1", d: "El mobiliario se monta a escala 1:1 en nuestras instalaciones y espacios comerciales antes de ser enviado a su destino. El cliente lo ve levantado antes de que salga de la nave." },
-  { n: "04", t: "Entrega", d: "El cliente ve el producto finalizado, acabados, montaje e instalación." },
+  {
+    n: "01", t: "Asesoramiento",
+    d: "Asesoramiento al cliente, y visita al espacio si el proyecto la precisa.",
+    icono: ["M7.9 20A9 9 0 1 0 4 16.1L2 22Z"],
+  },
+  {
+    n: "02", t: "Desarrollo",
+    d: "Desarrollo de la necesidad del cliente, fabricación y customización del mueble.",
+    icono: ["M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"],
+  },
+  {
+    n: "03", t: "Premontaje 1:1",
+    d: "El mobiliario se monta a escala 1:1 en nuestras instalaciones y espacios comerciales antes de ser enviado a su destino. El cliente lo ve levantado antes de que salga de la nave.",
+    icono: [
+      "M21.3 8.7 8.7 21.3a1 1 0 0 1-1.4 0l-4.6-4.6a1 1 0 0 1 0-1.4L15.3 2.7a1 1 0 0 1 1.4 0l4.6 4.6a1 1 0 0 1 0 1.4Z",
+      "M7.5 10.5l2 2", "M10.5 7.5l2 2", "M13.5 4.5l2 2", "M4.5 13.5l2 2",
+    ],
+  },
+  {
+    n: "04", t: "Entrega",
+    d: "El cliente ve el producto finalizado, acabados, montaje e instalación.",
+    icono: [
+      "M7.5 4.27l9 5.15",
+      "M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z",
+      "M3.3 7l8.7 5 8.7-5", "M12 22V12",
+    ],
+  },
 ];
 
 export const vias = [
-  { t: "Sobre planos de la marca", d: "Fabricación directa a partir de los planos entregados por la marca, la firma o el cliente." },
-  { t: "Con prototipo previo", d: "Fabricación previa de prototipo, presentación al cliente, producción con acabados e instalación." },
+  {
+    n: "Vía A", t: "Sobre planos de la marca",
+    d: "Fabricación directa a partir de los planos entregados por la marca, la firma o el cliente.",
+    icono: [
+      "M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z",
+      "M14 2v4a2 2 0 0 0 2 2h4", "M16 13H8", "M16 17H8", "M10 9H8",
+    ],
+  },
+  {
+    n: "Vía B", t: "Con prototipo previo",
+    d: "Fabricación previa de prototipo, presentación al cliente, producción con acabados e instalación.",
+    icono: [
+      "M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z",
+      "m6.08 9.5-3.5 1.6a1 1 0 0 0 0 1.81l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9a1 1 0 0 0 0-1.83l-3.5-1.59",
+      "m6.08 14.5-3.5 1.6a1 1 0 0 0 0 1.81l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9a1 1 0 0 0 0-1.83l-3.5-1.59",
+    ],
+  },
 ];
 
+// Los medios que han hablado de la casa, con el enlace a la pieza original.
+// `pdf: true` marca las que abren un documento en vez de una página: la ficha
+// lo avisa en pantalla para que nadie se lleve una descarga por sorpresa.
+//
+// Crónica Global publicó un reportaje que ya no tiene enlace vivo, así que se
+// ha quitado de la lista: una fila de prensa sin pieza que enseñar no acredita
+// nada.
 export const prensa = [
-  { medio: "RTVE", t: "RTVE a la Carta" },
-  { medio: "La Vanguardia", t: "Entrevista" },
-  { medio: "Crónica Global", t: "Reportaje" },
-  { medio: "Diari de Sabadell", t: "Entrevista" },
+  {
+    medio: "RTVE",
+    t: "RTVE a la Carta",
+    url: "https://www.rtve.es/play/videos/linformatiu/linformatiu-cap-setmana-15-02-2014/2399288/",
+  },
+  {
+    medio: "La Vanguardia",
+    t: "Entrevista",
+    url: "https://static1.squarespace.com/static/5ad89fdd12b13f87eda3e47a/t/5b1cfb7470a6ad394ea2cc77/1528626061812/2013-05-24-lavanguardia-enconstruccion_p14.pdf",
+    pdf: true,
+  },
+  {
+    medio: "Diari de Sabadell",
+    t: "Entrevista",
+    url: "https://static1.squarespace.com/static/5ad89fdd12b13f87eda3e47a/t/5b1cfd108a922ddcbe27f9e3/1528626474356/Diari+de+Sabadell",
+    pdf: true,
+  },
 ];
 
 export const acabados = [
@@ -126,7 +189,7 @@ export const paginas = [
   { href: "/", t: "Inicio" },
   { href: "/proyectos", t: "Proyectos" },
   { href: "/como-trabajamos", t: "Cómo trabajamos" },
-  { href: "/estudio", t: "Estudio" },
+  { href: "/taller", t: "Taller" },
   { href: "/contacto", t: "Contacto" },
 ];
 
