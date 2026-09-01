@@ -16,6 +16,7 @@
     "astro": "^7.2.8",
     "globe.gl": "^2.46.2",
     "playwright-core": "^1.62.1",
+    "svgmap": "^2.21.0",
     "three": "^0.185.1"
   },
   "devDependencies": {

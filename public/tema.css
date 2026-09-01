@@ -19,7 +19,14 @@
 
   --sc-shadow-color: 30 8% 55%;
 
-  --barra: 3.75rem;   /* alto del chrome fijo */
+  --barra: 3.75rem;   /* alto del chrome fijo de arriba */
+  /* Alto de la barra del recorrido, la del pie de la portada en móvil. En
+     escritorio la barra no existe y vale 0, así que quien la sume la suma sin
+     enterarse. Vive aquí y no en .recorrido porque la suman elementos que son
+     HERMANOS suyos (la copia del umbral, el botón de WhatsApp) y hasta ahí no
+     llega la herencia: un var() sin valor invalida la declaración entera y
+     manda el elemento a su posición estática. */
+  --recorrido-h: 0px;
 
   /* Entradas de página. El suelo trae --sc-d-fast/base/slow, pensadas para UI
      (bajo 300ms). Una entrada por scroll en una página de marca se lee mejor
@@ -87,7 +94,7 @@
 .chrome__menu a:hover { color: var(--sc-ink); background: var(--sc-surface); }
 .chrome__menu a[aria-current="page"] { color: var(--sc-ink); font-weight: 500; }
 
-/* ---- el botón del desplegable: solo en móvil y solo en la home ---- */
+/* ---- el botón del desplegable: solo en móvil, en todas las páginas ---- */
 .chrome__hamb {
   display: none;
   justify-self: end;
@@ -153,10 +160,14 @@
   transition: background var(--sc-d-fast) var(--sc-ease-out),
               transform var(--sc-d-fast) var(--sc-ease-out);
 }
+/* El rótulo de móvil no existe en escritorio. Los dos viven en el markup y el
+   CSS enciende uno: cambiarlo con JS haría parpadear el botón al cargar. */
+.chrome__cta-mov { display: none; }
 .chrome__cta:hover { background: var(--sc-accent); color: var(--sc-accent-ink); }
 .chrome__cta:active { transform: translateY(1px); }
 
-/* ---- el mapa de la nave: solo en la home ---- */
+/* ---- el mapa de la nave: solo en la home, y solo en escritorio.
+       En móvil su sitio es la barra del pie (EL RECORRIDO, al final). ---- */
 .mapa {
   min-width: 0;
   display: flex;
@@ -193,10 +204,10 @@
 @media (min-width: 1400px) { .mapa .txt { display: inline; } }
 
 @media (max-width: 860px) {
-  /* Aquí no hay ancho para centrar nada: el menú vuelve a la derecha y, si aun
-     así no cabe, se desliza en horizontal en vez de montarse sobre la marca.
-     minmax(0,1fr) es lo que deja encoger la columna: 1fr a secas tiene un
-     mínimo automático del tamaño del contenido y desborda la barra. */
+  /* Tres columnas: marca, la punta derecha (CTA y, en la portada, el recorrido
+     de la nave) y la hamburguesa. minmax(0,1fr) es lo que deja encoger la
+     columna del medio: 1fr a secas tiene un mínimo automático del tamaño del
+     contenido y desborda la barra. */
   .chrome {
     grid-template-columns: auto minmax(0, 1fr) auto;
     gap: var(--sc-3);
@@ -205,72 +216,68 @@
   /* Aquí no cabe "Pedir presupuesto" entero, pero el botón no se esconde en el
      desplegable: se queda en la barra con el rótulo corto. */
   .chrome__fin { gap: var(--sc-3); max-width: 100%; }
-  .chrome__cta { padding: 0.45rem 0.7rem; font-size: 0.5625rem; letter-spacing: 0.06em; }
-  .chrome__cta-larga { display: none; }
-  .chrome nav {
-    justify-self: end;
-    min-width: 0;
-    max-width: 100%;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
+  /* "Contacta con nosotros" es el doble de largo que "presupuesto" y la barra
+     del teléfono es la franja más disputada del sitio: entre la marca y la
+     hamburguesa quedan ~196 px a 375 y ~141 px a 320. El tamaño y el
+     interletrado se estiran con el ancho en vez de fijarse a un número, para
+     que el rótulo entre de una pieza en los dos casos sin partirse en dos
+     líneas ni empujar a la hamburguesa. */
+  .chrome__cta {
+    padding: 0.45rem clamp(0.5rem, 2.2vw, 0.75rem);
+    font-size: clamp(0.5rem, 2.05vw, 0.5625rem);
+    letter-spacing: clamp(0.02em, 0.9vw, 0.06em);
+    white-space: nowrap;
   }
-  .chrome nav::-webkit-scrollbar { display: none; }
+  .chrome__cta-esc { display: none; }
+  .chrome__cta-mov { display: inline; }
+  /* Aquí había una tira que deslizaba en horizontal. Medida en un iPhone de
+     375 px, la tira quedaba en 144 px de ancho: de los cinco enlaces se veían
+     dos, y los otros tres estaban detrás de un gesto lateral sin barra de
+     desplazamiento que lo anunciara. Navegación escondida. Ahora el
+     desplegable de la hamburguesa, que ya existía para la portada, es el
+     menú de móvil de TODAS las páginas: la misma prenda en todo el sitio, y
+     todos los enlaces a un toque visible. El JS ya era agnóstico de página;
+     esto es solo CSS. */
   .chrome__marca img { height: 1.5rem; }
   .chrome__menu { gap: 0; justify-content: flex-start; }
   .chrome__menu a { padding: 0.4rem 0.4rem; font-size: 0.6875rem; }
   .mapa { display: none; }
 
-  /* ---- móvil + home ----
-     En la home la barra es del recorrido de la nave, que es la navegación que
-     de verdad se usa mientras se baja. El menú de páginas se retira a un
-     desplegable. En el resto de páginas no hay recorrido que enseñar, así que
-     el menú se queda suelto en la barra y esto no aplica. */
-  .chrome--home { grid-template-columns: auto minmax(0, 1fr) auto; }
-  .chrome--home .chrome__marca { grid-area: 1 / 1; }
-  .chrome--home .chrome__hamb  { grid-area: 1 / 3; display: flex; }
+  /* ---- la barra en móvil ----
+     Tres cosas y ninguna más: la marca, el CTA y la hamburguesa. El menú de
+     páginas se retira a un desplegable y el recorrido de la nave baja al pie
+     (ver EL RECORRIDO, al final de esta hoja). La barra de arriba en el
+     teléfono es la más disputada del sitio; aquí solo se queda lo que no
+     puede estar en ningún otro sitio. */
+  .chrome__marca { grid-area: 1 / 1; }
+  .chrome__hamb  { grid-area: 1 / 3; display: flex; }
   /* La punta derecha ocupa toda la columna del medio: si se dejara al ancho
      de su contenido, el recorrido se montaría sobre el logotipo en vez de
      deslizarse. El CTA se queda pegado al borde y el recorrido encoge. */
-  .chrome--home .chrome__fin {
+  .chrome .chrome__fin {
     grid-area: 1 / 2;
     justify-self: stretch;
     justify-content: flex-end;
     min-width: 0;
   }
 
-  .chrome--home .mapa {
-    display: flex;
-    flex: 0 1 auto;
-    min-width: 0;
-    max-width: 100%;
-    gap: 0.15rem;
-    /* En pantallas muy estrechas (320) el recorrido no cabe entero: antes de
-       montarse sobre el logo, se desliza. */
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-  .chrome--home .mapa::-webkit-scrollbar { display: none; }
-  /* Sin los rótulos, el mapa serían cuatro rayas mudas: aquí es lo único que
-     nombra dónde estás, así que manda el texto y se va la raya. */
-  .chrome--home .mapa .txt { display: inline; }
-  .chrome--home .mapa button::before { display: none; }
-  .chrome--home .mapa button { padding: 0.5rem 0.3rem; font-size: 0.625rem; }
-
   /* El desplegable. Cuelga de la barra, no tapa la pantalla entera: son cinco
      enlaces, no un menú de sitio. */
-  .chrome--home nav {
+  .chrome nav {
     position: absolute;
     top: 100%;
     right: 0;
     justify-self: unset;
     overflow: visible;
     min-width: 12rem;
-    background: color-mix(in oklab, var(--sc-canvas) 96%, transparent);
-    backdrop-filter: blur(16px) saturate(1.15);
+    /* Opaco, no translúcido como la barra. Cuando el desplegable era solo de
+       la portada caía sobre lienzo liso y el 96% no se notaba; ahora cae sobre
+       el titular de cualquier página, y ahí el desenfoque no basta: los cinco
+       enlaces se leían con la letra del H1 cruzándolos. Un menú es para leerlo.
+       Además el backdrop-filter en un panel que aparece cuesta una capa de
+       composición en cada apertura, y en un móvil de gama media eso se nota. */
+    background: var(--sc-canvas);
+    box-shadow: 0 0.6rem 1.6rem rgba(0, 0, 0, 0.12);
     border: 1px solid var(--sc-hairline);
     border-top: 0;
     border-right: 0;
@@ -280,24 +287,24 @@
                 transform var(--sc-d-base) var(--sc-ease-out),
                 visibility 0s linear var(--sc-d-base);
   }
-  .chrome--home[data-menu="cerrado"] nav {
+  .chrome[data-menu="cerrado"] nav {
     opacity: 0;
     visibility: hidden;
     transform: translateY(-0.35rem);
     pointer-events: none;
   }
-  .chrome--home[data-menu="abierto"] nav {
+  .chrome[data-menu="abierto"] nav {
     opacity: 1;
     visibility: visible;
     transform: none;
     transition-delay: 0s;
   }
-  .chrome--home nav .chrome__menu {
+  .chrome nav .chrome__menu {
     display: grid;
     gap: 0;
     padding: 0.35rem;
   }
-  .chrome--home nav .chrome__menu a {
+  .chrome nav .chrome__menu a {
     padding: 0.7rem 0.9rem;
     font-size: 0.8125rem;
   }
@@ -305,8 +312,8 @@
 
 /* Sin movimiento, el desplegable aparece y desaparece sin deslizarse. */
 @media (max-width: 860px) and (prefers-reduced-motion: reduce) {
-  .chrome--home nav { transition: none; }
-  .chrome--home[data-menu="cerrado"] nav { transform: none; }
+  .chrome nav { transition: none; }
+  .chrome[data-menu="cerrado"] nav { transform: none; }
 }
 
 /* ---- el botón flotante de WhatsApp ----
@@ -540,7 +547,14 @@
 .copia {
   position: absolute;
   left: var(--sc-gutter);
-  bottom: clamp(3rem, 12vh, 8rem);
+  /* --recorrido-h vale 0 salvo en la portada en móvil, donde es el alto de la
+     barra de paradas del pie. Va SUMADO AQUÍ, en la declaración base, y no en
+     una regla suelta más abajo: tres de las cuatro paradas reposicionan su
+     copia con `bottom: auto` (--centro, --salida, --material), y una regla
+     `.copia { bottom: … }` escrita después de ellas tiene la misma
+     especificidad y gana por orden, así que les devolvía un `bottom` que
+     habían quitado a propósito y les mandaba el texto fuera de la pantalla. */
+  bottom: calc(clamp(3rem, 12vh, 8rem) + var(--recorrido-h));
   max-width: min(38rem, 76vw);
 }
 /* ---- el sello de la nave ----
@@ -1798,7 +1812,13 @@ html.mov [data-anima].es-dentro [data-ent="foto"] {
     display: flex;
     flex-direction: column;
     gap: clamp(0.75rem, 2.5vh, 1.5rem);
-    padding: calc(var(--barra) + 0.75rem) var(--sc-gutter) clamp(1rem, 4vh, 2rem);
+    /* Arriba, la barra fija del chrome. Abajo, la del recorrido: --recorrido-h
+       vale 0 donde esa barra no está, así que la cuenta vale para las dos
+       pantallas sin condicionales. Sin sumarla, la cartela se metía debajo. */
+    padding:
+      calc(var(--barra) + 0.75rem)
+      var(--sc-gutter)
+      calc(clamp(1rem, 4vh, 2rem) + var(--recorrido-h));
   }
   .copia--material {
     position: relative;
@@ -1807,8 +1827,19 @@ html.mov [data-anima].es-dentro [data-ent="foto"] {
     max-width: none;
     text-align: left;
   }
-  .copia--material h2 { font-size: var(--sc-t-lg); }
-  .copia--material p { font-size: var(--sc-t-sm); max-width: none; }
+  /* Aquí Material encogía su titular a --sc-t-lg y su texto a --sc-t-sm para
+     dejarle sitio al banco en la columna. El precio era que la única parada
+     que comparte pantalla con un widget era también la única que cambiaba de
+     cuerpo: bajando, el salto se leía como un error de maquetación, no como
+     una jerarquía. Las cuatro paradas usan ahora la misma escala.
+
+     Ojo con volver a poner una regla `.copia--material p`: la etiqueta de
+     parada es un <p class="copia__eti">, así que un selector de tipo se la
+     lleva por delante junto con el párrafo y desafina también el rótulo.
+
+     El sitio sale de la propia columna, que tenía 192 px de aire por debajo
+     del banco. Si algún día no cabe, lo que se recorta es el aire entre las
+     dos piezas, no el cuerpo del texto. */
 
   .banco {
     position: relative;
@@ -1844,6 +1875,70 @@ html.mov [data-anima].es-dentro [data-ent="foto"] {
   /* Alta de sobra para la frase mas larga: si la banda creciera al elegir una
      madera, el tablero daria un tironcito cada vez. */
   .banco__cartela { min-height: 5.75rem; }
+
+  /* ---- quien cede cuando no cabe ----
+     La columna de Material lleva cuatro piezas: titular, parrafo, tablero y
+     cartela. En un movil alto (375x812) sobran 94 px y no hay nada que
+     repartir. En uno corto —un SE de 375x667, un Android de 360x640— faltan
+     entre 20 y 65 px con el texto a la escala de las demas paradas.
+
+     El que cede es el TABLERO, que es una ilustracion y no le pasa nada por
+     ser mas pequena. No cede el texto: la escala de las cuatro paradas es la
+     misma y no puede depender del alto de la pantalla. Y no cede la cartela,
+     que es la respuesta al toque y tiene que caber entera siempre.
+
+     Se recorta por ANCHO y no por alto: el tablero son cuatro columnas de
+     muestras con proporcion fija, asi que estrechandolo baja tambien de alto y
+     la pieza sigue siendo la misma pieza, solo que mas pequena. Poniendole un
+     techo de alto habria que estirar o cortar las muestras. */
+  .banco__tablero { margin-inline: auto; }
+}
+
+@media (max-width: 860px) and (max-height: 700px) {
+  .banco__tablero { max-width: 18rem; }
+}
+@media (max-width: 860px) and (max-height: 660px) {
+  .banco__tablero { max-width: 15rem; }
+}
+/* ---- Material en pantallas cortas ----
+   Un iPhone SE son 375x667, y hay Androids de 320x640. Con el texto a la
+   escala de las demas paradas, la columna de Material —titular, parrafo,
+   tablero y cartela— pide unos 675 px y ahi solo hay 640. Algo tiene que ceder.
+
+   Lo que cede es el AIRE, no el cuerpo del texto: los huecos entre piezas, el
+   acolchado del tablero y la banda que la cartela tiene reservada. Encoger la
+   letra devolveria el problema que se acaba de arreglar —Material seria otra
+   vez la unica parada con otra escala— y ademas el cuerpo del texto es lo
+   ultimo que se toca en una pantalla pequena, no lo primero.
+
+   El corte va por ALTO y no por ancho: el que manda aqui es el alto, y a
+   375x812 (un iPhone normal) sobran 94 px y no hace falta apretar nada. */
+@media (max-width: 860px) and (max-height: 700px) {
+  .material { gap: 0.5rem; padding-bottom: calc(0.75rem + var(--recorrido-h)); }
+  .banco { gap: 0.5rem; }
+  .banco__tablero { padding: 0.6rem; }
+  .banco__muestras { gap: 0.5rem; }
+  /* La banda sigue reservada —el tablero no puede dar un tironcito al elegir
+     una madera— pero con la reserva justa para dos lineas en vez de tres. */
+  .banco__cartela { min-height: 4.25rem; }
+}
+
+/* Corta Y estrecha a la vez —un 320x640— es el caso peor: el parrafo se parte
+   en siete lineas en vez de seis y el titular sigue pidiendo dos, asi que solo
+   con estrechar el tablero no llega. Aqui se apura tambien la banda que la
+   cartela tiene reservada (le sobraba: la frase mas larga cabe en dos lineas)
+   y el aire entre piezas. El tablero baja hasta donde la muestra sigue siendo
+   tocable —43x49, en el limite de los 44— y no mas: por debajo de eso el
+   widget deja de funcionar con el dedo, que es peor que verse pequeno. */
+@media (max-width: 400px) and (max-height: 660px) {
+  .material {
+    padding-top: calc(var(--barra) + 0.25rem);
+    padding-bottom: calc(0.25rem + var(--recorrido-h));
+    gap: 0.25rem;
+  }
+  .banco { gap: 0.25rem; }
+  .banco__tablero { max-width: 13.5rem; }
+  .banco__cartela { min-height: 2.75rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1926,6 +2021,49 @@ html.mov [data-anima].es-dentro [data-ent="foto"] {
     top: calc(var(--barra) + clamp(1rem, 4vh, 2.5rem));
     bottom: auto;
   }
+
+  /* ---- el velo de Salida ----
+     Las otras tres paradas usan el halo radial de .copia::before: un óvalo de
+     luz centrado en el bloque, que funciona cuando el texto flota en mitad de
+     la pantalla. Aquí no flota: en móvil esta es la única parada donde la copia
+     sube y se ancla arriba, contra el canto de la barra. Un óvalo centrado ahí
+     deja el borde de arriba a media opacidad —el texto empieza donde el halo
+     todavía está subiendo— y se corta a los lados.
+
+     Así que aquí el velo es LINEAL y de arriba abajo, que es la dirección en
+     la que está el problema:
+
+       · La caja empieza en el canto superior del cristal, no en el del bloque
+         de texto: el inset negativo de arriba es exactamente lo que la copia
+         baja (barra + su separación), así que el blanco nace en y=0 y no queda
+         una franja de foto asomando por encima del antetítulo.
+       · A los lados llega a los bordes (el inset es el propio --sc-gutter):
+         una banda, no un óvalo recortado.
+       · Opaco del todo mientras dura el antetítulo y el titular; se disuelve a
+         lo largo del párrafo; transparente pasado el texto, con 4,5rem de cola
+         para que el final sea un desvanecido y no un corte. Abajo aún quedan
+         unos 60 px de foto limpia antes de que empiece el globo.
+
+     Las paradas son porcentajes de la caja, no píxeles: cuando el texto se
+     parte en más líneas —una pantalla estrecha— la caja crece con él y el
+     desvanecido se estira con el párrafo en vez de quedarse a mitad. */
+  .copia--salida::before {
+    inset:
+      calc(-1 * (var(--barra) + clamp(1rem, 4vh, 2.5rem)))
+      calc(-1 * var(--sc-gutter))
+      -4.5rem;
+    background: linear-gradient(to bottom,
+      rgba(255,255,255,1)    0%,
+      rgba(255,255,255,1)    40%,
+      rgba(255,255,255,0.96) 55%,
+      rgba(255,255,255,0.86) 70%,
+      rgba(255,255,255,0.68) 82%,
+      rgba(255,255,255,0.42) 88%,
+      rgba(255,255,255,0.20) 93%,
+      rgba(255,255,255,0.06) 97%,
+      rgba(255,255,255,0)    100%);
+  }
+
   .globo {
     inset: auto 0 0 0;
     height: min(46vh, 100vw);
@@ -2105,4 +2243,568 @@ html.mov [data-anima].es-dentro [data-ent="foto"] {
   }
   .ficha__marco { aspect-ratio: 1 / 1; }
   .ficha__pie { margin: 0; }
+}
+
+/* ============================================================== EL MÓVIL ===
+   Todo lo que en el teléfono no es "lo mismo pero estrecho". Va al final a
+   propósito: son correcciones sobre lo ya escrito y aquí ganan sin subir la
+   especificidad de nadie.
+
+   El criterio no es un gusto: es el mínimo de 44×44 px de Apple (HIG), los
+   48 dp de Material y el criterio 2.5.8 de WCAG 2.2 (24 px de objetivo, AA).
+   Se toma el mayor de los tres, 44, y se cumple SIN tocar el dibujo: la zona
+   de toque se agranda con un ::after transparente centrado en el elemento.
+   El botón se sigue viendo pequeño y elegante; el dedo acierta igual.
+   ========================================================================== */
+
+/* ---- el contrato del motor con <picture> ----
+   scrollcraft.css coloca el póster con `.sc-world__seg > :is(video,img,canvas)`,
+   un selector de hijo directo. Al envolver la imagen en <picture> para dar la
+   copia de móvil, el <img> pasa a nieto y se cae del contrato. Se repite aquí,
+   en la hoja de marca, en vez de tocar el motor. */
+.sc-world__seg > picture {
+  position: absolute; inset: 0;
+  display: block;
+}
+.sc-world__seg > picture > img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+/* ---- zona de toque ----
+   Dos técnicas, y cuál toca depende de si el elemento tiene sitio.
+
+   1. Donde LO HAY, se agranda de verdad con min-height. Es lo que aplica en la
+      barra: mide 3.75rem (60px), así que un enlace de 44 cabe entero y sin
+      mover el dibujo, porque el texto sigue centrado y el fondo del enlace es
+      transparente. Además la barra desliza en horizontal, y un `overflow-x`
+      recorta también en vertical: ahí una zona invisible que se sale del
+      elemento la corta el propio contenedor y no serviría de nada.
+
+   2. Donde NO lo hay —enlaces de texto dentro de un párrafo, como el pie— se
+      agranda solo la zona de toque con un ::after transparente centrado. El
+      enlace se sigue viendo del tamaño de su letra; el dedo acierta igual. */
+@media (hover: none), (pointer: coarse) {
+  .chrome__menu a,
+  .chrome__cta,
+  .chrome__hamb,
+  .mapa button,
+  .filtros button,
+  .enviar {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* El logotipo es una imagen de 24px de alto dentro de un enlace: se estira
+     el enlace, no la imagen. */
+  .chrome__marca { min-height: 44px; align-items: center; }
+
+  /* En móvil el botón de WhatsApp se queda en icono y se quedaba en 43×43 por
+     un pelo. El icono no crece; crece la pastilla. */
+  .wasap { min-width: 44px; min-height: 44px; justify-content: center; }
+
+  .pie a { position: relative; }
+  .pie a::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    translate: -50% -50%;
+    width: 100%;
+    height: 44px;
+    /* Sin z-index negativo a propósito: un pseudo detrás del padre se va
+       también detrás del fondo de su contenedor y deja de ser tocable. Tal
+       cual, encima, es invisible (no pinta nada) y el toque sigue yendo al
+       enlace, que es su padre. */
+  }
+  /* Los dos enlaces del pie van en la misma línea separados por un punto: si
+     cada zona de toque midiera 44 de alto, se solaparían con la línea de
+     arriba. La línea se abre para que no se pisen. */
+  .pie p { line-height: 2.4; }
+
+  /* El recuadro azul del navegador al tocar. En una web de galería blanca
+     desentona, y además tarda en irse: se apaga y se pone una respuesta
+     propia, inmediata, en :active. Sin respuesta al toque el móvil se siente
+     roto, así que apagarlo a secas no vale. */
+  a, button, input, textarea, select, label, [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+  .chrome__menu a:active,
+  .pie a:active,
+  .mapa button:active { opacity: 0.55; }
+  .chrome__cta:active,
+  .filtros button:active,
+  .enviar:active,
+  .wasap:active { scale: 0.97; }
+
+  /* La respuesta al toque no se anima: tiene que llegar en el mismo fotograma
+     que el dedo. La vuelta sí, para que no dé un tirón. */
+  .chrome__cta, .filtros button, .enviar, .wasap {
+    transition: scale 140ms var(--sc-ease-out);
+  }
+}
+
+/* ---- la muesca y la barra de gestos ----
+   Con viewport-fit=cover la página llega hasta el borde físico. Sin esto, el
+   botón de WhatsApp se sienta encima de la barra de gestos del iPhone (donde
+   el toque se lo queda el sistema) y la barra fija se mete bajo la muesca en
+   horizontal. */
+.chrome {
+  padding-left: max(var(--sc-gutter), env(safe-area-inset-left));
+  padding-right: max(var(--sc-gutter), env(safe-area-inset-right));
+}
+.wasap {
+  right: max(var(--sc-4), env(safe-area-inset-right));
+  bottom: max(var(--sc-4), env(safe-area-inset-bottom));
+}
+
+@media (max-width: 860px) {
+  .chrome {
+    padding-left: max(var(--sc-4), env(safe-area-inset-left));
+    padding-right: max(var(--sc-4), env(safe-area-inset-right));
+  }
+  /* La barra sube de 3.75rem a 3rem+lo que pida la muesca: el alto de la barra
+     es el que reserva el `scroll-margin-top` de los anclajes, así que se
+     declara aquí y no se parchea suelto. */
+  .chrome__menu a { padding: 0.55rem 0.5rem; }
+}
+
+/* ---- el formulario ----
+   Safari en iOS hace zoom sobre cualquier campo con tipografía menor de 16px,
+   y del zoom no vuelve solo: el visitante se queda con la web torcida a mitad
+   de rellenar el formulario. 16px es el número exacto, no una preferencia.
+   Se aplica por puntero grueso y no por ancho: un iPad en horizontal pasa de
+   860px y hace zoom igual. */
+@media (hover: none), (pointer: coarse) {
+  .campo :is(input, textarea, select) {
+    font-size: 16px;
+    /* Con el campo a 16px el alto natural ya pasa de 44, pero se fija por si
+       alguien recorta el padding más adelante. */
+    min-height: 44px;
+  }
+  .campo textarea { min-height: 8rem; }
+
+  /* La casilla del catálogo salía de 13×13. El navegador la dibuja pequeña por
+     defecto; aquí se agranda de verdad, no con una zona invisible, porque una
+     casilla que no se ve tampoco se entiende. */
+  .opcion input[type="checkbox"] {
+    width: 24px; height: 24px;
+    flex-shrink: 0;
+    accent-color: var(--sc-accent);
+  }
+  /* Y la etiqueta entera es zona de toque, que es lo que espera cualquiera. */
+  .opcion { gap: 0.75rem; padding-block: 0.35rem; }
+  .opcion label { cursor: pointer; }
+
+  .enviar { min-height: 48px; }
+}
+
+/* ---- el tirón de goma ----
+   Las tiras que se deslizan en horizontal (el menú y el recorrido de la nave)
+   ya cortan la cadena con overscroll-behavior-x. Falta el documento: sin esto,
+   en Chrome de Android tirar hacia abajo desde arriba recarga la página, y en
+   una portada gobernada por scroll eso pasa por accidente constantemente. */
+@media (hover: none), (pointer: coarse) {
+  html, body { overscroll-behavior-y: contain; }
+}
+
+/* ========================================================== EL RECORRIDO ===
+   La barra de paradas del pie, solo en móvil y solo en la portada. El mapa de
+   la nave de escritorio vive en la punta derecha de la barra de arriba; aquí
+   arriba no cabe, y abajo además está el pulgar.
+
+   Por qué barra a lo ancho y no pastilla flotante: la pastilla se sienta
+   encima de la copia y tapa una línea distinta en cada tramo, y su ancho lo
+   manda el texto, así que la parada de "1:1" acaba siendo la mitad de grande
+   que la de "Material" y se falla al tocarla. Una barra reserva su franja de
+   una vez, la copia se aparta de ella una sola vez, y las cuatro paradas miden
+   exactamente lo mismo porque son cuatro columnas iguales.
+
+   Lenguaje visual: el mismo de la barra de arriba (mezcla del lienzo,
+   desenfoque de fondo y filete). Son las dos puntas de la misma prenda.
+   ========================================================================== */
+
+.recorrido { display: none; }
+
+@media (max-width: 860px) {
+  /* La barra solo existe en la portada, así que solo ahí vale más que cero.
+     Se marca en el <body> y no en :root para que el resto de páginas —que no
+     tienen recorrido— no aparten su botón de WhatsApp de un canto que no está
+     ocupado por nada. Todo lo que suma la variable cuelga del body. */
+  body:has(.recorrido) { --recorrido-h: 3.5rem; }
+
+  .recorrido {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 60;
+    display: block;
+    /* El alto es fijo; lo que crece es el colchón de abajo cuando el teléfono
+       tiene barra de gestos. Así la franja útil mide siempre lo mismo y las
+       cuentas de la copia no dependen del modelo de móvil. */
+    padding-bottom: env(safe-area-inset-bottom);
+    background: color-mix(in oklab, var(--sc-canvas) 86%, transparent);
+    backdrop-filter: blur(18px) saturate(1.15);
+    border-top: 1px solid var(--sc-hairline);
+  }
+
+  .recorrido__lista {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    padding-inline: max(0px, env(safe-area-inset-left)) max(0px, env(safe-area-inset-right));
+  }
+  .recorrido__lista li { display: grid; }
+
+  .recorrido__lista button {
+    display: grid;
+    justify-items: center;
+    align-content: center;
+    gap: 0.2rem;
+    /* 3.5rem son 56 px: por encima de los 44 de Apple y de los 48 de Material,
+       y con las cuatro columnas iguales el objetivo más estrecho a 320 px sigue
+       midiendo 80 px de ancho. */
+    min-height: var(--recorrido-h);
+    padding: 0;
+    background: none;
+    border: 0;
+    color: var(--sc-ink-soft);
+    cursor: pointer;
+    transition: color var(--sc-d-fast) var(--sc-ease-out);
+  }
+
+  /* El ordinal. No es decoración: es lo que hace que la parada encendida se
+     distinga SIN depender del color (criterio 1.4.1 de WCAG, "el color no
+     puede ser el único medio"). Al encenderse sube de opacidad y de peso. */
+  .recorrido__n {
+    font-family: var(--sc-font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.12em;
+    opacity: 0.42;
+    transition: opacity var(--sc-d-fast) var(--sc-ease-out);
+  }
+  .recorrido__t {
+    font-family: var(--sc-font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .recorrido__lista button[aria-current="true"] { color: var(--sc-accent); }
+  .recorrido__lista button[aria-current="true"] .recorrido__n { opacity: 1; }
+  .recorrido__lista button[aria-current="true"] .recorrido__t { font-weight: 500; }
+
+  /* ---- la aguja ----
+     Una raya del ancho de una parada que recorre el canto superior. El JS
+     escribe --p (0 a 1, cuánto llevas del recorrido entero) y la cuenta se
+     hace aquí: 0 la deja sobre la primera parada y 1 sobre la última. Como es
+     una `translate` de un elemento suyo, se compone en la GPU y no toca layout
+     en ningún fotograma del scroll. */
+  .recorrido__aguja {
+    position: absolute;
+    top: -1px;              /* pisa el filete, no se apoya debajo */
+    left: 0;
+    width: 25%;
+    height: 2px;
+    background: var(--sc-accent);
+    translate: calc(var(--p, 0) * 300%) 0;
+    pointer-events: none;
+  }
+
+  /* La copia del umbral, que es la primera línea que se lee de la web, pasa a
+     apoyarse en el canto de la barra y no en el del cristal. La copia de cada
+     tramo del mundo hace lo mismo, pero eso va en su declaración base (busca
+     `.copia {` más arriba): aquí abajo pisaría a las paradas que se colocan
+     por su cuenta. */
+  .umbral__copia { padding-bottom: calc(clamp(2rem, 7vh, 4.5rem) + var(--recorrido-h)); }
+  /* El velo del umbral sube con ella: si se quedara a ras del cristal, las
+     últimas líneas se leerían sobre la foto sin nada que las sostenga. */
+  .umbral__copia::before { bottom: var(--recorrido-h); }
+
+  /* Y el botón de WhatsApp sube por encima de la barra en vez de sentarse en
+     ella. Sin :has(): en las páginas sin recorrido --recorrido-h vale 0 y la
+     cuenta devuelve el sitio de siempre. */
+  .wasap {
+    bottom: calc(var(--recorrido-h) + max(var(--sc-4), env(safe-area-inset-bottom)));
+  }
+}
+
+/* Sin movimiento, la aguja no se desliza: salta. Sigue diciendo dónde estás,
+   que es su trabajo; lo que se va es el viaje. */
+@media (max-width: 860px) and (prefers-reduced-motion: reduce) {
+  .recorrido__aguja { transition: none; }
+  .recorrido__lista button { transition: none; }
+}
+
+/* ================================================ EL MAPA PLANO DE MÓVIL ===
+   La parada "Salida" tiene dos dibujos y solo uno se monta por visita: el globo
+   3D en escritorio, este mapa en el teléfono. El reparto lo decide el script
+   con un matchMedia del MISMO corte de 860px que usa esta hoja, así que aquí
+   solo hay que apagar el que no toca — el script ni siquiera pide el otro
+   trozo de JavaScript.
+
+   OJO con la especificidad: la hoja de svgMap se carga con el módulo, o sea
+   DESPUÉS de esta, y trae `.svgMap-wrapper { position: relative }`. Con una
+   sola clase empatan y gana la suya por orden, así que la caja se quedaba en el
+   flujo en vez de anclarse abajo. Por eso las reglas de posición van con las
+   dos clases, `.mapa-salida.svgMap-wrapper`.
+   ========================================================================== */
+
+.mapa-salida { display: none; }
+
+@media (max-width: 860px) {
+  .globo { display: none; }
+
+  /* El mapa no va suelto sobre la fotografía: va sobre una lámina, la misma
+     que la ficha y la cartela del banco. Sin ella, un mapa de tierras claras
+     encima de una foto clara de la nave no se lee — y con un velo más oscuro
+     detrás la parada perdería la foto, que es lo que la sostiene. */
+  .mapa-salida.svgMap-wrapper {
+    position: absolute;
+    inset: auto var(--sc-gutter) calc(var(--recorrido-h) + var(--sc-4)) var(--sc-gutter);
+    display: block;
+    padding: clamp(0.4rem, 2vw, 0.6rem);
+    background: color-mix(in oklab, var(--sc-surface) 92%, transparent);
+    backdrop-filter: blur(12px);
+    border-radius: 3px;
+    box-shadow: 0 0.6rem 1.8rem rgba(22, 23, 26, 0.18);
+    /* pointer-events se hereda del bloque de copia, igual que el globo: el mapa
+       solo escucha cuando esta parada está de verdad en pantalla. Con `auto`
+       fijo se quedaría capturando toques durante todo el recorrido. */
+    pointer-events: inherit;
+  }
+
+  /* ---- el mapa ----
+     La proporción se declara AQUÍ y no se hereda de la hoja de la librería,
+     aunque sea la misma. La razón no es de gusto: su hoja llega en diferido,
+     con el módulo. Si el mapa se construye antes que ella, el contenedor mide
+     cero de alto y svg-pan-zoom revienta calculando su matriz ("matrix is not
+     invertible"). tema.css es bloqueante: la caja tiene alto desde el primer
+     fotograma.
+
+     La proporción va en `aspect-ratio` y no en un alto fijo: así el alto sale
+     del ancho y la caja es la misma en cualquier teléfono, sin depender de
+     `vh` —que en un móvil cambia solo con que aparezca la barra del
+     navegador—. 2 / 1 es la del mundo entero; aquí no se ve entero (ver
+     `encuadrar` en mapa-salida.js), pero es la ventana por la que se mira, y
+     apaisada es la que mejor le va a la mancha de países. */
+  .mapa-salida .svgMap-map-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 1;
+    height: auto;
+    padding-top: 0;
+    overflow: hidden;
+    /* El océano no es azul: aquí el mapa es un dibujo de marca, no un atlas.
+       Transparente, para que se vea la lámina de debajo. */
+    background: transparent;
+  }
+  .mapa-salida .svgMap-map-image {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+  }
+  /* Sin zoom no hay nada que controlar. La librería los pinta siempre y solo
+     los marca como deshabilitados; aquí se van del todo, que ocupan una
+     esquina y en un móvil invitan a un gesto que no lleva a ningún sitio. */
+  .mapa-salida .svgMap-map-controls-wrapper,
+  .mapa-salida .svgMap-map-continent-controls-wrapper { display: none; }
+
+  .mapa-salida .svgMap-country {
+    stroke: var(--sc-surface);
+    stroke-width: 0.6;
+    vector-effect: non-scaling-stroke;
+  }
+
+  /* ---- el botón de acercar ----
+     Va DENTRO de la lámina y encima del mapa, en la esquina que menos tapa
+     —arriba a la derecha, sobre océano en cualquiera de las dos vistas—.
+
+     El chip se ve pequeño porque el mapa mide 190 px y un botón de 44 se
+     comería una cuarta parte del dibujo. Pero el objetivo del dedo sí mide 44:
+     lo estira un ::after invisible, el mismo recurso que en los enlaces del
+     pie. Lo que se ve y lo que se puede tocar no tienen por qué ser lo mismo. */
+  .mapa-salida__zoom {
+    position: absolute;
+    top: clamp(0.4rem, 2vw, 0.6rem);
+    right: clamp(0.4rem, 2vw, 0.6rem);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.5rem;
+    font-family: var(--sc-font-mono);
+    font-size: var(--sc-t-xs);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sc-ink);
+    background: color-mix(in oklab, var(--sc-canvas) 94%, transparent);
+    border: 1px solid var(--sc-hairline-strong);
+    border-radius: 2px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mapa-salida__zoom::after {
+    content: "";
+    position: absolute;
+    inset: 50% auto auto 50%;
+    translate: -50% -50%;
+    width: max(100%, 44px);
+    height: 44px;
+  }
+  .mapa-salida__zoom:active { opacity: 0.7; }
+  .mapa-salida__zoom:focus-visible {
+    outline: 2px solid var(--sc-ink);
+    outline-offset: 2px;
+  }
+
+  /* ---- las chinchetas ----
+     Son el objetivo de verdad, no el país: Luxemburgo a la escala de un mapa
+     de 335 px no se puede tocar con un dedo por mucho que se acerque el
+     encuadre. La chincheta sí, y lleva su propio escuchador en el JS. */
+  .mapa-salida .svgMap-pin {
+    pointer-events: auto;
+    cursor: pointer;
+    transition: r var(--sc-d-fast) var(--sc-ease-out),
+                fill var(--sc-d-fast) var(--sc-ease-out);
+  }
+  /* El radio de la elegida lo escribe el JS (ver ajustarChinchetas): en
+     unidades de SVG un número fijo depende de cuánto se haya acercado el mapa.
+     Aquí solo va el color. */
+  .mapa-salida .mapa-salida__pin--elegido { fill: var(--sc-accent); }
+
+  /* El foco de teclado. Los países son <path> dentro de un SVG: el contorno del
+     navegador se dibuja sobre una forma irregular y se pierde. Un trazo grueso
+     del color de la tinta sobre el propio país se ve siempre. */
+  .mapa-salida .svgMap-country:focus-visible {
+    outline: none;
+    stroke: var(--sc-ink);
+    stroke-width: 2.5;
+  }
+
+  /* ---- el globito ----
+     NINGUNA de estas reglas lleva `.mapa-salida` delante, y no es un descuido:
+     svgMap cuelga el globito DIRECTAMENTE DE <body>, no del mapa. Un selector
+     descendiente no lo alcanza jamás —lo llevaron un tiempo y este bloque
+     entero no pintaba nada—. Como el globito solo existe cuando existe el
+     mapa, y el mapa solo se monta en móvil, no le hace falta más apellido.
+
+     El z-index es lo que lo hacía ilegible: la librería le pone 2, y las
+     fotografías del recorrido van por 100-120, así que el globito salía DETRÁS
+     de la foto. 130 lo deja por encima de todo el recorrido y por debajo del
+     salto al contenido (200), que tiene que poder taparlo todo.
+
+     Y la clase va REPETIDA, igual que en `.mapa-salida.svgMap-wrapper` de más
+     arriba y por el mismo motivo: la hoja de svgMap llega con el módulo, o sea
+     DESPUÉS de esta. Con una sola clase empatan en especificidad y gana la
+     suya por orden de llegada; repetirla la sube y gana esta. */
+  .svgMap-tooltip.svgMap-tooltip {
+    z-index: 130;
+    background: var(--sc-canvas);
+    border: 1px solid var(--sc-hairline-strong);
+    border-radius: 2px;
+    box-shadow: 0 0.5rem 1.4rem rgba(22, 23, 26, 0.18);
+    min-width: 0;
+    padding: 0.3rem 0.55rem;
+  }
+  /* Los países sin obra no dicen nada, que es lo que esta parada viene
+     prometiendo desde el principio. La librería enseña el nombre de CUALQUIER
+     país y además en inglés —los nombres en español solo los tenemos para los
+     doce, ver montesinos.js—: un mapa de una ebanistería de Sabadell que al
+     tocar Italia contesta «Italy» no informa de nada. Quién tiene obra y quién
+     no lo marca el JS al vuelo (ver `onGetTooltip` en mapa-salida.js).
+
+     Con `!important` porque la librería escribe `display: block` en el propio
+     elemento al enseñarlo, y un estilo en línea no se gana de otra forma. */
+  .svgMap-tooltip[data-obra="no"] { display: none !important; }
+
+  .svgMap-tooltip-pointer.svgMap-tooltip-pointer { display: none; }
+  /* El relleno lo pone la caja de fuera. Sin esto se suman los dos y el
+     globito queda con el doble de aire del que le corresponde. */
+  .svgMap-tooltip.svgMap-tooltip .svgMap-tooltip-content-container { padding: 0; }
+  /* Con el globito delante, no por gusto: la librería escribe este título con
+     `.svgMap-tooltip .svgMap-tooltip-title` —dos clases—, así que repetir la
+     clase sola empataba y volvía a ganar ella por orden. Tres pesan más. */
+  .svgMap-tooltip.svgMap-tooltip .svgMap-tooltip-title {
+    font-family: var(--sc-font-mono);
+    font-size: var(--sc-t-xs);
+    line-height: 1.4;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sc-ink);
+    padding: 0;
+    border: 0;
+  }
+  /* La tabla de cifras y la bandera, fuera: aquí no se enseña ningún dato. El
+     valor que se le pasa existe solo porque svgMap exige una métrica (ver
+     mapa-salida.js).
+
+     Se apaga `-content`, NO `-content-container`: el título vive dentro del
+     contenedor junto con la tabla, así que apagar el contenedor dejaba un
+     globito vacío. */
+  .svgMap-tooltip.svgMap-tooltip .svgMap-tooltip-content,
+  .svgMap-tooltip.svgMap-tooltip .svgMap-tooltip-flag-container { display: none; }
+
+  /* ---- la ficha, debajo del mapa ----
+     En escritorio la ficha vive en el hueco de arriba a la izquierda, al lado
+     del globo. Aquí no hay hueco lateral que valga: 375px no se parten en dos
+     sin que la foto quede del tamaño de un sello. Así que la ficha se pone
+     DEBAJO del mapa, en la lectura natural: toco un país y la respuesta
+     aparece justo donde ya estoy mirando.
+
+     Ocupa sitio siempre —también vacía— para que el mapa no dé un salto la
+     primera vez que alguien toca un país. */
+  .mapa-salida__ficha {
+    position: relative;
+    margin-top: clamp(0.4rem, 2vw, 0.6rem);
+    min-height: clamp(3.5rem, 9vh, 4rem);
+  }
+
+  /* ---- la pista de arranque ----
+     Ocupa el hueco de la ficha mientras no hay ninguna obra elegida. Va
+     ABSOLUTA dentro de él, no en el flujo: el hueco ya tiene su alto reservado
+     para que el mapa no dé un salto al elegir el primer país, y una pista que
+     sumara su propia altura se cargaría justo eso.
+
+     La tipografía es la misma que la de la cartela del banco de maderas, que
+     dice lo mismo dos paradas más arriba. Dos instrucciones de la misma web no
+     tienen por qué inventarse cada una su estilo. */
+  .mapa-salida__pista {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding-right: 3.5rem; /* el globo de WhatsApp vive en esta esquina */
+    font-family: var(--sc-font-mono);
+    font-size: var(--sc-t-xs);
+    line-height: 1.5;
+    letter-spacing: 0.06em;
+    color: var(--sc-ink-soft);
+    /* No se toca: lo que se toca es el mapa que tiene encima. */
+    pointer-events: none;
+  }
+  .mapa-salida__ficha .ficha {
+    position: static;
+    inset: auto;
+    top: auto;
+    width: auto;
+    /* Ya está sobre la lámina del mapa: no necesita la suya. */
+    padding: 0;
+    background: none;
+    backdrop-filter: none;
+    box-shadow: none;
+  }
+  .mapa-salida__ficha .ficha[data-estado="vacio"] { visibility: hidden; }
+
+  /* Si el mapa no llega (red caída, JS fallido), la sección sigue en pie: el
+     texto y la lista de doce países están en el HTML. Solo se retira el hueco
+     del dibujo que no hay. */
+  .mapa-salida[data-estado="sin-mapa"] { display: none; }
 }

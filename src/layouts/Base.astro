@@ -8,19 +8,42 @@ const { titulo, desc, ruta, mapa = false } = Astro.props;
 <html lang="es">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- viewport-fit=cover: la página llega hasta el borde físico del
+         teléfono, por debajo de la muesca y de la barra de gestos. A cambio,
+         todo lo fijo tiene que respetar los env(safe-area-inset-*) — está en
+         tema.css, al final. NO se pone maximum-scale ni user-scalable=no:
+         impedir el zoom rompe el criterio 1.4.4 de WCAG y deja fuera a quien
+         necesita acercarse para leer. El zoom molesto de iOS al enfocar un
+         campo se resuelve con tipografía de 16px, no capando el gesto. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="description" content={desc} />
     <meta name="theme-color" content="#F4F3F0" />
     <title>{titulo}</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Las hojas propias van primero y bloqueando: son las que dibujan la
+         página. La de Google es de otro dominio y en una línea móvil su
+         resolución + handshake + descarga se cobra en la primera pantalla,
+         que es justo donde está el armario. Se carga sin bloquear (media
+         print, que no aplica, y al terminar se pasa a all) y las familias
+         tienen fallback de sistema en los tokens, así que el texto se lee
+         desde el primer fotograma y luego cambia de letra. El <noscript>
+         cubre al que navega sin JS. -->
+    <link rel="stylesheet" href="/scrollcraft.css" />
+    <link rel="stylesheet" href="/tema.css" />
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap"
+      media="print"
+      onload="this.media='all'"
     />
-    <link rel="stylesheet" href="/scrollcraft.css" />
-    <link rel="stylesheet" href="/tema.css" />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap"
+      />
+    </noscript>
   </head>
   <body>
     <script is:inline>
@@ -35,7 +58,7 @@ const { titulo, desc, ruta, mapa = false } = Astro.props;
 
     <header class:list={["chrome", mapa && "chrome--home"]} data-menu="cerrado">
       <a class="chrome__marca" href="/" aria-label="Ebanistería Montesinos, ir al inicio">
-        <img src="/logo-montesinos.png" alt="" />
+        <img src="/logo-montesinos.png" alt="" width="452" height="124" />
       </a>
 
       <!-- Solo se ve en móvil y solo en la home, donde la barra la ocupa el mapa
@@ -67,20 +90,67 @@ const { titulo, desc, ruta, mapa = false } = Astro.props;
            solo. -->
       <div class="chrome__fin">
         {mapa && (
-          <ul class="mapa" id="mapa" aria-label="Recorrido por la nave">
+          <ul class="mapa" id="mapa" data-mapa aria-label="Recorrido por la nave">
             <li><button type="button" aria-current="true"><span class="txt">Nave</span></button></li>
             <li><button type="button" aria-current="false"><span class="txt">Material</span></button></li>
             <li><button type="button" aria-current="false"><span class="txt">1:1</span></button></li>
             <li><button type="button" aria-current="false"><span class="txt">Salida</span></button></li>
           </ul>
         )}
-        <a class="chrome__cta" href={contactoDirecto.ctaHref} aria-label={contactoDirecto.ctaTexto}>
-          <span class="chrome__cta-larga">Pedir&nbsp;</span>presupuesto
+        <!-- Dos rótulos, uno por pantalla, y el CSS enciende el que toca.
+             En escritorio el botón pide presupuesto, que es la conversión que
+             se busca. En el teléfono se abre la puerta un paso antes: pedir un
+             presupuesto compromete, "contacta con nosotros" no, y desde el
+             móvil se entra a preguntar mucho más que a encargar.
+
+             Sin aria-label: el nombre accesible sale del texto, y el texto
+             escondido con display:none no cuenta para calcularlo. Así el
+             lector de pantalla lee SIEMPRE lo mismo que se ve, que es lo que
+             pide el criterio 2.5.3 de WCAG. Un aria-label fijo con dos rótulos
+             distintos lo rompería en una de las dos pantallas. -->
+        <a class="chrome__cta" href={contactoDirecto.ctaHref}>
+          <span class="chrome__cta-esc"><span class="chrome__cta-larga">Pedir&nbsp;</span>presupuesto</span>
+          <span class="chrome__cta-mov">Contacta con nosotros</span>
         </a>
       </div>
     </header>
 
     <slot />
+
+    <!-- ================================================== EL RECORRIDO =====
+         El mismo mapa de la nave que en escritorio vive en la punta derecha de
+         la barra de arriba. En el teléfono ahí no cabe: compartía los ~140 px
+         que sobran con el CTA, y de las cuatro paradas se leían dos y media.
+
+         Abajo hay sitio de sobra y, además, es donde está el pulgar. Es la
+         misma lista de siempre —los mismos cuatro botones, el mismo salto, el
+         mismo aria-current— repetida en un segundo sitio porque el sitio
+         cambia con la pantalla y el DOM no puede estar en dos lados. El JS
+         recorre TODAS las listas [data-mapa], así que ninguna de las dos sabe
+         que existe la otra.
+
+         Es una barra a lo ancho y no una pastilla flotante a propósito: una
+         pastilla se sienta encima de la copia y tapa una línea distinta en
+         cada tramo. Una barra reserva su franja y la copia se aparta de ella
+         una sola vez (--recorrido-h).
+    -->
+    {mapa && (
+      <nav class="recorrido" id="recorrido" aria-label="Recorrido por la nave">
+        <!-- La aguja va la primera y detrás de los botones: es decoración que
+             se desliza, no un separador entre paradas. -->
+        <span class="recorrido__aguja" aria-hidden="true"></span>
+        <ol class="recorrido__lista" data-mapa>
+          {["Nave", "Material", "1:1", "Salida"].map((t, i) => (
+            <li>
+              <button type="button" aria-current={i === 0 ? "true" : "false"}>
+                <span class="recorrido__n" aria-hidden="true">{String(i + 1).padStart(2, "0")}</span>
+                <span class="recorrido__t">{t}</span>
+              </button>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )}
 
     <BotonWhatsApp />
 

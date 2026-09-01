@@ -121,39 +121,182 @@
      La gramática de mundo continuo pide que el nav sea un mapa y que se pueda
      saltar. El motor publica el waypoint; el dibujo es de la página.
   */
-  var mapa = document.getElementById('mapa');
-  var botones = mapa ? [].slice.call(mapa.querySelectorAll('button')) : [];
+  // Hay DOS mapas en la página y ninguno sabe del otro: el de la barra de
+  // arriba (escritorio) y la barra del recorrido de abajo (móvil). Solo uno se
+  // ve a la vez, pero los dos se mantienen al día: si se actualizara solo el
+  // visible habría que preguntar por el ancho aquí dentro, y girar el teléfono
+  // dejaría al otro marcando la parada equivocada. Se recorren todas las
+  // listas [data-mapa] y se agrupan sus botones por índice de parada.
+  var listas = [].slice.call(document.querySelectorAll('[data-mapa]'));
+  var paradas = [];   // paradas[i] = todos los botones de la parada i
+  listas.forEach(function (l) {
+    [].slice.call(l.querySelectorAll('button')).forEach(function (b, i) {
+      (paradas[i] || (paradas[i] = [])).push(b);
+    });
+  });
   var mundo = document.querySelector('[data-sc-mode="worldflight"]');
   var tramos = mundo ? [].slice.call(mundo.querySelectorAll('[data-sc-segment]')) : [];
 
-  function scrollDeTramo(i) {
-    if (!mundo || !tramos.length) return 0;
-    var top = mundo.getBoundingClientRect().top + scrollY;
-    var run = 0;
-    for (var k = 0; k < i; k++) run += parseFloat(tramos[k].getAttribute('data-sc-w')) || 1.3;
-    // Un pelín dentro del tramo, para caer donde la copia ya está abierta.
-    var w = parseFloat(tramos[i].getAttribute('data-sc-w')) || 1.3;
-    var parada = parseFloat(tramos[i].getAttribute('data-sc-parada'));
-    if (isNaN(parada)) parada = 0.34;
-    return Math.round(top + (run + w * parada) * innerHeight);
+  var pesoTotal = 0;
+  for (var wi = 0; wi < tramos.length; wi++) {
+    pesoTotal += parseFloat(tramos[wi].getAttribute('data-sc-w')) || 1.3;
   }
 
-  botones.forEach(function (b, i) {
-    b.addEventListener('click', function () {
-      scrollTo({ top: scrollDeTramo(i), behavior: reduce ? 'auto' : 'smooth' });
+  // La altura de pantalla con la que MIDE EL MOTOR, no la de ahora mismo.
+  //
+  // En un teléfono `innerHeight` cambia sola: la barra del navegador se
+  // esconde al bajar y reaparece al subir, y ahí se van entre 60 y 90 px. El
+  // motor fija la pista de scroll una vez, en su layout, con la altura que
+  // había entonces; si el salto se calcula con la de ahora, las dos cuentas
+  // usan reglas distintas y el aterrizaje se corre. La pista mide
+  // (peso total + 1) alturas, así que dividiendo se recupera la suya exacta.
+  var espaciador = mundo && (mundo.querySelector('[data-sc-spacer]') || mundo.querySelector('.sc-world__spacer'));
+  function alturaMotor() {
+    if (espaciador) {
+      var h = espaciador.getBoundingClientRect().height / (pesoTotal + 1);
+      if (h > 100) return h;
+    }
+    return innerHeight;
+  }
+
+  /* Dónde para cada botón.
+     ---------------------------------------------------------------------
+     La versión corta: donde el texto de esa parada se lee ENTERO.
+
+     Antes cada tramo declaraba a mano en qué punto de sí mismo se paraba
+     (data-sc-parada, 0.34 por defecto). El problema de un número a mano es que
+     no sabe nada del texto: la copia de cada parada tiene su propia ventana,
+     con su entrada y su salida en degradado, y basta con que alguien retoque
+     una de esas ventanas para que el salto caiga en mitad del fundido. Medido
+     antes de tocar nada, con las ventanas que hay hoy:
+
+         NAVE      435 px dentro de la meseta   bien
+         MATERIAL  215 px dentro                bien
+         1:1        43 px dentro                al filo
+         SALIDA     -1 px                       FUERA: se aterrizaba con el
+                                                texto todavía entrando
+
+     Así que el destino ya no se declara: se deduce. Se leen las ventanas de
+     copia —los mismos atributos que lee el motor, con sus mismas reglas— se
+     calcula la MESETA de cada una (el tramo en el que el texto está a plena
+     opacidad, ni entrando ni saliendo) y se aterriza un cuarto dentro de ella.
+     Un cuarto y no la mitad: así queda margen de sobra con el borde de entrada
+     y, aun así, la mayor parte del tramo por delante para seguir bajando.
+
+     Lo bueno de deducirlo es que ya no se puede desincronizar: mueve mañana
+     una ventana en el HTML y el botón te sigue. */
+  function mesetas() {
+    if (!mundo) return [];
+    var w0 = tramos.length ? (parseFloat(tramos[0].getAttribute('data-sc-w')) || 1.3) : 1;
+    var ultimo = tramos.length ? tramos[tramos.length - 1] : null;
+    var wN = ultimo ? (parseFloat(ultimo.getAttribute('data-sc-w')) || 1.3) : 1;
+
+    return [].slice.call(mundo.querySelectorAll('[data-sc-copy]')).map(function (c) {
+      var spec = (c.getAttribute('data-sc-window') || '').trim();
+      var from = 0, to = 1, rIn = 0.3, rOut = 0.3, n;
+      // Las tres formas que entiende el motor. Aquí no se inventa ninguna
+      // regla: es su misma lectura, para que no puedan discrepar.
+      if (spec === 'hero') {
+        from = 0; to = (0.62 * w0) / pesoTotal; rIn = 0; rOut = 0.65;
+      } else if (spec === 'finale') {
+        from = (pesoTotal - wN + 0.4 * wN) / pesoTotal; to = 1; rIn = 0.55; rOut = 0;
+      } else {
+        n = spec.split(/\s+/).map(parseFloat);
+        from = isNaN(n[0]) ? 0 : clamp01(n[0]);
+        to = (n.length > 1 && !isNaN(n[1])) ? clamp01(n[1]) : clamp01(from + 0.18);
+        if (n.length > 2 && !isNaN(n[2])) rIn = clamp01(n[2]);
+        if (n.length > 3 && !isNaN(n[3])) rOut = clamp01(n[3]);
+      }
+      if (to <= from) to = clamp01(from + 0.05);
+      var ancho = to - from;
+      return { a: from + ancho * rIn, b: to - ancho * rOut };
+    });
+  }
+
+  // La meseta que más se solapa con este tramo, recortada a él. Se elige por
+  // solape y no por orden en el documento: así un tramo sin copia propia no se
+  // queda con la del vecino, y reordenar el HTML no rompe nada.
+  function mesetaDe(desde, hasta) {
+    var lista = mesetas(), mejor = null, mejorSolape = 0;
+    for (var i = 0; i < lista.length; i++) {
+      var a = Math.max(lista[i].a, desde);
+      var b = Math.min(lista[i].b, hasta);
+      if (b - a > mejorSolape) { mejorSolape = b - a; mejor = { a: a, b: b }; }
+    }
+    return mejor;
+  }
+
+  function scrollDeTramo(i) {
+    if (!mundo || !tramos.length) return 0;
+    var vh = alturaMotor();
+    var top = mundo.getBoundingClientRect().top + scrollY;
+
+    var c0 = 0;
+    for (var k = 0; k < i; k++) c0 += parseFloat(tramos[k].getAttribute('data-sc-w')) || 1.3;
+    var w = parseFloat(tramos[i].getAttribute('data-sc-w')) || 1.3;
+
+    var meseta = mesetaDe(c0 / pesoTotal, (c0 + w) / pesoTotal);
+    if (meseta) {
+      return Math.round(top + (meseta.a + (meseta.b - meseta.a) * 0.25) * pesoTotal * vh);
+    }
+
+    // Respaldo para un mundo sin copias declaradas: el punto a mano de siempre.
+    var parada = parseFloat(tramos[i].getAttribute('data-sc-parada'));
+    if (isNaN(parada)) parada = 0.34;
+    return Math.round(top + (c0 + w * parada) * vh);
+  }
+
+  paradas.forEach(function (grupo, i) {
+    grupo.forEach(function (b) {
+      b.addEventListener('click', function () {
+        scrollTo({ top: scrollDeTramo(i), behavior: reduce ? 'auto' : 'smooth' });
+      });
     });
   });
 
   if (mundo) {
     mundo.addEventListener('sc:waypoint', function (e) {
       var k = e.detail.index;
-      botones.forEach(function (b, i) {
+      paradas.forEach(function (grupo, i) {
         var on = i === k;
-        if ((b.getAttribute('aria-current') === 'true') !== on) {
-          b.setAttribute('aria-current', on ? 'true' : 'false');
-        }
+        grupo.forEach(function (b) {
+          if ((b.getAttribute('aria-current') === 'true') !== on) {
+            b.setAttribute('aria-current', on ? 'true' : 'false');
+          }
+        });
       });
     });
+  }
+
+  /* ------------------------------------------------------- la aguja -------
+     La parada encendida dice en cuál de las cuatro estás. La aguja dice CUÁNTO
+     llevas de ella: es una raya del ancho de una parada que se desliza por el
+     canto superior de la barra siguiendo el scroll, no un punto que salta de
+     casilla en casilla al cruzar el umbral de cada tramo.
+
+     La diferencia importa en una portada que ES un recorrido: entre parada y
+     parada hay dos o tres pantallas de scroll, y con un punto que salta te
+     pasas todo ese rato sin saber si te queda mucho. Se escribe una sola
+     propiedad (--p, de 0 a 1) y el CSS hace la cuenta; así el bucle de scroll
+     no toca layout ni lee nada del DOM.
+
+     Va aparte de pintarCamara() porque aquella se apaga con movimiento
+     reducido —es un gesto— y esto no es un gesto, es un indicador de posición:
+     tiene que seguir funcionando. Lo que se apaga en ese caso es la transición
+     del CSS, no el dato. */
+  var recorrido = document.getElementById('recorrido');
+
+  function pintarRecorrido() {
+    if (!recorrido || !mundo || !tramos.length) return;
+    var top = mundo.getBoundingClientRect().top + scrollY;
+    var t = (scrollY - top) / Math.max(innerHeight, 1);
+    var total = 0;
+    for (var i = 0; i < tramos.length; i++) {
+      total += parseFloat(tramos[i].getAttribute('data-sc-w')) || 1.3;
+    }
+    // Antes de entrar en el mundo (todo el umbral) la aguja espera en la
+    // primera parada; después del último tramo se queda en la última.
+    recorrido.style.setProperty('--p', clamp01(t / total).toFixed(4));
   }
 
   /* ------------------------------------------------- cámara por tramo ----
@@ -264,6 +407,7 @@
       pintarCierre();
       pintarCamara();
       pintarCopias();
+      pintarRecorrido();
       pendiente = false;
     });
   }
@@ -276,6 +420,7 @@
   pintarCierre();
   pintarCamara();
   pintarCopias();
+  pintarRecorrido();
 
   /* ------------------------------------------- la inclinación del sello ---
      El motor trae `data-sc-tilt`, pero apaga TODOS sus dispositivos de puntero

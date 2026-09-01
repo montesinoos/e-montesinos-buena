@@ -1,9 +1,22 @@
 ---
+import fs from "node:fs";
 import Base from "../layouts/Base.astro";
 import Pie from "../components/Pie.astro";
 import { proyectos, sectores } from "../data/montesinos.js";
 
 const nombreSector = (id) => sectores.find((s) => s.id === id)?.nombre ?? id;
+
+// Qué fotos tienen copia de móvil. Se mira la carpeta en tiempo de compilación
+// en vez de mantener una lista a mano: la lista se olvidaría en cuanto entrara
+// una obra nueva, y un srcset que apunta a un archivo inexistente da un 404 en
+// silencio y deja el hueco en blanco. Las fotos que ya venían por debajo de
+// 1100 px no tienen `-m` porque no lo necesitan.
+const conMovil = new Set(
+  fs
+    .readdirSync("public/proyectos-web")
+    .filter((f) => f.endsWith("-m.webp"))
+    .map((f) => f.replace("-m.webp", ""))
+);
 ---
 
 <Base
@@ -34,12 +47,31 @@ const nombreSector = (id) => sectores.find((s) => s.id === id)?.nombre ?? id;
       {proyectos.map((p) => (
         <figure class="obra" data-sector={p.sector}>
           <div class="obra__media">
-            <img
-              src={`/proyectos-web/${p.img}.webp`}
-              alt={`Proyecto de Ebanistería Montesinos para ${p.nombre}`}
-              loading="lazy"
-              decoding="async"
-            />
+            <!-- La rejilla es de 1 columna en móvil y de 3 en escritorio,
+                 así que el mismo archivo se pinta a 335 px o a 420 px. Servir
+                 los 1800 px del original en un teléfono son ~2,5 MB de
+                 galería para nada. Las fotos que lo pedían tienen copia de
+                 900 px (`-m`); las que ya venían pequeñas, no, y ahí el
+                 srcset se queda con la única que hay. `sizes` es lo que de
+                 verdad elige: sin él el navegador supone 100vw y en
+                 escritorio bajaría de más. -->
+            {!conMovil.has(p.img) ? (
+              <img
+                src={`/proyectos-web/${p.img}.webp`}
+                alt={`Proyecto de Ebanistería Montesinos para ${p.nombre}`}
+                loading="lazy"
+                decoding="async"
+              />
+            ) : (
+              <img
+                src={`/proyectos-web/${p.img}.webp`}
+                srcset={`/proyectos-web/${p.img}-m.webp 900w, /proyectos-web/${p.img}.webp 1800w`}
+                sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
+                alt={`Proyecto de Ebanistería Montesinos para ${p.nombre}`}
+                loading="lazy"
+                decoding="async"
+              />
+            )}
           </div>
           <figcaption>
             <h2>{p.nombre}</h2>

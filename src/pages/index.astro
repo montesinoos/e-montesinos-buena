@@ -22,24 +22,42 @@ const desc =
          sea cual sea la pantalla. Con la foto en object-fit:cover directamente
          sobre el viewport, en vertical las hojas se despegaban del mueble. -->
     <div class="umbral__escena">
-      <img class="umbral__sala" src="/puertas/sala.webp" alt="" fetchpriority="high" />
+      <!-- Cada foto del umbral lleva su copia de movil. No es una cuestion de
+           encuadre —el recorte es el mismo— sino de peso: en el telefono la
+           sala se pinta a 544 px de ancho y la hoja de la puerta a 150, y bajar
+           la original de 2200 px por una linea movil es tirar el presupuesto de
+           la primera pantalla. Esta es LA imagen del LCP: lo que tarde en
+           llegar es lo que tarda la web en existir. -->
+      <picture>
+        <source media="(max-width: 860px)" srcset="/puertas/sala-m.webp" width="1100" height="611" />
+        <img class="umbral__sala" src="/puertas/sala.webp" alt="" width="2200" height="1222" fetchpriority="high" decoding="async" />
+      </picture>
 
       <div class="umbral__hueco">
-        <img src="/mundo/nave-entrada.webp" alt="" />
+        <picture>
+          <source media="(max-width: 860px)" srcset="/mundo/nave-entrada-m.webp" width="780" height="1386" />
+          <img src="/mundo/nave-entrada.webp" alt="" width="2000" height="1112" decoding="async" />
+        </picture>
       </div>
 
       <div class="puerta puerta--izq">
-        <img src="/puertas/puerta-izq.webp" alt="" />
+        <picture>
+          <source media="(max-width: 860px)" srcset="/puertas/puerta-izq-m.webp" width="420" height="734" />
+          <img src="/puertas/puerta-izq.webp" alt="" width="739" height="1292" decoding="async" />
+        </picture>
         <span class="puerta__luz"></span>
       </div>
       <div class="puerta puerta--der">
-        <img src="/puertas/puerta-der.webp" alt="" />
+        <picture>
+          <source media="(max-width: 860px)" srcset="/puertas/puerta-der-m.webp" width="430" height="730" />
+          <img src="/puertas/puerta-der.webp" alt="" width="761" height="1292" decoding="async" />
+        </picture>
         <span class="puerta__luz"></span>
       </div>
     </div>
 
     <div class="umbral__copia">
-      <h1>Un armario de <img class="umbral__logo" src="/logo-montesinos.png" alt="Montesinos" /> por fuera.<br />Una fábrica entera por dentro.</h1>
+      <h1>Un armario de <img class="umbral__logo" src="/logo-montesinos.png" alt="Montesinos" width="452" height="124" decoding="async" /> por fuera.<br />Una fábrica entera por dentro.</h1>
       <p>Taller en Sabadell · Oficina técnica en Madrid · Distribución en Londres</p>
     </div>
   </div>
@@ -55,7 +73,14 @@ const desc =
     <div data-sc-mode="worldflight" data-sc-seam="0.16">
       <div data-sc-world>
         <div data-sc-segment data-sc-w="1.5" data-sc-linger="0.25" data-sc-waypoint="Nave">
-          <img class="sc-world__poster" src="/mundo/nave-entrada.webp" alt="Nave de Ebanistería Montesinos, vacía, con luz de los ventanales industriales" />
+          <picture>
+            <!-- La copia de movil no es la misma foto encogida: esta
+                 recortada en vertical (780x1386), que es la forma real de
+                 la pantalla de un telefono. La apaisada, escalada a cubrir,
+                 se sale de cuadro por los lados y ademas pesa el doble. -->
+            <source media="(max-width: 860px) and (orientation: portrait)" srcset="/mundo/nave-entrada-m.webp" width="780" height="1386" />
+            <img class="sc-world__poster" src="/mundo/nave-entrada.webp" alt="Nave de Ebanistería Montesinos, vacía, con luz de los ventanales industriales" width="2000" height="1112" decoding="async" />
+          </picture>
         </div>
         <!-- El fondo de Material es una superficie lisa a propósito. Aquí el
              protagonista es el banco de muestras, que ya es madera: una foto de
@@ -63,14 +88,39 @@ const desc =
              perdía. Este archivo es un MARCADOR DE POSICIÓN generado
              (lab/gen-fondo.mjs) hasta que llegue la foto real de pared o suelo
              del taller. Instrucciones de encuadre en README-FOTOS.md. -->
+        <!-- data-sc-parada ya NO decide donde para el boton del recorrido: ese
+             punto se deduce de la ventana de la copia (ver scrollDeTramo en
+             montesinos.js). Se queda como respaldo por si algun dia hay un
+             tramo sin copia declarada. -->
         <div data-sc-segment data-sc-w="3.4" data-sc-linger="0.3" data-sc-parada="0.16" data-sc-waypoint="Material">
-          <img class="sc-world__poster" src="/mundo/nave-fondo-liso.webp" alt="Pared lisa del taller, sin objetos: fondo neutro para las muestras de madera" />
+          <picture>
+            <!-- La copia de movil no es la misma foto encogida: esta
+                 recortada en vertical (780x1386), que es la forma real de
+                 la pantalla de un telefono. La apaisada, escalada a cubrir,
+                 se sale de cuadro por los lados y ademas pesa el doble. -->
+            <source media="(max-width: 860px) and (orientation: portrait)" srcset="/mundo/nave-fondo-liso-m.webp" width="780" height="1386" />
+            <img class="sc-world__poster" src="/mundo/nave-fondo-liso.webp" alt="Pared lisa del taller, sin objetos: fondo neutro para las muestras de madera" width="2400" height="1350" decoding="async" />
+          </picture>
         </div>
         <div data-sc-segment data-sc-w="2.2" data-sc-linger="0.2" data-sc-waypoint="Uno a uno">
-          <img class="sc-world__poster" src="/mundo/nave-uno-a-uno.webp" alt="Un interior comercial completo, montado a escala real, de pie en mitad de la nave" />
+          <picture>
+            <!-- La copia de movil no es la misma foto encogida: esta
+                 recortada en vertical (780x1386), que es la forma real de
+                 la pantalla de un telefono. La apaisada, escalada a cubrir,
+                 se sale de cuadro por los lados y ademas pesa el doble. -->
+            <source media="(max-width: 860px) and (orientation: portrait)" srcset="/mundo/nave-uno-a-uno-m.webp" width="780" height="1386" />
+            <img class="sc-world__poster" src="/mundo/nave-uno-a-uno.webp" alt="Un interior comercial completo, montado a escala real, de pie en mitad de la nave" width="2000" height="1112" decoding="async" />
+          </picture>
         </div>
         <div data-sc-segment data-sc-w="1.4" data-sc-linger="0.25" data-sc-waypoint="Salida">
-          <img class="sc-world__poster" src="/mundo/nave-embalaje.webp" alt="Piezas terminadas, embaladas y flejadas junto al portón de carga" />
+          <picture>
+            <!-- La copia de movil no es la misma foto encogida: esta
+                 recortada en vertical (780x1386), que es la forma real de
+                 la pantalla de un telefono. La apaisada, escalada a cubrir,
+                 se sale de cuadro por los lados y ademas pesa el doble. -->
+            <source media="(max-width: 860px) and (orientation: portrait)" srcset="/mundo/nave-embalaje-m.webp" width="780" height="1386" />
+            <img class="sc-world__poster" src="/mundo/nave-embalaje.webp" alt="Piezas terminadas, embaladas y flejadas junto al portón de carga" width="2000" height="1112" decoding="async" />
+          </picture>
         </div>
       </div>
 
@@ -85,8 +135,23 @@ const desc =
           <div class="sello" aria-hidden="true">
             <div class="sello__eje">
               <picture>
-                <source srcset="/logo-disco.webp" type="image/webp" />
-                <img class="sello__img" src="/logo-disco.png" alt="" decoding="async" />
+                <!-- El sello no se dibuja por debajo de 1025px (tema.css lo
+                     apaga con display:none en puntero grueso). Aun así, Chrome
+                     descarga las imágenes perezosas que viven dentro de un
+                     display:none, así que con un <img> normal el teléfono se
+                     bajaba 425 KB de disco para no enseñarlos nunca. La única
+                     fuente lleva `media` de escritorio y el <img> de reserva es
+                     un GIF transparente de 1×1 en línea: bajo 1025px no se pide
+                     nada a la red. -->
+                <source media="(min-width: 1025px)" srcset="/logo-disco.webp" type="image/webp" />
+                <img
+                  class="sello__img"
+                  src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+                  alt=""
+                  width="900"
+                  height="876"
+                  decoding="async"
+                />
               </picture>
             </div>
           </div>
@@ -200,6 +265,14 @@ const desc =
                propio <canvas>. -->
           <div class="globo" id="globo-salida" aria-hidden="true"></div>
 
+          <!-- El mismo sitio, en movil: un mapa plano en SVG en vez del globo.
+               El div esta vacio a proposito, igual que el del globo: svgMap le
+               cuelga dentro su propio <svg>. Cual de los dos se monta lo decide
+               el script de mas abajo con un matchMedia; el CSS apaga el otro.
+               NO lleva aria-hidden: al contrario que el globo, los doce paises
+               del mapa son enfocables y se anuncian. -->
+          <div class="mapa-salida" id="mapa-salida"></div>
+
           <!-- La ficha del proyecto. Vive en el hueco de arriba a la izquierda,
                que hasta ahora estaba vacio: el texto ocupa la banda de abajo y
                el globo la mitad derecha.
@@ -259,8 +332,36 @@ const desc =
   -->
   <script>
     import { paisesGlobo } from "../data/montesinos.js";
+    import { crearFicha } from "../scripts/ficha.js";
 
     const caja = document.getElementById("globo-salida");
+
+    // ----------------------------------------------- globo o mapa plano ----
+    // Escritorio se lleva el globo 3D; el telefono, el mapa plano. Se pregunta
+    // por el ANCHO y no por el puntero: el corte es el mismo 860px que usa toda
+    // la hoja de estilo, y asi lo que se ve y lo que se descarga no pueden
+    // discrepar.
+    //
+    // Se guarda la CONSULTA, no su respuesta. Leerla una sola vez al arrancar
+    // dejaba la seccion VACIA en cuanto la ventana cruzaba los 860px despues
+    // de cargar --girar el telefono, arrastrar la esquina, abrir el modo movil
+    // de las herramientas del navegador--: el CSS apagaba la pieza que ya no
+    // tocaba y la que tocaba no se habia montado nunca. Ahora se pregunta en
+    // el momento de montar, y se escucha el cruce (mas abajo).
+    const ESTRECHA = window.matchMedia("(max-width: 860px)");
+
+    // Donde vive la ficha en escritorio, apuntado ANTES de que nadie la toque:
+    // el mapa plano se la lleva debajo de si, y si la ventana vuelve a ser
+    // ancha hay que devolverla a su hueco junto al globo.
+    const fichaCasa = (() => {
+      const f = document.getElementById("ficha-globo");
+      return f ? { padre: f.parentNode, siguiente: f.nextSibling } : null;
+    })();
+
+    // Cada pieza se monta UNA vez, aunque se cruce el limite diez veces.
+    let mapaPuesto = false;
+    let globoPuesto = false;
+    let yaArranco = false;
 
     // ------------------------------------------------- cuando se carga ----
     // globe.gl + three + las texturas son, con diferencia, lo mas pesado de
@@ -319,6 +420,38 @@ const desc =
     };
 
     async function montar() {
+      yaArranco = true;
+
+      // En movil no se toca ni globe.gl ni three: se pide el mapa plano, que es
+      // otro trozo y pesa una fraccion. El import() dinamico es lo que hace que
+      // el visitante de telefono no descargue NADA del globo y viceversa.
+      if (ESTRECHA.matches) {
+        if (mapaPuesto) {
+          // Ya estaba montado: solo hay que reclamar la ficha, que si por el
+          // camino se paso por escritorio habra vuelto al hueco del globo.
+          const cajon = document.querySelector(".mapa-salida__ficha");
+          const ficha = document.getElementById("ficha-globo");
+          if (cajon && ficha) cajon.append(ficha);
+          return;
+        }
+        try {
+          const { montarMapa } = await import("../scripts/mapa-salida.js");
+          montarMapa(document.getElementById("mapa-salida"));
+          mapaPuesto = true;
+        } catch (e) {
+          // Si el mapa no llega, la seccion sigue en pie: el texto y la lista
+          // de doce paises estan en el HTML y no dependen de esto.
+          document.getElementById("mapa-salida").dataset.estado = "sin-mapa";
+        }
+        return;
+      }
+
+      // De vuelta a ancho: la ficha se la habia llevado el mapa debajo de si.
+      if (mapaPuesto && fichaCasa) {
+        fichaCasa.padre.insertBefore(document.getElementById("ficha-globo"), fichaCasa.siguiente);
+      }
+      if (globoPuesto) return;
+
       // La pregunta va ANTES de los import(), no despues: en una maquina sin
       // WebGL descargar globe.gl y three seria megabyte y medio para no pintar
       // nada. Y three escribe en consola por su cuenta antes de lanzar, asi que
@@ -341,6 +474,7 @@ const desc =
       // suelta.
       try {
         montarGlobo(Globe, THREE);
+        globoPuesto = true;
       } catch (e) {
         caja.dataset.estado = "sin-webgl";
       }
@@ -547,17 +681,17 @@ const desc =
       const texElegido = hacerTextura(1.5, "rgba(214, 158, 66, 0.98)");
 
       let marcado = null;              // el marcador bajo el cursor, o null
-      let elegido = null;              // el marcador cuya obra esta en la ficha
       const spriteDe = new Map();      // dato -> su sprite, para vestirlo al vuelo
 
       const vestir = (sprite, d) => {
         // El elegido manda sobre el senalado: si se pasa el cursor por encima
-        // de otro, el que esta en la ficha no debe perder su aro.
-        const esElegido = d === elegido;
+        // de otro, el que esta en la ficha no debe perder su aro. Quien sabe
+        // cual esta elegido es la ficha, que es la que lo cambia.
+        const elegido = esElegido(d);
         const esMarcado = d === marcado;
-        sprite.material.map = esElegido ? texElegido : esMarcado ? texHover : texReposo;
+        sprite.material.map = elegido ? texElegido : esMarcado ? texHover : texReposo;
         sprite.material.needsUpdate = true;
-        const t = esElegido ? TAMANO_ELEGIDO : esMarcado ? TAMANO_HOVER : TAMANO;
+        const t = elegido ? TAMANO_ELEGIDO : esMarcado ? TAMANO_HOVER : TAMANO;
         sprite.scale.set(t, t, 1);
       };
 
@@ -567,6 +701,14 @@ const desc =
           if (sprite) vestir(sprite, d);
         }
       };
+
+      // ------------------------------------------------------- LA FICHA ----
+      // La tarjeta de obra vive en su propio modulo (src/scripts/ficha.js)
+      // porque la abren dos piezas: este globo y el mapa plano de movil. Aqui
+      // solo se le dice que, al cambiar de obra, hay que revestir el marcador
+      // que sale y el que entra. Se crea ANTES que los sprites: `vestir` la
+      // consulta en cuanto la capa recibe sus datos.
+      const { mostrar, esElegido } = crearFicha({ alCambiar: revestir });
 
       globo
         .customLayerData([])     // se rellenan cuando el globo esta listo
@@ -611,74 +753,6 @@ const desc =
       // Los doce entran cuando la textura del planeta ya esta puesta, no antes:
       // apareciendo sobre una esfera todavia gris se leerian como un error de
       // carga.
-      // ------------------------------------------------------- LA FICHA ----
-      const ficha = document.getElementById("ficha-globo");
-      const laminas = document.getElementById("ficha-laminas");
-      const pie = document.getElementById("ficha-pie");
-      const SUAVE = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-      const hacerLamina = (d) => {
-        const lamina = document.createElement("div");
-        lamina.className = "ficha__lamina";
-        const img = document.createElement("img");
-        img.src = d.img;
-        img.alt = `Proyecto de Ebanistería Montesinos en ${d.ciudad}, ${d.pais}`;
-        img.decoding = "async";
-        lamina.append(img);
-        return lamina;
-      };
-
-      const mostrar = (d) => {
-        if (!d || d === elegido) return;
-
-        const previo = elegido;
-        elegido = d;
-        revestir(previo, d);
-
-        const saliente = laminas.lastElementChild;
-        const entrante = hacerLamina(d);
-
-        const escribirPie = () => {
-          pie.replaceChildren();
-          pie.append(Object.assign(document.createElement("b"), { textContent: d.ciudad }));
-          pie.append(Object.assign(document.createElement("span"), { textContent: d.pais }));
-        };
-
-        if (SUAVE.matches || !saliente) {
-          // Sin deslizamiento: la lamina vieja se va y la nueva ya esta puesta.
-          laminas.replaceChildren(entrante);
-          escribirPie();
-          ficha.dataset.estado = "llena";
-          return;
-        }
-
-        // La que se va deja de contar para el lector de pantalla en cuanto
-        // empieza a salir: durante 380 ms hay dos fotos en el DOM y solo una
-        // es la actual.
-        saliente.setAttribute("aria-hidden", "true");
-
-        entrante.classList.add("ficha__lamina--entra");
-        laminas.append(entrante);
-        ficha.dataset.cambiando = "si";   // el pie se desvanece
-
-        // Dos fotogramas de margen: uno no basta para que el navegador
-        // registre la posicion de partida, y sin posicion de partida no hay
-        // transicion, hay salto.
-        requestAnimationFrame(() => requestAnimationFrame(() => {
-          entrante.classList.remove("ficha__lamina--entra");
-          saliente.classList.add("ficha__lamina--sale");
-          // A mitad del recorrido, cuando el pie ya se ha ido, se cambia el
-          // texto y vuelve: asi ciudad y foto cambian a la vez y no se lee el
-          // pie viejo sobre la foto nueva.
-          setTimeout(() => {
-            escribirPie();
-            ficha.dataset.cambiando = "no";
-          }, 190);
-        }));
-
-        saliente.addEventListener("transitionend", () => saliente.remove(), { once: true });
-        ficha.dataset.estado = "llena";
-      };
 
       // El clic NO va por onCustomLayerClick. La libreria dispara ese callback
       // con el objeto que tenia bajo el cursor la ultima vez que paso el
@@ -730,7 +804,7 @@ const desc =
       // recibir el foco se dispara el mismo salto que el "Salida" del mapa de
       // la cabecera; se reutiliza ese boton en vez de recalcular la posicion,
       // que ya la sabe montesinos.js.
-      const bloque = ficha.closest("[data-sc-copy]");
+      const bloque = document.getElementById("ficha-globo").closest("[data-sc-copy]");
       const irASalida = [...document.querySelectorAll("#mapa button")]
         .find((b) => b.textContent.trim().toLowerCase() === "salida");
 
@@ -767,6 +841,26 @@ const desc =
     }
 
     if (caja && !arrancar()) addEventListener("scroll", arrancar, { passive: true });
+
+    // El cruce de los 860px despues de haber montado: se pide la pieza del otro
+    // lado. Solo despues de `yaArranco`, para no descargar nada a quien todavia
+    // no ha bajado al recorrido.
+    //
+    // Se vigila por dos caminos a proposito. El evento de la consulta es el
+    // limpio, pero hay entornos que cambian el tamano de la ventana por debajo
+    // (el modo movil de las herramientas del navegador, los paneles empotrados)
+    // y ahi `matches` cambia sin que llegue el aviso. El `resize` es la red:
+    // compara con lo ultimo que se sabia y solo hace algo cuando de verdad se
+    // ha cruzado el limite, asi que redimensionar dentro del mismo lado no
+    // cuesta nada.
+    let eraEstrecha = ESTRECHA.matches;
+    const revisarAncho = () => {
+      if (!yaArranco || ESTRECHA.matches === eraEstrecha) return;
+      eraEstrecha = ESTRECHA.matches;
+      montar();
+    };
+    ESTRECHA.addEventListener("change", revisarAncho);
+    addEventListener("resize", revisarAncho, { passive: true });
   </script>
 
   <!-- ===================================================== EL CIERRE ======

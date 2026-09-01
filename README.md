@@ -55,6 +55,67 @@ assets-source/
   generado/                (ignorado) PNG originales de KIE.AI
 ```
 
+## El recorrido de la nave
+
+El mapa de cuatro paradas (Nave · Material · 1:1 · Salida) está **dos veces en
+el DOM** y solo se ve una a la vez: en escritorio, en la punta derecha de la
+barra de arriba (`.mapa`, en `Base.astro` dentro del `<header>`); en móvil, en
+una barra fija al pie de la portada (`.recorrido`, hermana del `<header>`).
+Arriba, en un teléfono, las cuatro paradas se quedaban en 144 px compartidos
+con el CTA.
+
+El JS no sabe cuál de las dos se ve: recorre todas las listas `[data-mapa]` y
+agrupa sus botones por índice de parada, así que las dos saltan igual y las dos
+se encienden con el mismo `sc:waypoint`. Si se añade una parada hay que
+añadirla en los dos sitios.
+
+**Dónde para cada botón no se declara: se deduce.** Cada parada tiene su
+bloque de copia con una ventana (`data-sc-window`: desde, hasta, y cuánto tarda
+en entrar y en salir). De ahí se saca la *meseta* —el tramo en el que el texto
+está a plena opacidad— y el botón aterriza un cuarto dentro de ella. Antes cada
+tramo llevaba el punto a mano (`data-sc-parada`) y el número no sabía nada del
+texto: bastaba retocar una ventana para que el salto cayera en mitad del
+fundido. Con las ventanas de hoy, «1:1» aterrizaba a 43 px del borde y «Salida»
+1 px FUERA —se llegaba con el texto todavía entrando—. `data-sc-parada` se
+queda solo como respaldo para un tramo sin copia declarada.
+
+El salto usa la altura de pantalla **del motor**, no `innerHeight`: en un móvil
+la barra del navegador se esconde y reaparece, y ahí se van entre 60 y 90 px. El
+motor fija su pista una vez, con la altura que había entonces; se recupera
+dividiendo el alto del espaciador entre (peso total + 1).
+
+La aguja de la barra del pie es continua, no salta de casilla: `pintarRecorrido()`
+escribe `--p` (0 a 1, cuánto llevas del recorrido entero) y el CSS la desliza.
+Va aparte de `pintarCamara()` porque aquella se apaga con movimiento reducido y
+un indicador de posición no puede apagarse.
+
+`--recorrido-h` (en `tema.css`) es el alto de esa barra: vale `0px` por defecto
+y `3.5rem` en `body:has(.recorrido)` bajo 860 px. Todo lo que se apoya en el
+borde inferior de la pantalla —la copia del umbral, la copia de cada tramo, el
+botón de WhatsApp— la suma, así que en el resto de páginas la cuenta da el sitio
+de siempre sin condicionales.
+
+## Las imágenes en móvil
+
+Toda foto que se pinte grande tiene una copia `-m` al lado. No es la misma
+imagen encogida: las de `mundo/` son recortes **verticales** de 780×1386,
+que es la forma real de la pantalla de un teléfono, y se eligen con
+`<picture>` + `media` (dirección de arte). Las de `proyectos-web/` sí son la
+misma foto a 900 px de ancho y se eligen con `srcset` + `sizes`, que es
+resolución y no encuadre. Con eso la portada baja de 1,3 MB a 380 KB y la
+galería de 2,8 MB a 1 MB.
+
+Si entra una foto nueva:
+
+```bash
+# proyectos: cualquiera que pase de 1100 px de ancho quiere su copia
+node -e "const s=require('sharp');s('public/proyectos-web/NOMBRE.webp').resize({width:900}).webp({quality:74}).toFile('public/proyectos-web/NOMBRE-m.webp')"
+```
+
+`proyectos.astro` mira la carpeta al compilar, así que en cuanto el archivo
+`-m` existe entra solo en el `srcset`. Las fotos que ya vienen por debajo de
+1100 px no necesitan copia y la página lo detecta.
+
 ## Sobre el contenido
 
 Todo lo de `src/data/montesinos.js` procede de themontesinos.com. Los teléfonos,

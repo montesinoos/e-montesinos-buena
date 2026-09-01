@@ -2,6 +2,70 @@
 
 ---
 
+## El mapa plano de móvil (parada «Salida»)
+
+En el teléfono la parada «Salida» no monta el globo 3D: monta un mapa plano en
+SVG con [svgMap](https://github.com/stephanwagner/svgMap). Mismos doce países,
+misma ficha de obra, misma lista de datos (`paisesGlobo`); otro dibujo. El
+reparto lo hace un `matchMedia("(max-width: 860px)")` leído una sola vez al
+arrancar, así que cada visita descarga UNA de las dos piezas y nunca las dos.
+
+Medido igual que la ficha del globo de más abajo: sitio ya construido
+(`npm run build`), pesos de `dist/_astro`, gzip calculado sobre el fichero.
+
+### Peso añadido
+
+| Pieza | En disco | Gzip | Cuándo se descarga |
+|---|---|---|---|
+| `svgmap` + código propio del mapa y de la ficha | 166 KB | 55 KB | diferido |
+| Hoja de `svgmap` | 8 KB | 2 KB | diferido |
+| **Total diferido** | **174 KB** | **57 KB por la red** | |
+
+No hay texturas: el mapa del mundo son trazados SVG dentro del propio
+JavaScript, y no se pide ninguna imagen. Tampoco hay banderas (`hideFlag`), que
+en esta librería son una petición por país a un CDN de terceros.
+
+### La comparación, que es el motivo del cambio
+
+| | Por la red | Factor |
+|---|---|---|
+| Globo 3D (globe.gl + three + dos texturas) | ~872 KB | — |
+| Mapa plano (svgMap) | **57 KB** | **15× más ligero** |
+
+**Se ahorran unos 815 KB, un 93 %**, en el dispositivo que peor conexión y peor
+batería tiene. Y no solo bytes: el globo abre un contexto WebGL y deja un bucle
+de render vivo mientras la parada está en pantalla; el mapa es un SVG quieto,
+sin GPU y sin bucle.
+
+El disparo de la carga diferida es EL MISMO que el del globo —al entrar en el
+recorrido del mundo, con el umbral ya pasado— así que quien abre la home y no
+baja del armario no descarga ninguna de las dos piezas.
+
+### Lo que queda a medias
+
+- **Hay dos vistas, no zoom libre.** El botón «Acercar» alterna entre el
+  recorte general y el grupo de países que quedan juntos; no hay pellizco ni
+  arrastre. Es a propósito: el mapa vive dentro de un recorrido que se mueve
+  con el scroll, y un mapa que responde al arrastre se queda con el gesto de
+  bajar por la página. Qué países forman ese grupo se calcula midiendo cuáles
+  caen cerca unos de otros, así que no hay ninguna lista que mantener.
+- **El mapa va recortado, no completo.** Se enseña la ventana donde están las
+  obras —de Portugal al Golfo, con Rusia entera— y no el planeta. Es una
+  decisión, no una limitación: se probó con el mundo completo y sobre 320-400 px
+  las chinchetas quedaban del tamaño de una mota y las de Europa occidental se
+  fundían en una mancha. El recorte no se escribe a mano: se mide sobre las
+  chinchetas ya pintadas, así que un país nuevo en `paisesGlobo` lo recoloca
+  solo. Quien quiera volver al planeta entero: quitar `encuadrarEnCadena` en
+  mapa-salida.js.
+- **Las chinchetas de Europa occidental siguen sin ser objetivos de 44 px.**
+  El botón «Acercar» las separa —de 6 a 13 px entre centros, que con puntos de
+  13 px es dejar de solaparse—, pero eso las hace tocables, no cómodas. La
+  salida siguiente, si algún día molesta, es separar los puntos del centro real
+  del país con un pequeño desplazamiento, como hacen los mapas de metro. Con el
+  mando ya puesto, esto ha bajado bastante de urgencia.
+
+---
+
 ## El globo 3D de la sección «Salida»
 
 Ficha de rendimiento del globo interactivo de la home (parada «Salida»), tomada

@@ -23,23 +23,23 @@ import { sedes } from "../data/montesinos.js";
       <form class="form" id="form-contacto" novalidate>
         <div class="campo">
           <label for="nombre">Nombre y apellido</label>
-          <input id="nombre" name="nombre" type="text" autocomplete="name" required />
+          <input id="nombre" name="nombre" type="text" autocomplete="name" enterkeyhint="next" required />
         </div>
         <div class="campo">
           <label for="email">Correo electrónico</label>
-          <input id="email" name="email" type="email" autocomplete="email" required />
+          <input id="email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="next" required />
         </div>
         <div class="campo">
           <label for="localidad">Localidad</label>
-          <input id="localidad" name="localidad" type="text" autocomplete="address-level2" />
+          <input id="localidad" name="localidad" type="text" autocomplete="address-level2" enterkeyhint="next" />
         </div>
         <div class="campo">
           <label for="asunto">Asunto</label>
-          <input id="asunto" name="asunto" type="text" />
+          <input id="asunto" name="asunto" type="text" autocomplete="off" enterkeyhint="next" />
         </div>
         <div class="campo">
           <label for="mensaje">Mensaje</label>
-          <textarea id="mensaje" name="mensaje" rows="5"></textarea>
+          <textarea id="mensaje" name="mensaje" rows="5" enterkeyhint="enter"></textarea>
         </div>
         <div class="opcion">
           <input id="catalogo" name="catalogo" type="checkbox" />

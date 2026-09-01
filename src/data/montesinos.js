@@ -201,17 +201,27 @@ export const paginas = [
 // foto de Louboutin sería inventarse un proyecto, que es justo lo que prohíbe la
 // regla dura de la cabecera de este archivo. Cuando lleguen ciudades y fotos
 // reales se sustituyen `ciudad` e `img` y no hay que tocar nada más.
+// Los doce países con obra. UNA sola lista para las dos piezas que los pintan:
+// el globo 3D de escritorio (que usa lat/lng) y el mapa plano de móvil (que usa
+// `iso`, el código ISO 3166-1 alfa-2, que es como svgMap identifica países).
+// Si algún día entra un país nuevo, entra aquí y aparece en los dos sitios.
+//
+// `iso` sirve además de traducción: svgMap trae los nombres de país en inglés y
+// el paquete de npm no incluye los ficheros de idioma (viven en la carpeta
+// `demo/` del repositorio, que no se publica). Como aquí ya están los doce
+// nombres en español, el mapa se construye su propio `countryNames` con ellos
+// en vez de traerse una tabla de 250 países para usar doce.
 export const paisesGlobo = [
-  { pais: "España",          ciudad: "Madrid",      lat: 40.4168, lng: -3.7038 },
-  { pais: "Portugal",        ciudad: "Lisboa",      lat: 38.7223, lng: -9.1393 },
-  { pais: "Francia",         ciudad: "París",       lat: 48.8566, lng:  2.3522 },
-  { pais: "Reino Unido",     ciudad: "Londres",     lat: 51.5074, lng: -0.1278 },
-  { pais: "Países Bajos",    ciudad: "Ámsterdam",   lat: 52.3676, lng:  4.9041 },
-  { pais: "Alemania",        ciudad: "Berlín",      lat: 52.5200, lng: 13.4050 },
-  { pais: "Luxemburgo",      ciudad: "Luxemburgo",  lat: 49.6116, lng:  6.1319 },
-  { pais: "Suiza",           ciudad: "Berna",       lat: 46.9480, lng:  7.4474 },
-  { pais: "Suecia",          ciudad: "Estocolmo",   lat: 59.3293, lng: 18.0686 },
-  { pais: "Rusia",           ciudad: "Moscú",       lat: 55.7558, lng: 37.6173 },
-  { pais: "Qatar",           ciudad: "Doha",        lat: 25.2854, lng: 51.5310 },
-  { pais: "Emiratos Árabes", ciudad: "Abu Dabi",    lat: 24.4539, lng: 54.3773 },
+  { pais: "España",          iso: "ES", ciudad: "Madrid",      lat: 40.4168, lng: -3.7038 },
+  { pais: "Portugal",        iso: "PT", ciudad: "Lisboa",      lat: 38.7223, lng: -9.1393 },
+  { pais: "Francia",         iso: "FR", ciudad: "París",       lat: 48.8566, lng:  2.3522 },
+  { pais: "Reino Unido",     iso: "GB", ciudad: "Londres",     lat: 51.5074, lng: -0.1278 },
+  { pais: "Países Bajos",    iso: "NL", ciudad: "Ámsterdam",   lat: 52.3676, lng:  4.9041 },
+  { pais: "Alemania",        iso: "DE", ciudad: "Berlín",      lat: 52.5200, lng: 13.4050 },
+  { pais: "Luxemburgo",      iso: "LU", ciudad: "Luxemburgo",  lat: 49.6116, lng:  6.1319 },
+  { pais: "Suiza",           iso: "CH", ciudad: "Berna",       lat: 46.9480, lng:  7.4474 },
+  { pais: "Suecia",          iso: "SE", ciudad: "Estocolmo",   lat: 59.3293, lng: 18.0686 },
+  { pais: "Rusia",           iso: "RU", ciudad: "Moscú",       lat: 55.7558, lng: 37.6173 },
+  { pais: "Qatar",           iso: "QA", ciudad: "Doha",        lat: 25.2854, lng: 51.5310 },
+  { pais: "Emiratos Árabes", iso: "AE", ciudad: "Abu Dabi",    lat: 24.4539, lng: 54.3773 },
 ].map((p) => ({ ...p, img: "/proyectos-web/showroom-1.webp" }));
