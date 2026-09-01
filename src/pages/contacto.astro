@@ -9,59 +9,60 @@ import { sedes } from "../data/montesinos.js";
   desc="Presupuesto orientativo. Taller y sede principal en Sabadell, oficina técnica en Madrid y red de distribución en Londres. Escríbenos y contestamos enseguida."
   ruta="/contacto"
 >
-  <main id="principal" class="pagina sc-wrap">
+  <main id="principal" class="pagina sc-wrap contacto">
     <div class="titular">
-      <p class="eti">Contacto</p>
-      <h1>Presupuesto orientativo.</h1>
-      <p>
+      <p class="eti" style="--i: 0">Contacto</p>
+      <h1 style="--i: 1">Presupuesto orientativo.</h1>
+      <p style="--i: 2">
         Cuéntanos qué hay que resolver, o simplemente pregunta lo que necesites
         saber. Contestamos enseguida.
       </p>
     </div>
 
-    <div class="dos" style="align-items:start; gap: var(--sc-9);">
-      <form class="form" id="form-contacto" novalidate>
-        <div class="campo">
+    <div class="dos dos--contacto">
+      <form class="form" id="form-contacto" novalidate data-anima>
+        <div class="campo" data-ent style="--i: 0">
           <label for="nombre">Nombre y apellido</label>
           <input id="nombre" name="nombre" type="text" autocomplete="name" enterkeyhint="next" required />
         </div>
-        <div class="campo">
+        <div class="campo" data-ent style="--i: 1">
           <label for="email">Correo electrónico</label>
           <input id="email" name="email" type="email" inputmode="email" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="next" required />
         </div>
-        <div class="campo">
+        <div class="campo" data-ent style="--i: 2">
           <label for="localidad">Localidad</label>
           <input id="localidad" name="localidad" type="text" autocomplete="address-level2" enterkeyhint="next" />
         </div>
-        <div class="campo">
+        <div class="campo" data-ent style="--i: 3">
           <label for="asunto">Asunto</label>
           <input id="asunto" name="asunto" type="text" autocomplete="off" enterkeyhint="next" />
         </div>
-        <div class="campo">
+        <div class="campo" data-ent style="--i: 4">
           <label for="mensaje">Mensaje</label>
           <textarea id="mensaje" name="mensaje" rows="5" enterkeyhint="enter"></textarea>
         </div>
-        <div class="opcion">
-          <input id="catalogo" name="catalogo" type="checkbox" />
-          <label for="catalogo">Quiero recibir el catálogo</label>
-        </div>
-        <button class="enviar" type="submit">Enviar</button>
+        <!-- La entrada va en el envoltorio y no en el propio botón, igual que en
+             el cierre de "Cómo trabajamos": si el botón cargara las dos cosas, la
+             transición de entrada le ganaría en especificidad al hover. -->
+        <span class="form__accion" data-ent style="--i: 6">
+          <button class="enviar" type="submit">Enviar</button>
+        </span>
         <p class="recado" id="recado" role="status" aria-live="polite"></p>
       </form>
 
-      <div>
-        <h2 class="paso__n" style="color:var(--sc-accent); margin-bottom:var(--sc-4);">
-          DÓNDE ESTAMOS
-        </h2>
-        <ul class="pasos" style="list-style:none; padding:0;">
-          {sedes.map((s) => (
-            <li class="paso" style="grid-template-columns: 1fr;">
-              <span class="paso__n" style="margin-bottom:0.4rem;">{s.pais}</span>
-              <h3>{s.ciudad} <span style="font-family:var(--sc-font-mono);font-size:var(--sc-t-xs);color:var(--sc-ink-soft);text-transform:uppercase;letter-spacing:0.06em;">· {s.rol}</span></h3>
-              <p>
-                {s.dir}<br />{s.cp}
-                {s.tel && (<><br /><a href={`tel:${s.telHref}`}>{s.tel}</a></>)}
-              </p>
+      <div class="sedes" data-anima>
+        <h2 class="sedes__eti" data-ent style="--i: 0">Dónde estamos</h2>
+        <ul class="sedes__lista">
+          {sedes.map((s, i) => (
+            <li class="tarjeta sede" data-ent style={`--i: ${i}`}>
+              <p class="sede__pais">{s.pais}</p>
+              <h3 class="sede__ciudad">
+                {s.ciudad}<span class="sede__rol"> · {s.rol}</span>
+              </h3>
+              <p class="sede__dir">{s.dir}, {s.cp}</p>
+              {s.tel && (
+                <p class="sede__tel"><a href={`tel:${s.telHref}`}>{s.tel}</a></p>
+              )}
             </li>
           ))}
         </ul>

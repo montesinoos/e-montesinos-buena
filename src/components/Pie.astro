@@ -3,6 +3,12 @@ import { sedes } from "../data/montesinos.js";
 const sabadell = sedes[0];
 ---
 <footer class="pie">
-  <p>Ebanistería Montesinos · {sabadell.dir}, {sabadell.cp}</p>
+  <p class="pie__marca">
+    <!-- El nombre lo pone ahora la marca, no el texto: por eso el alt lleva el
+         nombre completo y no va vacío como el de la barra de arriba, donde el
+         enlace ya lo dice por su aria-label. -->
+    <img class="pie__logo" src="/logo-montesinos.png" alt="Ebanistería Montesinos" width="452" height="124" />
+    <span>{sabadell.dir}, {sabadell.cp}</span>
+  </p>
   <p><a href={`tel:${sabadell.telHref}`}>{sabadell.tel}</a> · <a href="/contacto">Pedir presupuesto</a></p>
 </footer>

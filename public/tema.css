@@ -1108,8 +1108,8 @@
 .opcion { display: flex; align-items: center; gap: 0.6rem; }
 .opcion label { text-transform: none; letter-spacing: 0; font-family: var(--sc-font-text); font-size: var(--sc-t-sm); }
 
+.form__accion { justify-self: start; }
 .enviar {
-  justify-self: start;
   padding: 0.85rem 1.8rem;
   border: 0; border-radius: 2px;
   background: var(--sc-ink); color: var(--sc-canvas);
@@ -1122,6 +1122,106 @@
 }
 .enviar:hover { background: var(--sc-accent); }
 .recado { font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); color: var(--sc-accent); min-height: 1.2em; margin: 0; }
+
+/* ---- contacto: formulario + sedes ----
+   Las dos columnas terminan a la misma altura sin recurrir a media queries: la
+   fila de .dos estira las dos columnas a la altura de la más alta (el
+   formulario), y dentro de .sedes las tres tarjetas se reparten ese hueco con
+   `minmax(min-content, 1fr)`. Cuando las columnas se apilan en móvil la fila
+   deja de tener altura impuesta, 1fr vuelve a valer lo que mide el contenido y
+   cada tarjeta ocupa lo suyo. Nada de relleno inventado: lo que respira es el
+   padding, no el texto. */
+/* Aquí no vale el `auto-fit` de .dos: el punto exacto en el que pasa a una
+   columna depende del ancho del envoltorio y no se puede nombrar en una media
+   query, y justo ahí es donde hay que dejar de igualar alturas. Con dos
+   columnas explícitas el corte es un número conocido (52rem) y todo lo que
+   depende de él cuadra. */
+.dos--contacto {
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(var(--sc-6), 5vw, var(--sc-9));
+}
+@media (min-width: 52rem) {
+  .dos--contacto { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+
+/* El formulario se queda arriba: si se estirara, `align-content: stretch` (el
+   valor por defecto de una rejilla con filas automáticas) separaría los campos
+   entre sí en cuanto la otra columna fuese más alta. */
+.form { align-content: start; }
+
+.sedes {
+  height: 100%;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: var(--sc-4);
+}
+.sedes__eti {
+  margin: 0;
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sc-accent);
+}
+.sedes__lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-auto-rows: minmax(min-content, 1fr);
+  gap: var(--sc-3);
+}
+
+/* Hereda de .tarjeta el blanco, el borde fino y el radio de 2px: es la misma
+   tarjeta que ya se usa en el resto de la casa, solo que con el ritmo interno
+   de una ficha de sede. */
+.sede {
+  display: grid;
+  align-content: center;
+  gap: 0.3rem;
+  padding: clamp(1rem, 1.9vw, 1.5rem) clamp(var(--sc-4), 2.4vw, var(--sc-5));
+}
+.sede__pais {
+  margin: 0;
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.08em;
+  color: var(--sc-ink-soft);
+}
+.sede__ciudad {
+  margin: 0;
+  font-family: var(--sc-font-display);
+  font-size: var(--sc-t-lg);
+  font-weight: 500;
+  letter-spacing: var(--sc-track-snug);
+  line-height: 1.15;
+}
+.sede__rol {
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sc-ink-soft);
+}
+.sede__dir {
+  margin: 0;
+  font-size: var(--sc-t-sm);
+  line-height: 1.5;
+  color: var(--sc-ink-soft);
+}
+.sede__tel { margin: 0; font-size: var(--sc-t-sm); }
+
+/* Las dos columnas se estiran a la misma altura, pero el formulario reserva
+   bajo el botón un hueco para el aviso de estado (.recado) que está vacío casi
+   siempre. Descontándolo aquí, la última tarjeta cierra a la altura del botón
+   ENVIAR y no 32px por debajo. Solo mientras van en paralelo: apiladas, cada
+   bloque ocupa lo suyo. */
+@media (min-width: 52rem) {
+  .sedes { padding-bottom: calc(var(--sc-4) + 1.2 * var(--sc-t-xs)); }
+}
+
 
 /* ---- pie ---- */
 .pie {
@@ -1137,6 +1237,20 @@
 }
 .pie a { color: inherit; }
 .pie a:hover { color: var(--sc-accent); }
+
+/* La marca del pie es la misma imagen de la barra de arriba, y a la misma
+   altura (1.75rem) por un motivo medido, no estético: dentro del PNG las letras
+   de ONTESINOS ocupan solo el 45% del alto —el resto lo llena la insignia
+   redonda—, así que la imagen tiene que ir bastante más alta que el texto para
+   que su rótulo NO salga más pequeño que el renglón de al lado. A 1.75rem las
+   letras miden ~12.6px contra los ~9px de altura de mayúscula del texto en
+   --sc-t-xs: 1.4 veces. Bajar esta altura invierte la relación.
+
+   Aquí no hay «·» separando marca y dirección, y en el resto del pie sí: en el
+   teléfono el renglón se parte y el punto se habría quedado colgando solo al
+   principio de la línea de abajo. Separa el hueco, que no se descuelga. */
+.pie__marca { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; margin: 0; }
+.pie__logo { height: 1.75rem; width: auto; display: block; }
 
 /* ====================================================== CÓMO TRABAJAMOS ===
    Página propia: cabecera, diagrama del proceso, dos vías, para quién y
@@ -1572,6 +1686,39 @@ html.mov [data-anima].es-dentro [data-ent="foto"] {
   html.mov [data-anima].es-dentro [data-ent="foto"] { transform: none; }
 
   .taller .titular > * { animation-name: sc-aparece; }
+}
+
+/* ============================================================= CONTACTO ===
+   Mismo mecanismo que "Cómo trabajamos" y "Taller": html.mov para el estado
+   inicial, [data-anima] para el bloque que observa el IntersectionObserver de
+   Base.astro —que no se desconecta, así que subiendo y bajando la entrada se
+   repite— y [data-ent] + --i para el escalonado. Aquí no se añade ni una
+   propiedad nueva: solo se cuelgan los tokens que ya existen.
+
+   El paso es el corto (60ms, el de Taller): son campos de un formulario, una
+   lista que se lee de un tirón, no un diagrama que se dibuja.
+
+   El pie queda fuera a propósito. Es información de servicio —dirección,
+   teléfono— y no se hace esperar a nadie por leerla.
+   ========================================================================== */
+
+.contacto { --sc-paso-ent: 60ms; }
+
+/* La cabecera ya está en pantalla cuando carga la página: no hay nada que
+   observar, solo el corte seco del primer pintado que evitar. Entra una vez,
+   con animation, y no vuelve. */
+.contacto .titular > * {
+  animation: sc-alza var(--sc-d-entrada) var(--sc-ease-out) both;
+  animation-delay: calc(var(--i, 0) * var(--sc-paso-ent));
+}
+
+/* El botón es el momento de conversión de esta página: llega detrás del último
+   campo, no a la vez. El salto de --i de 4 a 6 es ese respiro, y la entrada va
+   sobre .form__accion (declarada junto al formulario) para no pisarle al botón
+   la transición del hover. */
+
+@media (prefers-reduced-motion: reduce) {
+  .contacto .titular > * { animation-name: sc-aparece; }
 }
 
 /* ============================================================ EL BANCO ====
