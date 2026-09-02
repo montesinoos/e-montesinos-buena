@@ -521,7 +521,14 @@
 }
 .umbral__copia h1 .umbral__logo {
   display: inline-block;
-  --umbral-logo-h: 1.35em;
+  /* El alto NO se elige a ojo: sale de igualar la palabra del PNG con la del
+     titular. En el archivo (452x124) «ONTESINOS» ocupa 47 px de alto de tinta,
+     o sea el 37,9% de la imagen; el resto es el disco, que sobresale por
+     arriba y por abajo como marca que es. En Instrument Sans 600 esa misma
+     palabra mide 0,74 em de tinta. Para que las dos midan lo mismo:
+     0,74 / 0,379 = 1,95. Con 1,35 em que había antes, la palabra del logotipo
+     se quedaba en el 69% de la de al lado y se leía como una errata. */
+  --umbral-logo-h: 1.95em;
   height: var(--umbral-logo-h);
   width: auto;
   /* El PNG deja un 29% de su alto por debajo de la línea base del logotipo:
@@ -2675,15 +2682,38 @@ html.mov [data-anima].es-dentro [data-ent="foto"] {
     pointer-events: none;
   }
 
-  /* La copia del umbral, que es la primera línea que se lee de la web, pasa a
-     apoyarse en el canto de la barra y no en el del cristal. La copia de cada
-     tramo del mundo hace lo mismo, pero eso va en su declaración base (busca
-     `.copia {` más arriba): aquí abajo pisaría a las paradas que se colocan
-     por su cuenta. */
-  .umbral__copia { padding-bottom: calc(clamp(2rem, 7vh, 4.5rem) + var(--recorrido-h)); }
+  /* La copia del umbral, que es la primera línea que se lee de la web, deja de
+     colgar del canto de abajo y pasa a colgar DEL MUEBLE.
+
+     Colgando del canto de abajo se leía bien en el simulador y se subía encima
+     del armario en un iPhone de verdad. El motivo es que `.umbral` es
+     `fixed; inset: 0`, o sea que mide el viewport GRANDE, mientras que la
+     escena se dimensiona con `100svh`, que es el pequeño. En Safari esos dos
+     números no son el mismo: el mueble baja con la escena, el rótulo se queda
+     donde estaba, y la distancia entre los dos se la come el navegador. Con
+     dos líneas de más en el titular, encima.
+
+     Así que el rótulo arranca donde acaba el mueble. La caja va del canto
+     inferior del armario al de la pantalla, y el texto se centra dentro: donde
+     sobra sitio respira, donde falta se aprieta, y encima del mueble no se
+     puede poner porque la caja no llega. Debajo solo hay suelo, que es plano y
+     claro y es donde se lee. */
+  .umbral__copia {
+    top: var(--umbral-mueble-canto);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding-block: clamp(0.75rem, 2.5vh, 1.25rem)
+                   calc(var(--recorrido-h) + clamp(0.75rem, 2.5vh, 1.25rem));
+  }
   /* El velo del umbral sube con ella: si se quedara a ras del cristal, las
-     últimas líneas se leerían sobre la foto sin nada que las sostenga. */
-  .umbral__copia::before { bottom: var(--recorrido-h); }
+     últimas líneas se leerían sobre la foto sin nada que las sostenga. Y no
+     puede pasar de lo que mide la franja: si la desbordara por arriba volvería
+     a aparecer sobre el mueble, que es justo lo que se ha quitado. */
+  .umbral__copia::before {
+    bottom: var(--recorrido-h);
+    height: min(30vh, 100%);
+  }
 
   /* ---- el umbral en vertical: otra foto y OTRAS coordenadas ----
      En el telefono la toma apaisada de escritorio se quedaba encajada a lo
@@ -2706,12 +2736,26 @@ html.mov [data-anima].es-dentro [data-ent="foto"] {
      62.88% (1854 y 3144 px), que siguen dando los mismos ~1290 px de alto de
      hoja de siempre. El zoom del recorrido no se toca: montesinos.js lo deduce
      midiendo el hueco real en pantalla, asi que se recalcula solo. */
-  .umbral__escena {
-    aspect-ratio: 2736 / 5000;
+  /* La medida de la escena se declara UNA vez y de ahí cuelga todo lo que
+     tiene que saber dónde está el mueble. Si se vuelve a tocar la foto, esto
+     es lo único que hay que volver a medir. */
+  .umbral {
     /* Los 2px de propina no son decorativos: 100svh redondea a subpixel y sin
        ellos la escena se queda 0.03px corta de alto, que es una linea de lienzo
        asomando por abajo. */
-    width: max(100vw, calc(100svh * 2736 / 5000 + 2px));
+    --umbral-escena-w: max(100vw, calc(100svh * 2736 / 5000 + 2px));
+    --umbral-escena-h: calc(var(--umbral-escena-w) * 5000 / 2736);
+    /* El canto inferior del mueble, contado desde arriba de `.umbral`. La
+       escena se ancla por su centro (`top: 50%`), y el canto cae en el 62,88%
+       de su alto: 12,88 puntos por debajo de ese centro. El 50% se resuelve
+       contra `.umbral`, igual que el de la escena, así que los dos siguen
+       cuadrando aunque el viewport grande y el pequeño no midan lo mismo. */
+    --umbral-mueble-canto: calc(50% + var(--umbral-escena-h) * 0.1288);
+  }
+
+  .umbral__escena {
+    aspect-ratio: 2736 / 5000;
+    width: var(--umbral-escena-w);
   }
 
   .umbral__hueco,
