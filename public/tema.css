@@ -962,9 +962,17 @@
   letter-spacing: 0.04em;
   color: var(--sc-ink-soft);
   cursor: pointer;
-  transition: all var(--sc-d-fast) var(--sc-ease-out);
+  /* Nombradas y no `all`: con `all`, el dia que este boton reciba un
+     transform o una sombra, tambien se le pondria a transicionar sin que
+     nadie lo haya decidido. */
+  transition:
+    color var(--sc-d-fast) var(--sc-ease-out),
+    border-color var(--sc-d-fast) var(--sc-ease-out),
+    background-color var(--sc-d-fast) var(--sc-ease-out);
 }
-.filtros button:hover { color: var(--sc-ink); border-color: var(--sc-ink); }
+@media (hover: hover) and (pointer: fine) {
+  .filtros button:hover { color: var(--sc-ink); border-color: var(--sc-ink); }
+}
 .filtros button[aria-pressed="true"] {
   background: var(--sc-ink); border-color: var(--sc-ink); color: var(--sc-canvas);
 }
@@ -984,9 +992,12 @@
 }
 .obra__media img {
   width: 100%; height: 100%; object-fit: cover;
-  transition: scale 700ms var(--sc-ease-out);
+  /* 420ms y no los 700ms de antes: en un hover, la vuelta manda tanto como la
+     ida, y a 700ms la foto seguia recogiendose casi medio segundo despues de
+     haber sacado el raton de la tarjeta. Sigue siendo un acercamiento lento
+     —es una foto, no un boton—, pero ya no arrastra. */
+  transition: scale 420ms var(--sc-ease-out);
 }
-.obra:hover .obra__media img { scale: 1.04; }
 /* Ficha apilada: con nombre y sector en la misma línea, "Christian Louboutin"
    partía en dos y descuadraba la fila entera. */
 .obra figcaption { display: grid; gap: 0.15rem; }
@@ -1739,6 +1750,111 @@ html.mov [data-anima].es-dentro [data-ent="foto"] {
 
 @media (prefers-reduced-motion: reduce) {
   .contacto .titular > * { animation-name: sc-aparece; }
+}
+
+/* ============================================================ PROYECTOS ===
+   Entradas y hover de la galeria. Ni una propiedad nueva: se cuelga todo del
+   mismo mecanismo que Taller y Contacto (html.mov para el estado inicial,
+   [data-anima] para el observador de Base.astro, --i para el escalonado) para
+   no tener dos sistemas de entradas conviviendo.
+
+   La pagina se identifica por `:has(.rejilla)` y no por una clase nueva en el
+   <main>: la rejilla solo existe aqui, asi que ya es el nombre de la pagina.
+   ========================================================================== */
+
+.pagina:has(.rejilla) { --sc-paso-ent: 70ms; }
+
+/* ---- cabecera y filtros ----
+   Ya estan en pantalla cuando carga la pagina: no hay nada que observar, solo
+   el corte seco del primer pintado que evitar. Entran una vez con `animation`
+   y no vuelven, igual que en Taller y Contacto.
+
+   El --i va por nth-child y no por un `style` en la plantilla: son tres lineas
+   fijas y un numero de orden que el CSS sabe contar solo. */
+.pagina:has(.rejilla) .titular > *,
+.pagina:has(.rejilla) .filtros {
+  animation: sc-alza var(--sc-d-entrada) var(--sc-ease-out) both;
+  animation-delay: calc(var(--i, 0) * var(--sc-paso-ent));
+}
+.pagina:has(.rejilla) .titular > :nth-child(2) { --i: 1; }
+.pagina:has(.rejilla) .titular > :nth-child(3) { --i: 2; }
+/* La barra entera como una pieza, no boton a boton: son ocho, se leen de un
+   golpe y una ondulacion de ocho tiempos sobre algo que se va a pulsar en
+   seguida es ruido, no entrada. */
+.pagina:has(.rejilla) .filtros { --i: 3; }
+
+/* ---- las obras ----
+   Cada tarjeta lleva su propio [data-anima] y entra cuando le toca a ella. El
+   escalonado colgado de la rejilla entera no valia: con veinte obras, la
+   ultima salia 1,4 s despues de la primera, y las de mas abajo terminaban de
+   entrar mucho antes de que nadie bajara a verlas.
+
+   Como el observador de Base.astro no se desconecta y `.obra[hidden]` es
+   `display: none`, filtrar por sector devuelve las tarjetas a su estado
+   inicial y las vuelve a hacer entrar. No hay una linea para eso: sale solo.
+
+   El reset instantaneo (transicion de 0s) es el mismo recurso que en el bloque
+   generico: la tarjeta ya esta fuera de pantalla cuando se apaga, nadie ve el
+   corte, y una salida a medio camino no se cruza con la siguiente entrada. */
+html.mov .obra[data-anima] {
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0s, transform 0s;
+}
+html.mov .obra[data-anima].es-dentro {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity var(--sc-d-entrada) var(--sc-ease-out) calc(var(--i, 0) * var(--sc-paso-ent)),
+    transform var(--sc-d-entrada) var(--sc-ease-out) calc(var(--i, 0) * var(--sc-paso-ent));
+}
+/* Ondulacion solo donde hay fila. A partir de tres columnas las tres tarjetas
+   cruzan el borde a la vez y el desfase las lee de izquierda a derecha; con
+   una o dos columnas ya llegan de una en una y el retardo solo seria espera. */
+@media (min-width: 62rem) {
+  html.mov .rejilla .obra:nth-child(3n+2) { --i: 1; }
+  html.mov .rejilla .obra:nth-child(3n)   { --i: 2; }
+}
+
+/* ---- hover ----
+   El que se levanta es .obra__media, no .obra. Dos razones y las dos mandan:
+   la entrada escribe `transform` sobre .obra y le ganaria en peso al hover
+   —el mismo choque que ya esta documentado en el boton de Contacto—, y ademas
+   el pie de la tarjeta no deberia moverse bajo el cursor: lo que se levanta es
+   la foto, el nombre se queda donde se estaba leyendo.
+
+   Con puerta de puntero: en una pantalla tactil el hover se queda pegado
+   despues del toque y la tarjeta se quedaba levantada hasta tocar otra. */
+@media (hover: hover) and (pointer: fine) {
+  .obra__media {
+    transition:
+      transform 220ms var(--sc-ease-out),
+      box-shadow 220ms var(--sc-ease-out);
+  }
+  .obra:hover .obra__media {
+    transform: translateY(-4px) scale(1.008);
+    box-shadow: 0 0.9rem 2.2rem rgba(22, 23, 26, 0.16);
+  }
+  /* La foto, un punto mas adentro. Se mueve mas que la tarjeta a proposito:
+     asi el marco se queda quieto y lo que entra es el encuadre. */
+  .obra:hover .obra__media img { scale: 1.045; }
+  /* El sector sube de tono. Es el unico texto que cambia: el nombre de la obra
+     ya esta a plena tinta y subirlo mas no diria nada. */
+  .obra .sect { transition: color 220ms var(--sc-ease-out); }
+  .obra:hover .sect { color: var(--sc-ink); }
+}
+
+/* Movimiento reducido: todo sigue entrando y el hover sigue respondiendo, pero
+   solo con fundido y color. Ningun desplazamiento, ninguna escala. */
+@media (prefers-reduced-motion: reduce) {
+  .pagina:has(.rejilla) .titular > *,
+  .pagina:has(.rejilla) .filtros { animation-name: sc-aparece; }
+
+  html.mov .obra[data-anima],
+  html.mov .obra[data-anima].es-dentro { transform: none; }
+
+  .obra:hover .obra__media { transform: none; }
+  .obra:hover .obra__media img { scale: 1; }
 }
 
 /* ============================================================ EL BANCO ====

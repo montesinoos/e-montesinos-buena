@@ -44,8 +44,11 @@ const conMovil = new Set(
     <p class="sr" aria-live="polite"><span id="cuenta-obras">{proyectos.length}</span> proyectos</p>
 
     <div class="rejilla">
+      <!-- data-anima: lo observa el IntersectionObserver de Base.astro, el mismo
+           que el resto de la web. Va en CADA obra y no en la rejilla, para que
+           cada tarjeta entre cuando le toca a ella y no las veinte de golpe. -->
       {proyectos.map((p) => (
-        <figure class="obra" data-sector={p.sector}>
+        <figure class="obra" data-sector={p.sector} data-anima>
           <div class="obra__media">
             <!-- La rejilla es de 1 columna en móvil y de 3 en escritorio,
                  así que el mismo archivo se pinta a 335 px o a 420 px. Servir
