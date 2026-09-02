@@ -445,7 +445,20 @@
   height: 85.0%;
   backface-visibility: hidden;
   will-change: transform;
-  transform-style: preserve-3d;
+  /* Las hojas no llevan nada dentro que viva en 3D: la foto y el velo de luz
+     son planos. Con `preserve-3d` heredaban el contexto de la escena y podían
+     cortarse contra el hueco; en plano no. */
+  transform-style: flat;
+  /* Los 2px de propina. La hoja y `.umbral__hueco` son hermanas dentro del
+     `preserve-3d` de la escena y las dos nacen en z=0: mientras el giro es de
+     décimas de grado los dos planos son casi coplanares y el compositor pinta
+     su línea de intersección, o sea un recorte rectangular de la nave POR
+     DELANTE de una puerta todavía cerrada. Se veía entre p≈0.08 y p≈0.17 del
+     recorrido, justo cuando la hoja arranca. Separarlas en Z rompe el empate y
+     el hueco se queda donde le toca: detrás. Se aplica antes que `transform`
+     (montesinos.js escribe ahí el `rotateY`), así que no pisa el giro.
+     Con 1700px de perspectiva son 0.12% de escala: 0.3px sobre el mueble. */
+  translate: 0 0 2px;
 }
 .puerta img { width: 100%; height: 100%; object-fit: fill; display: block; }
 
