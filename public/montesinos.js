@@ -703,4 +703,275 @@
       if (cuenta) cuenta.textContent = n;
     });
   }
+
+  /* ============================================================ EL SNAP ===
+     "El mismo scroll en todas las secciones para pasar a la siguiente."
+
+     El problema de partida: los cuatro tramos del mundo NO miden lo mismo, y
+     miden distinto a propósito. Material pesa 3.4 y Nave 1.5 porque Material
+     aloja el banco de muestras y necesita ese aire; igualarlos obligaría a
+     recalcular las cuatro ventanas de copia y a reencuadrar el banco. Así que
+     lo que se uniforma no es la DISTANCIA —que es la que pide la narración—
+     sino el ESFUERZO: un gesto, una parada. Da igual que Material ocupe el
+     doble de pista; se cruza con la misma rueda de ratón que Nave.
+
+     Por eso no es scroll-snap de CSS. El snap de CSS necesita hijos reales en
+     el flujo a los que ponerles scroll-snap-align, y aquí el único hijo del
+     flujo es un espaciador vacío de 950vh: los cuatro tramos son fotogramas de
+     un mismo lienzo `position:fixed`. Aunque existieran, `proximity` y
+     `mandatory` solo deciden DÓNDE se posa el scroll, no cuánto cuesta llegar,
+     que es justo lo que se pide aquí.
+
+     Seis paradas, no cuatro: el umbral y el cierre son secciones para quien
+     mira aunque no lo sean para el motor. Y cinco saltos, no seis: el primero
+     —del armario cerrado a la nave— se recorre a mano, ver sueltoEnElUmbral().
+
+     Se apaga solo con movimiento reducido —convertir cada rueda en un viaje
+     animado de un segundo es exactamente lo que esa preferencia pide evitar—
+     y con .sin-snap en el body, por si hay que desactivarlo sin tocar código.
+  */
+  var snapOn = !!mundo && !!tramos.length && !reduce &&
+               !document.body.classList.contains('sin-snap');
+
+  if (snapOn) (function () {
+    var anclas = null;          // se calculan al primer gesto: el motor ya ha
+                                // hecho su layout para entonces
+    var animando = false;
+    var finPrevisto = 0;        // cuándo debería haber terminado el viaje
+    var destino = 0;            // dónde tenía que acabar el viaje en curso
+    var mudo = 0;               // instante hasta el que se ignora la entrada
+    var acumulado = 0;
+
+    // requestAnimationFrame no corre en una pestaña de fondo. Si el visitante
+    // se va a otra pestaña en mitad de un viaje, el bucle se queda congelado
+    // con `animando` en alto y, al volver, la rueda no responde: la página
+    // parece muerta.
+    //
+    // Lo normal se arregla al volver (visibilitychange, más abajo): se planta
+    // el scroll en el destino y se acabó el viaje. El margen de aquí es la
+    // última red, para el navegador que no avise; por eso es generoso. Si
+    // fuera corto, un equipo lento que se retrase medio segundo daría el viaje
+    // por muerto en mitad del recorrido y el siguiente golpe de rueda saldría
+    // desde donde estuviera: un gesto valdría por dos paradas.
+    function libre() {
+      if (animando && performance.now() > finPrevisto + 3000) animando = false;
+      return !animando;
+    }
+
+    function maxScroll() {
+      return Math.max(document.documentElement.scrollHeight - innerHeight, 0);
+    }
+
+    function calcular() {
+      var a = [0];
+      for (var i = 0; i < tramos.length; i++) a.push(scrollDeTramo(i));
+      // El cierre: donde las hojas ya están cerradas del todo. pintarCierre()
+      // completa el giro en p = 0.82, así que se aterriza un poco después para
+      // no quedarse en mitad del portazo.
+      if (pistaCi) {
+        var alto = Math.max(pistaCi.offsetHeight - innerHeight, 1);
+        a.push(Math.round(pistaCi.offsetTop + alto * 0.9));
+      }
+      var tope = maxScroll();
+      // Monótonas y dentro de la página: si un cálculo se sale, se recorta en
+      // vez de dejar una parada por detrás de la anterior, que deja el gesto
+      // rebotando entre dos anclas.
+      for (var k = 0; k < a.length; k++) {
+        a[k] = clamp(a[k], k ? Math.min(a[k - 1] + 1, tope) : 0, tope);
+      }
+      return a;
+    }
+
+    function asegurar() { if (!anclas) anclas = calcular(); return anclas; }
+
+    function masCercana() {
+      var a = asegurar(), y = scrollY, mejor = 0, dist = Infinity;
+      for (var i = 0; i < a.length; i++) {
+        var d = Math.abs(a[i] - y);
+        if (d < dist) { dist = d; mejor = i; }
+      }
+      return mejor;
+    }
+
+    /* El umbral queda fuera del snap.
+       ---------------------------------------------------------------------
+       De la primera parada a la segunda —el armario cerrado abriéndose hasta
+       la nave— el scroll es el de toda la vida: rueda a rueda, dedo a dedo,
+       y se puede dejar a medias con las hojas a medio girar.
+
+       Es el movimiento firma de la página y no se parece a las otras
+       transiciones: en el resto del recorrido el scroll TE LLEVA de una foto
+       a la siguiente, aquí el scroll ES el que abre las puertas. Convertirlo
+       en un salto de un gesto lo reduce a un corte y se pierde justo lo que
+       hay que enseñar. Los tramos del mundo sí se saltan porque entre parada
+       y parada hay paisaje de paso; entre el armario y la nave no hay paso:
+       hay la única cosa que pasa.
+
+       Vale en los dos sentidos, así que hay que mirar la dirección: parado
+       en la nave, bajar es saltar al siguiente tramo, pero subir es volver a
+       entrar en el umbral y ahí se suelta el control. Y se suelta mirando a
+       qué parada se IRÍA, no a cuántos píxeles se está de ella: unos pocos
+       píxeles pasada la nave, un salto animado hasta arriba se traga el giro
+       entero de las puertas en tres cuartos de segundo, que es justo el
+       fotograma que este tramo existe para enseñar. */
+    function sueltoEnElUmbral(dir) {
+      var a = asegurar();
+      if (a.length < 2) return false;
+      if (scrollY < a[1] - 1) return true;   // aún dentro del umbral
+      return dir < 0 && masCercana() <= 1;   // saliendo hacia él
+    }
+
+    // Animación propia y no scrollTo({behavior:'smooth'}): la del navegador no
+    // avisa de cuándo termina —y hay que saberlo para tragarse la cola de
+    // inercia del trackpad— ni deja elegir la duración, que aquí sube con la
+    // distancia para que el paneo largo de Material no pase borroso.
+    var facil = function (x) {
+      return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+    };
+
+    function viajar(i) {
+      var a = asegurar();
+      i = clamp(i, 0, a.length - 1);
+      var desde = scrollY, hasta = a[i], salto = hasta - desde;
+      if (Math.abs(salto) < 2) return;
+      destino = hasta;
+
+      var vh = alturaMotor();
+      var dur = clamp(380 * (Math.abs(salto) / vh), 750, 1600);
+      var t0 = performance.now();
+      animando = true;
+      finPrevisto = t0 + dur;
+
+      // 'instant' y no scrollTo(0, y) a secas: la hoja del motor declara
+      // `html { scroll-behavior: smooth }`, así que un scrollTo normal lo
+      // ANIMA el navegador. Sesenta veces por segundo eso es sesenta
+      // animaciones nuevas pisándose, y la página se queda temblando en el
+      // sitio. Aquí la interpolación ya la hace este bucle; el navegador solo
+      // tiene que poner el número.
+      (function paso(t) {
+        var p = clamp01((t - t0) / dur);
+        var y = Math.round(desde + salto * facil(p));
+        try { scrollTo({ top: y, left: 0, behavior: 'instant' }); }
+        catch (err) { scrollTo(0, y); }
+        if (p < 1) requestAnimationFrame(paso);
+        else {
+          animando = false;
+          // La rueda de un trackpad sigue mandando eventos por inercia mucho
+          // después de que el dedo se levante. Sin este silencio, esa cola se
+          // lee como gestos nuevos y la página se va tres paradas de golpe.
+          mudo = performance.now() + 300;
+          acumulado = 0;
+        }
+      })(t0);
+    }
+
+    function mover(dir) {
+      if (!libre() || performance.now() < mudo) return;
+      if (document.querySelector('.chrome[data-menu="abierto"]')) return;
+      viajar(masCercana() + dir);
+    }
+
+    /* ---- rueda y trackpad ---- */
+    var ultimo = 0;
+    addEventListener('wheel', function (e) {
+      if (e.ctrlKey) return;              // zoom del navegador: no es scroll
+      // Se decide con el signo de ESTE evento y no con el acumulado: el
+      // preventDefault hay que darlo o no darlo ahora, no dos ruedas después.
+      if (sueltoEnElUmbral(e.deltaY > 0 ? 1 : -1)) { acumulado = 0; return; }
+      e.preventDefault();
+      if (!libre() || performance.now() < mudo) { acumulado = 0; return; }
+
+      var ahora = performance.now();
+      if (ahora - ultimo > 200) acumulado = 0;   // gesto nuevo
+      ultimo = ahora;
+      acumulado += e.deltaY;
+      if (Math.abs(acumulado) > 40) {
+        var d = acumulado > 0 ? 1 : -1;
+        acumulado = 0;
+        mover(d);
+      }
+    }, { passive: false });
+
+    /* ---- táctil ----
+       Se bloquea el arrastre nativo, pero SOLO con un dedo: con dos o más el
+       gesto se suelta entero para no capar el pellizco de zoom, que es lo que
+       usa quien necesita acercarse a leer (WCAG 1.4.4). */
+    var y0 = 0, siguiendo = false;
+    addEventListener('touchstart', function (e) {
+      siguiendo = e.touches.length === 1;
+      if (siguiendo) y0 = e.touches[0].clientY;
+    }, { passive: true });
+
+    addEventListener('touchmove', function (e) {
+      if (!siguiendo || e.touches.length > 1) { siguiendo = false; return; }
+      // La dirección sale del recorrido del dedo hasta aquí. Si el arrastre
+      // empieza en el umbral se suelta el gesto ENTERO, aunque a mitad se
+      // cruce a la nave: cortarle el dedo a alguien a medio arrastre es peor
+      // que dejarle pasar de largo una parada.
+      var dy = y0 - e.touches[0].clientY;
+      if (sueltoEnElUmbral(dy > 0 ? 1 : -1)) { siguiendo = false; return; }
+      e.preventDefault();
+    }, { passive: false });
+
+    addEventListener('touchend', function (e) {
+      if (!siguiendo) return;
+      siguiendo = false;
+      var t = e.changedTouches[0];
+      if (!t) return;
+      var dy = y0 - t.clientY;
+      if (Math.abs(dy) > 45) mover(dy > 0 ? 1 : -1);
+    }, { passive: true });
+
+    /* ---- teclado ----
+       Con la rueda intervenida, el teclado deja de ser la alternativa y pasa a
+       ser la única forma de recorrer la página sin ratón. No se toca cuando el
+       foco está escribiendo. */
+    addEventListener('keydown', function (e) {
+      var t = e.target;
+      if (t && (t.isContentEditable ||
+                /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName || ''))) return;
+
+      var k = e.key, dir = 0, ir = -1;
+      if (k === 'ArrowDown' || k === 'PageDown') dir = 1;
+      else if (k === 'ArrowUp' || k === 'PageUp') dir = -1;
+      else if (k === ' ' || k === 'Spacebar') dir = e.shiftKey ? -1 : 1;
+      else if (k === 'Home') ir = 0;
+      else if (k === 'End') ir = asegurar().length - 1;
+      else return;
+
+      // Home y End son saltos pedidos a propósito: van a su parada desde
+      // donde sea, umbral incluido.
+      if (ir >= 0) { e.preventDefault(); if (libre()) viajar(ir); return; }
+
+      if (sueltoEnElUmbral(dir)) return;   // sin preventDefault: scroll nativo
+      e.preventDefault();
+      if (!libre()) return;
+      mover(dir);
+    });
+
+    /* ---- recalcular ----
+       Las anclas se deducen de la pista del motor, que se remide en cada
+       resize. Se tiran y se vuelven a calcular en el siguiente uso, no aquí:
+       durante el propio resize el motor todavía está recolocando. */
+    var reloj = 0;
+    addEventListener('resize', function () {
+      clearTimeout(reloj);
+      reloj = setTimeout(function () { anclas = null; }, 250);
+    });
+
+    // Al volver de otra pestaña: el viaje que se quedó a medias se termina de
+    // golpe, sin animar, porque su animación pertenece a un momento que ya
+    // pasó. Lo que importa es no dejar la página encallada entre dos paradas.
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden || !animando) return;
+      animando = false;
+      acumulado = 0;
+      try { scrollTo({ top: destino, left: 0, behavior: 'instant' }); }
+      catch (err) { scrollTo(0, destino); }
+      mudo = performance.now() + 300;
+    });
+
+    addEventListener('load', function () { anclas = null; });
+  })();
+
 })();
