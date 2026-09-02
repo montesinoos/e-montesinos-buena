@@ -38,7 +38,9 @@
   var copiaUm  = umbral && umbral.querySelector('.umbral__copia');
 
   var ANG = 88;       // tope: pasado 90 se ve la cara trasera y queda oculta
-  var ZOOM = 2.35;    // se recalcula según lo que mida la abertura en pantalla
+  var ZOOM  = 2.35;   // tope del recorrido
+  var CUBRE = 2.35;   // escalado con el que la abertura tapa el viewport
+  var TRAMO = 1;      // en qué punto del recorrido se alcanza CUBRE
 
   // La abertura mide distinto en cada pantalla, así que el zoom no puede ser
   // un número fijo: se deduce de cuánto tiene que crecer el hueco para
@@ -50,7 +52,31 @@
     var r = hueco.getBoundingClientRect();
     hueco.style.transform = prev;
     if (r.width < 4 || r.height < 4) return;
-    ZOOM = clamp(Math.max(innerWidth / r.width, innerHeight / r.height) * 1.06, 1.4, 7);
+
+    // Lo que hay que tapar es el propio umbral, que es `fixed; inset: 0`, y no
+    // innerWidth/innerHeight. En iOS no son lo mismo: la escena se dimensiona
+    // con svh (el viewport CON las barras) mientras innerHeight puede venir del
+    // viewport grande, y con esa mezcla el zoom se quedaba corto y dejaba una
+    // franja sin tapar arriba y abajo. El rect del umbral no miente.
+    var v = umbral.getBoundingClientRect();
+    var vw = v.width  || innerWidth;
+    var vh = v.height || innerHeight;
+
+    CUBRE = clamp(Math.max(vw / r.width, vh / r.height), 1.05, 12);
+
+    // En apaisado la abertura NACE tapando casi todo el alto de la pantalla
+    // (un 85%), le queda un crecimiento corto y llegar a cubrir en el ultimo
+    // tramo no se nota: lo que se ve es una ventana que se ensancha.
+    //
+    // En una pantalla alta nace tapando un cuarto del alto y tiene que crecer
+    // cuatro veces. Con el reparto de antes -cubrir siempre al final- el hueco
+    // se pasaba medio recorrido como un RECUADRO PEGADO sobre la sala, con sus
+    // cuatro bordes a la vista, que es justo lo que se veia en un iPhone. Ahi
+    // se cubre a mitad de recorrido y la otra mitad se sigue entrando, ya con
+    // la nave a pantalla completa.
+    var alta = r.height / vh < 0.6;
+    TRAMO = alta ? 0.5 : 1;
+    ZOOM  = clamp(CUBRE * (alta ? 1.5 : 1.06), 1.4, 18);
   }
 
   function pintarUmbral() {
@@ -65,8 +91,12 @@
     if (umbral.hidden) umbral.hidden = false;
 
     // 1. Espera. 2. Las hojas giran. 3. La abertura se traga la pantalla.
+    // El zoom NO arranca hasta que el giro ha terminado (0.46). Antes se
+    // solapaban, y como el hueco crece desde su centro, asomaba por detras de
+    // una hoja que todavia estaba ahi: una franja oscura por el canto de la
+    // puerta derecha. Encadenados no puede pasar.
     var giro  = pesada(clamp01((p - 0.06) / 0.40));
-    var zoom  = suave(clamp01((p - 0.34) / 0.54));
+    var zoom  = suave(clamp01((p - 0.46) / 0.38));
     var apaga = suave(clamp01((p - 0.84) / 0.16));
 
     var a = giro * ANG;
@@ -76,14 +106,24 @@
     if (luzIzq) luzIzq.style.opacity = (giro * 0.85).toFixed(3);
     if (luzDer) luzDer.style.opacity = (giro * 0.85).toFixed(3);
 
-    var esc = 1 + zoom * (ZOOM - 1);
+    // Un solo tramo cuando la abertura ya nace casi cubriendo (apaisado); dos
+    // cuando no, para llegar a tapar la pantalla en TRAMO y no al final.
+    var esc = TRAMO >= 1
+      ? 1 + zoom * (ZOOM - 1)
+      : zoom <= TRAMO
+        ? 1 + (zoom / TRAMO) * (CUBRE - 1)
+        : CUBRE + ((zoom - TRAMO) / (1 - TRAMO)) * (ZOOM - CUBRE);
     if (hueco) hueco.style.transform = 'scale(' + esc.toFixed(4) + ')';
     // La nave NO se mueve: se contraescala para quedar clavada a la pantalla.
     // Por eso parece que se abre un hueco sobre un sitio que ya estaba ahí.
     if (huecoImg) huecoImg.style.transform = 'translate(-50%,-50%) scale(' + (1 / esc).toFixed(4) + ')';
+    // La sala se apaga DEL TODO, y no hasta 0.45 como antes. Con el resto de
+    // opacidad puesta encima, al final del recorrido se veia la nave con la
+    // sala superpuesta en fantasma: dos fotos a la vez. Se apaga justo cuando
+    // la abertura acaba de tapar la pantalla, que es cuando ya no hace falta.
     if (sala) {
       sala.style.transform = 'scale(' + (1 + zoom * 0.5).toFixed(4) + ')';
-      sala.style.opacity = (1 - zoom * 0.55).toFixed(3);
+      sala.style.opacity = (1 - suave(clamp01(zoom / (TRAMO < 1 ? TRAMO + 0.1 : 1)))).toFixed(3);
     }
     if (pIzq) pIzq.style.opacity = (1 - apaga).toFixed(3);
     if (pDer) pDer.style.opacity = (1 - apaga).toFixed(3);
@@ -415,6 +455,13 @@
   addEventListener('resize', alScroll, { passive: true });
 
   addEventListener('resize', calcularZoom, { passive: true });
+  addEventListener('orientationchange', calcularZoom, { passive: true });
+  // En iOS la barra de direcciones se retrae al hacer scroll y el viewport
+  // cambia de alto SIN disparar `resize`. Ahi el zoom se quedaba calculado
+  // para el viewport de antes y la abertura no llegaba a tapar la pantalla.
+  if (window.visualViewport) {
+    visualViewport.addEventListener('resize', calcularZoom, { passive: true });
+  }
   calcularZoom();
   pintarUmbral();
   pintarCierre();
