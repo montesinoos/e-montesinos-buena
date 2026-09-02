@@ -2672,6 +2672,41 @@ html.mov [data-anima].es-dentro [data-ent="foto"] {
      últimas líneas se leerían sobre la foto sin nada que las sostenga. */
   .umbral__copia::before { bottom: var(--recorrido-h); }
 
+  /* ---- el umbral en vertical: otra foto y OTRAS coordenadas ----
+     En el telefono la toma apaisada de escritorio se quedaba encajada a lo
+     ancho y dejaba franjas de lienzo arriba y abajo. Aqui se sirve una toma
+     vertical del mismo armario (2736x5000), y la escena pasa a tener SU
+     proporcion y a dimensionarse a cubrir: el lado que se queda corto es el que
+     manda, asi que no queda borde sin foto ni en el movil mas estrecho ni en la
+     tablet mas cuadrada.
+
+     Solo cambia el EJE VERTICAL. Medido sobre los pixeles de la toma vertical,
+     el mueble ocupa 1502 px de ancho y el canto izquierdo cae en el pixel 618:
+     exactamente lo mismo que en la apaisada, porque el lienzo se amplio arriba
+     y abajo pero no a lo ancho, y el ancho sigue siendo 2736 px. Los
+     porcentajes horizontales, por tanto, son los mismos y no se redeclaran: si
+     se metieran hacia dentro, al abrirse las hojas dejarian a la vista el
+     listonado de los lados.
+
+     Lo que si cambia es el alto del lienzo, de 1520 a 5000 px, asi que el
+     mueble se sienta en otro sitio: borde superior 37.08% y borde inferior
+     62.88% (1854 y 3144 px), que siguen dando los mismos ~1290 px de alto de
+     hoja de siempre. El zoom del recorrido no se toca: montesinos.js lo deduce
+     midiendo el hueco real en pantalla, asi que se recalcula solo. */
+  .umbral__escena {
+    aspect-ratio: 2736 / 5000;
+    /* Los 2px de propina no son decorativos: 100svh redondea a subpixel y sin
+       ellos la escena se queda 0.03px corta de alto, que es una linea de lienzo
+       asomando por abajo. */
+    width: max(100vw, calc(100svh * 2736 / 5000 + 2px));
+  }
+
+  .umbral__hueco,
+  .puerta {
+    top: 37.08%;
+    height: 25.80%;    /* 62.88 - 37.08 */
+  }
+
   /* Y el botón de WhatsApp sube por encima de la barra en vez de sentarse en
      ella. Sin :has(): en las páginas sin recorrido --recorrido-h vale 0 y la
      cuenta devuelve el sitio de siempre. */

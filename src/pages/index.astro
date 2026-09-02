@@ -22,14 +22,23 @@ const desc =
          sea cual sea la pantalla. Con la foto en object-fit:cover directamente
          sobre el viewport, en vertical las hojas se despegaban del mueble. -->
     <div class="umbral__escena">
-      <!-- Cada foto del umbral lleva su copia de movil. No es una cuestion de
-           encuadre —el recorte es el mismo— sino de peso: en el telefono la
-           sala se pinta a 544 px de ancho y la hoja de la puerta a 150, y bajar
-           la original de 2200 px por una linea movil es tirar el presupuesto de
-           la primera pantalla. Esta es LA imagen del LCP: lo que tarde en
-           llegar es lo que tarda la web en existir. -->
+      <!-- Cada foto del umbral lleva su copia de movil, y ya NO es el mismo
+           encuadre: en el telefono se sirve una toma vertical del mismo armario
+           (2736x5000) para que la escena cubra la pantalla de borde a borde en
+           vez de dejar franjas arriba y abajo. El lienzo solo se amplio arriba
+           y abajo, asi que en tema.css se redeclaran los porcentajes VERTICALES
+           del recorte y los horizontales siguen siendo los mismos.
+           El peso sigue mandando: esta es LA imagen del LCP, lo que tarde en
+           llegar es lo que tarda la web en existir, asi que va en varios
+           tamanos y el que se sirve en un telefono corriente pesa ~13-32 KB. -->
       <picture>
-        <source media="(max-width: 860px)" srcset="/puertas/sala-m.webp" width="1100" height="611" />
+        <source
+          media="(max-width: 860px)"
+          srcset="/puertas/sala-vertical-480.webp 480w, /puertas/sala-vertical-780.webp 780w, /puertas/sala-vertical-1180.webp 1180w"
+          sizes="120vw"
+          width="1180"
+          height="2156"
+        />
         <img class="umbral__sala" src="/puertas/sala.webp" alt="" width="2200" height="1222" fetchpriority="high" decoding="async" />
       </picture>
 
@@ -42,14 +51,14 @@ const desc =
 
       <div class="puerta puerta--izq">
         <picture>
-          <source media="(max-width: 860px)" srcset="/puertas/puerta-izq-m.webp" width="420" height="734" />
+          <source media="(max-width: 860px)" srcset="/puertas/puerta-izq-vertical.webp" width="300" height="524" />
           <img src="/puertas/puerta-izq.webp" alt="" width="739" height="1292" decoding="async" />
         </picture>
         <span class="puerta__luz"></span>
       </div>
       <div class="puerta puerta--der">
         <picture>
-          <source media="(max-width: 860px)" srcset="/puertas/puerta-der-m.webp" width="430" height="730" />
+          <source media="(max-width: 860px)" srcset="/puertas/puerta-der-vertical.webp" width="300" height="509" />
           <img src="/puertas/puerta-der.webp" alt="" width="761" height="1292" decoding="async" />
         </picture>
         <span class="puerta__luz"></span>
