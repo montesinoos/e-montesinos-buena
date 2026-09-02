@@ -188,10 +188,12 @@ const desc =
              el visitante sigue bajando, el viaje continúa. Nadie queda
              retenido.
 
-             FASE 1: colores planos. Las muestras son cajas pintadas con dos
-             tonos. Cuando entren las texturas generadas se sustituye la cara
-             de cada muestra por su imagen y la geometría (posiciones, giros,
-             cartela) no se toca. -->
+             Cada muestra es la fotografía de esa madera, encuadrada a 3:3.4
+             con la misma luz y el mismo plano cenital que las demás: van una
+             al lado de otra sobre el mismo banco, y basta con que una tenga
+             otra luz o la veta a otra escala para que cante. Se generan y se
+             preparan con los dos scripts de scripts/, y la lista de maderas
+             vive en src/data/maderas.js. -->
         <div data-sc-copy data-sc-window="0.1553 0.5824 0.13 0.11">
           <div class="material">
             <div class="copia copia--der copia--material" data-entrada="derecha">
@@ -210,7 +212,7 @@ const desc =
                   {maderas.map((m) => (
                     <li
                       class="muestra"
-                      style={`--x:${m.x}%;--y:${m.y}%;--giro:${m.giro}deg;--tono:${m.tono};--veta:${m.veta}`}
+                      style={`--x:${m.x}%;--y:${m.y}%;--giro:${m.giro}deg;--tono:${m.tono}`}
                     >
                       <button
                         type="button"
@@ -220,7 +222,15 @@ const desc =
                         data-nombre={m.nombre}
                         data-frase={m.frase}
                       >
-                        <span class="muestra__cara" aria-hidden="true"></span>
+                        <img
+                          class="muestra__cara"
+                          src={m.img}
+                          alt=""
+                          width="560"
+                          height="635"
+                          loading="lazy"
+                          decoding="async"
+                        />
                         <span class="muestra__canto" aria-hidden="true"></span>
                         {/* El texto de cada madera vive en el HTML, no solo en
                             el data-. Asi esta ahi para quien navega con lector
