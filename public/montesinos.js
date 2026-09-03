@@ -177,6 +177,18 @@
   var mundo = document.querySelector('[data-sc-mode="worldflight"]');
   var tramos = mundo ? [].slice.call(mundo.querySelectorAll('[data-sc-segment]')) : [];
 
+  // Táctil, no "pantalla pequeña". Por ancho, un iPad en horizontal pasa de
+  // 860px y se quedaría con las reglas de escritorio teniendo dedos; es el
+  // mismo criterio que ya usa tema.css para el zoom de los formularios.
+  // Se pregunta en cada uso y no una vez al arrancar: a un iPad se le acopla
+  // un teclado con trackpad a mitad de visita.
+  var mqGrueso = matchMedia('(pointer: coarse)');
+  function grueso() { return mqGrueso.matches; }
+
+  // Lo rellena el bloque del snap, si llega a montarse. Los botones del
+  // recorrido lo usan para saltar con el mismo motor que el dedo.
+  var irAParada = null;
+
   var pesoTotal = 0;
   for (var wi = 0; wi < tramos.length; wi++) {
     pesoTotal += parseFloat(tramos[wi].getAttribute('data-sc-w')) || 1.3;
@@ -289,6 +301,11 @@
   paradas.forEach(function (grupo, i) {
     grupo.forEach(function (b) {
       b.addEventListener('click', function () {
+        // En táctil el botón salta con el mismo motor que el dedo. Si no,
+        // conviven dos animaciones distintas —la del navegador y la del
+        // snap— que ni duran lo mismo ni se avisan: pulsar una parada en
+        // mitad de un viaje dejaba a las dos tirando del scroll a la vez.
+        if (irAParada && grueso()) { irAParada(i + 1); return; }
         scrollTo({ top: scrollDeTramo(i), behavior: reduce ? 'auto' : 'smooth' });
       });
     });
@@ -840,6 +857,8 @@
     var animando = false;
     var finPrevisto = 0;        // cuándo debería haber terminado el viaje
     var destino = 0;            // dónde tenía que acabar el viaje en curso
+    var posado = -1;            // parada en la que se quedó el último viaje
+    var posadoY = 0;            // y en qué píxel se quedó
     var mudo = 0;               // instante hasta el que se ignora la entrada
     var acumulado = 0;
 
@@ -937,8 +956,17 @@
       if (Math.abs(salto) < 2) return;
       destino = hasta;
 
+      // El tiempo, no la velocidad, es lo que se siente como "cuánto scroll
+      // me ha costado esta sección". En escritorio la duración sube con la
+      // distancia y está bien: la rueda es un mando fino y el paneo largo se
+      // agradece despacio. Con el dedo no: sueltas y esperas, y como las
+      // paradas no están a la misma distancia —salir de Material son 2860 px
+      // y salir de 1:1 son 1660— eso medía 1200 ms contra 700. El mismo gesto
+      // costaba casi el doble de espera y se leía como "aquí hay más scroll".
+      // Un tiempo fijo iguala las cuatro secciones; lo que varía entonces es
+      // la velocidad del paneo, que en una foto que se desplaza no se nota.
       var vh = alturaMotor();
-      var dur = clamp(380 * (Math.abs(salto) / vh), 750, 1600);
+      var dur = grueso() ? 820 : clamp(380 * (Math.abs(salto) / vh), 750, 1600);
       var t0 = performance.now();
       animando = true;
       finPrevisto = t0 + dur;
@@ -957,6 +985,7 @@
         if (p < 1) requestAnimationFrame(paso);
         else {
           animando = false;
+          posado = i; posadoY = hasta;
           // La rueda de un trackpad sigue mandando eventos por inercia mucho
           // después de que el dedo se levante. Sin este silencio, esa cola se
           // lee como gestos nuevos y la página se va tres paradas de golpe.
@@ -1050,14 +1079,62 @@
       mover(dir);
     });
 
-    /* ---- recalcular ----
-       Las anclas se deducen de la pista del motor, que se remide en cada
-       resize. Se tiran y se vuelven a calcular en el siguiente uso, no aquí:
-       durante el propio resize el motor todavía está recolocando. */
+    /* ---- cuando la ventana cambia de alto ----
+       ---------------------------------------------------------------------
+       En un teléfono la ventana cambia de alto sola: Safari esconde su barra
+       al bajar y la saca al subir, y ahí se van cien píxeles.
+
+       El motor, a propósito, NO rehace su layout en ese caso (scrollcraft.js,
+       "Ignore URL-bar-only height changes"): recolocar la página bajo el
+       pulgar de alguien que está leyendo es peor que el desajuste. Pero sí se
+       queda con la altura nueva para calcular el progreso, mientras su pista
+       de scroll sigue medida con la vieja. Resultado: el recorrido se acorta
+       un 12% y el mismo píxel de scroll vale más progreso que antes.
+
+       El error es proporcional a lo andado, así que en Nave no se ve y en
+       Salida son casi nueve décimas de pantalla: la copia se sale de su
+       ventana y desaparece. Antes esto pasaba desapercibido porque con el
+       scroll libre nunca estás quieto y el fotograma se rehace solo; con el
+       snap te quedas parado justo en ese punto y ahí se queda.
+
+       Aquí el momento es el bueno: la página está posada en una parada y
+       nadie tiene el dedo encima, que es exactamente lo que el motor quería
+       proteger. Se le pide que remida y se vuelve a posar en la misma parada.
+
+       Sólo en táctil: en un escritorio la ventana no cambia de alto sola, y
+       si el usuario la redimensiona a mano ya no está leyendo. */
     var reloj = 0;
+
+    function reasentar() {
+      anclas = null;
+      if (!grueso() || !sc || !sc.layout) return;
+      if (posado < 1) return;              // en el umbral no hay nada que cuadrar
+
+      // Con un viaje en marcha se espera: mover el suelo a media animación es
+      // peor que llegar tarde.
+      if (!libre() || performance.now() < mudo) {
+        clearTimeout(reloj);
+        reloj = setTimeout(reasentar, 300);
+        return;
+      }
+
+      // Al encoger el documento el navegador ya ha corrido el scroll en
+      // proporción, así que se sigue estando junto a la misma parada. Si no
+      // es el caso, es que el visitante se ha ido a otro sitio por su cuenta
+      // y no hay que devolverlo a rastras.
+      if (Math.abs(scrollY - posadoY) > innerHeight) return;
+
+      sc.layout();
+      anclas = null;
+      var y = asegurar()[posado];
+      posadoY = y;
+      try { scrollTo({ top: y, left: 0, behavior: 'instant' }); }
+      catch (err) { scrollTo(0, y); }
+    }
+
     addEventListener('resize', function () {
       clearTimeout(reloj);
-      reloj = setTimeout(function () { anclas = null; }, 250);
+      reloj = setTimeout(reasentar, 250);
     });
 
     // Al volver de otra pestaña: el viaje que se quedó a medias se termina de
@@ -1071,6 +1148,8 @@
       catch (err) { scrollTo(0, destino); }
       mudo = performance.now() + 300;
     });
+
+    irAParada = viajar;
 
     addEventListener('load', function () { anclas = null; });
   })();
