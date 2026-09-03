@@ -49,7 +49,19 @@ const conMovil = new Set(
            cada tarjeta entre cuando le toca a ella y no las veinte de golpe. -->
       {proyectos.map((p) => (
         <figure class="obra" data-sector={p.sector} data-anima>
-          <div class="obra__media">
+          <!-- El media es un botón y no un div: abrir la foto en grande es una
+               acción, y así entra con teclado y lo canta el lector de pantalla
+               sin inventar roles a mano. La foto grande que sirve el visor es
+               siempre el original de 1800 px, no la copia `-m` de la rejilla. -->
+          <button
+            type="button"
+            class="obra__media"
+            data-abrir-visor
+            data-full={`/proyectos-web/${p.img}.webp`}
+            data-titulo={p.nombre}
+            data-sector-nombre={nombreSector(p.sector)}
+            aria-label={`Ver en grande la obra para ${p.nombre}`}
+          >
             <!-- La rejilla es de 1 columna en móvil y de 3 en escritorio,
                  así que el mismo archivo se pinta a 335 px o a 420 px. Servir
                  los 1800 px del original en un teléfono son ~2,5 MB de
@@ -75,7 +87,7 @@ const conMovil = new Set(
                 decoding="async"
               />
             )}
-          </div>
+          </button>
           <figcaption>
             <h2>{p.nombre}</h2>
             <span class="sect">{nombreSector(p.sector)}</span>
@@ -83,6 +95,40 @@ const conMovil = new Set(
         </figure>
       ))}
     </div>
+
+    <!-- Visor de obra. <dialog> nativo: se lleva puestos el foco atrapado, el
+         Esc, el ::backdrop y el inerte del resto de la página sin que haya que
+         escribir nada de eso. El contenido se rellena al abrir, así que aquí
+         solo está el armazón. -->
+    <dialog class="visor" id="visor" aria-label="Imagen del proyecto">
+      <button type="button" class="visor__cerrar" data-cerrar-visor aria-label="Cerrar">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none"
+             stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+          <path d="M5 5l14 14M19 5L5 19" />
+        </svg>
+      </button>
+
+      <button type="button" class="visor__paso visor__paso--ant" data-visor-paso="-1" aria-label="Obra anterior">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none"
+             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 4l-8 8 8 8" />
+        </svg>
+      </button>
+      <button type="button" class="visor__paso visor__paso--sig" data-visor-paso="1" aria-label="Obra siguiente">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none"
+             stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 4l8 8-8 8" />
+        </svg>
+      </button>
+
+      <figure class="visor__marco">
+        <img id="visor-img" src="" alt="" decoding="async" />
+        <figcaption class="visor__pie">
+          <span class="visor__titulo" id="visor-titulo"></span>
+          <span class="visor__sector" id="visor-sector"></span>
+        </figcaption>
+      </figure>
+    </dialog>
 
     <Pie />
   </main>

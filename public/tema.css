@@ -1016,6 +1016,118 @@
   white-space: nowrap;
 }
 
+/* El media de la obra pasó de div a button para abrir el visor. Un botón trae
+   de fábrica borde, fondo, padding y font propios del sistema: se apagan aquí
+   para que la tarjeta se vea exactamente igual que antes. */
+.obra__media {
+  border: 0; padding: 0; margin: 0;
+  display: block; width: 100%;
+  font: inherit; color: inherit;
+  cursor: zoom-in;
+}
+.obra__media:focus-visible {
+  outline: 2px solid var(--sc-accent);
+  outline-offset: 3px;
+}
+
+/* ---- visor de obra (dialog nativo) ---- */
+.visor {
+  /* El dialog nativo trae margin auto, borde y max-width/height de 100%-6px.
+     Aquí ocupa la ventana entera y coloca su contenido a mano. */
+  width: 100%; max-width: 100%;
+  height: 100%; max-height: 100%;
+  margin: 0; padding: 0; border: 0;
+  background: transparent;
+  overflow: hidden;
+  place-items: center;
+}
+.visor[open] { display: grid; }
+.visor::backdrop { background: rgba(10, 10, 11, 0.92); }
+
+.visor__marco {
+  margin: 0;
+  display: grid;
+  gap: var(--sc-3);
+  justify-items: center;
+  padding: var(--sc-5);
+  max-width: 100%;
+}
+.visor__marco img {
+  /* contain y no cover: en el visor la foto se ve entera, recortarla sería
+     justo lo contrario de lo que se ha pedido al hacer clic. */
+  max-width: min(92vw, 1400px);
+  max-height: 78vh;
+  width: auto; height: auto;
+  object-fit: contain;
+  border-radius: 2px;
+}
+.visor__pie {
+  display: flex; flex-wrap: wrap; gap: 0.35rem var(--sc-3);
+  align-items: baseline; justify-content: center;
+  text-align: center;
+}
+.visor__titulo {
+  font-family: var(--sc-font-display);
+  font-size: var(--sc-t-base);
+  letter-spacing: var(--sc-track-snug);
+  color: #F4F3F0;
+}
+.visor__sector {
+  font-family: var(--sc-font-mono);
+  font-size: var(--sc-t-xs);
+  letter-spacing: 0.05em;
+  color: rgba(244, 243, 240, 0.6);
+}
+
+.visor__cerrar,
+.visor__paso {
+  position: fixed;
+  z-index: 2;
+  display: grid; place-items: center;
+  width: 2.75rem; height: 2.75rem;
+  padding: 0;
+  border: 1px solid rgba(244, 243, 240, 0.22);
+  border-radius: 50%;
+  background: rgba(244, 243, 240, 0.06);
+  color: #F4F3F0;
+  cursor: pointer;
+}
+.visor__cerrar { top: var(--sc-gutter); right: var(--sc-gutter); }
+.visor__paso { top: 50%; translate: 0 -50%; }
+.visor__paso--ant { left: var(--sc-gutter); }
+.visor__paso--sig { right: var(--sc-gutter); }
+.visor__cerrar:focus-visible,
+.visor__paso:focus-visible { outline: 2px solid var(--sc-accent); outline-offset: 3px; }
+
+/* Con una sola obra a la vista (o filtrando hasta dejar una) las flechas no
+   llevan a ningún sitio: el JS marca el dialog y aquí se retiran. */
+.visor[data-solo-una] .visor__paso { display: none; }
+
+@media (max-width: 700px) {
+  .visor__marco img { max-height: 68vh; }
+  .visor__paso { top: auto; bottom: var(--sc-gutter); translate: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .visor__cerrar, .visor__paso {
+    transition: background var(--sc-d-fast) var(--sc-ease-out),
+                border-color var(--sc-d-fast) var(--sc-ease-out);
+  }
+  .visor[open] { animation: sc-visor-entra 260ms var(--sc-ease-out) both; }
+  .visor[open]::backdrop { animation: sc-visor-fondo 260ms var(--sc-ease-out) both; }
+}
+@media (hover: hover) {
+  .visor__cerrar:hover, .visor__paso:hover {
+    background: rgba(244, 243, 240, 0.16);
+    border-color: rgba(244, 243, 240, 0.4);
+  }
+}
+@keyframes sc-visor-entra {
+  from { opacity: 0; scale: 0.985; }
+  to   { opacity: 1; scale: 1; }
+}
+@keyframes sc-visor-fondo { from { opacity: 0; } to { opacity: 1; } }
+
 /* ---- listas numeradas (proceso, pilares) ---- */
 .pasos { border-top: 1px solid var(--sc-hairline); margin: 0; padding: 0; list-style: none; }
 .paso {

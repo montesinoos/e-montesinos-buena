@@ -701,6 +701,107 @@
         if (ok) n++;
       });
       if (cuenta) cuenta.textContent = n;
+      if (typeof window.sincronizaVisor === 'function') window.sincronizaVisor();
+    });
+  }
+
+  /* ---------------------------------------------- visor de obra en grande --
+     Clic en la foto de la rejilla y la obra se abre a tamaño completo sobre un
+     fondo oscuro. Es un <dialog> nativo con showModal(): el foco atrapado, el
+     Esc, el fondo inerte y el ::backdrop vienen dados; escribirlos a mano
+     seria reimplementar peor lo que ya trae el navegador.
+
+     Las flechas recorren SOLO las obras visibles: si hay un filtro puesto,
+     saltar a una obra que el usuario ha filtrado fuera es sacarle de donde
+     estaba. La lista se recalcula al abrir y cada vez que cambia el filtro. */
+  var visor = document.getElementById('visor');
+  if (visor && visor.showModal) {
+    var visorImg = document.getElementById('visor-img');
+    var visorTit = document.getElementById('visor-titulo');
+    var visorSec = document.getElementById('visor-sector');
+    var botones = [];   // los .obra__media visibles, en orden de rejilla
+    var indice = -1;
+
+    function recuentaBotones() {
+      botones = [].slice
+        .call(document.querySelectorAll('[data-abrir-visor]'))
+        .filter(function (b) { return !b.closest('.obra').hidden; });
+      if (botones.length < 2) visor.setAttribute('data-solo-una', '');
+      else visor.removeAttribute('data-solo-una');
+    }
+
+    function pinta(i) {
+      var b = botones[i];
+      if (!b) return;
+      indice = i;
+      visorImg.src = b.getAttribute('data-full');
+      visorImg.alt = 'Proyecto de Ebanistería Montesinos para ' + b.getAttribute('data-titulo');
+      visorTit.textContent = b.getAttribute('data-titulo');
+      visorSec.textContent = b.getAttribute('data-sector-nombre') || '';
+    }
+
+    // Cerrar es más que llamar a close(): hay que soltar la foto grande y
+    // devolver el foco a la tarjeta de la que se salió, o el tabulador vuelve
+    // a empezar desde arriba de la página. No se cuelga del evento 'close'
+    // porque hay navegadores empotrados donde ese evento no llega.
+    function cierra() {
+      if (!visor.open) return;
+      visor.close();
+      visorImg.removeAttribute('src');
+      var b = botones[indice];
+      if (b) b.focus({ preventScroll: true });
+    }
+
+    function pasa(d) {
+      if (botones.length < 2) return;
+      // Vuelta al principio por los dos lados: en una galería corta, chocar
+      // contra el final obliga a volver a mano por donde ya se ha pasado.
+      pinta((indice + d + botones.length) % botones.length);
+    }
+
+    // Se sincroniza tras filtrar: la obra abierta puede haber quedado fuera.
+    window.sincronizaVisor = function () {
+      if (visor.open) { recuentaBotones(); }
+    };
+
+    document.addEventListener('click', function (e) {
+      var abre = e.target.closest('[data-abrir-visor]');
+      if (abre) {
+        recuentaBotones();
+        var i = botones.indexOf(abre);
+        pinta(i < 0 ? 0 : i);
+        visor.showModal();
+        return;
+      }
+      if (!visor.open) return;
+      if (e.target.closest('[data-cerrar-visor]')) { cierra(); return; }
+      var paso = e.target.closest('[data-visor-paso]');
+      if (paso) { pasa(Number(paso.getAttribute('data-visor-paso'))); return; }
+      // Clic fuera del marco (el hueco oscuro alrededor de la foto) cierra.
+      if (e.target === visor) cierra();
+    });
+
+    visor.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { e.preventDefault(); pasa(1); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); pasa(-1); }
+      // Esc lo cierra el propio <dialog>, pero no en todos los contextos
+      // (webviews y navegadores empotrados donde el gesto de cierre lo
+      // intercepta el contenedor). Cerrarlo aquí también no molesta: si el
+      // navegador ya lo ha cerrado, close() sobre un dialog cerrado no hace
+      // nada.
+      else if (e.key === 'Escape') { cierra(); }
+    });
+
+    // Y si el Esc lo atiende el navegador antes que nosotros, el dialog se
+    // cierra por su cuenta: aquí se recoge esa vía para dejar el mismo estado.
+    // El `open` se comprueba porque 'close' llega en una tarea aparte: si para
+    // entonces el visor ya se ha vuelto a abrir con otra obra, limpiar la foto
+    // dejaria el hueco en blanco sobre una obra recien abierta.
+    visor.addEventListener('close', function () {
+      if (visor.open) return;
+      visorImg.removeAttribute('src');
+      var b = botones[indice];
+      if (b) b.focus({ preventScroll: true });
     });
   }
 
