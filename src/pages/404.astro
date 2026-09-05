@@ -1,0 +1,97 @@
+---
+import Base from "../layouts/Base.astro";
+import Pie from "../components/Pie.astro";
+---
+
+<Base
+  titulo="Página no encontrada — Ebanistería Montesinos"
+  desc="Página no encontrada. Vuelve al inicio o consulta los proyectos de Ebanistería Montesinos."
+  ruta="/404"
+>
+  <main id="principal" class="pagina sc-wrap error-404">
+    <section class="error-404__contenido" aria-labelledby="titulo-404">
+      <h1 id="titulo-404">Página no encontrada.</h1>
+      <p>La dirección no corresponde a ninguna página del sitio.</p>
+      <nav class="error-404__acciones" aria-label="Continuar navegando">
+        <a class="error-404__principal" href="/">Volver al inicio</a>
+        <a href="/proyectos">Ver proyectos</a>
+      </nav>
+    </section>
+
+    <Pie />
+  </main>
+</Base>
+
+<style>
+  .error-404 {
+    min-height: 100svh;
+    display: grid;
+    grid-template-rows: 1fr auto;
+  }
+
+  .error-404__contenido {
+    align-self: center;
+    max-width: 48rem;
+    padding-block: var(--sc-8);
+  }
+
+  h1 {
+    margin: 0;
+    font-family: var(--sc-font-display);
+    font-size: var(--sc-t-3xl);
+    font-weight: 500;
+    letter-spacing: var(--sc-track-tight);
+    line-height: var(--sc-leading-tight);
+    text-wrap: balance;
+  }
+
+  p {
+    max-width: 42ch;
+    margin: var(--sc-5) 0 0;
+    color: var(--sc-ink-soft);
+    font-size: var(--sc-t-lg);
+    line-height: 1.45;
+  }
+
+  .error-404__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sc-5);
+    margin-top: var(--sc-6);
+  }
+
+  .error-404__acciones a {
+    color: var(--sc-ink);
+    font-family: var(--sc-font-mono);
+    font-size: var(--sc-t-xs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-underline-offset: 0.3em;
+  }
+
+  .error-404__acciones .error-404__principal {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.7rem 1.1rem;
+    border-radius: var(--sc-r-pill);
+    background: var(--sc-ink);
+    color: var(--sc-canvas);
+    text-decoration: none;
+  }
+
+  @media (max-width: 520px) {
+    .error-404__acciones {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: var(--sc-4);
+    }
+
+    .error-404__acciones a:not(.error-404__principal) {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+    }
+  }
+</style>

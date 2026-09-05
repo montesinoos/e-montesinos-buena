@@ -33,7 +33,7 @@ const desc =
            tamanos y el que se sirve en un telefono corriente pesa ~13-32 KB. -->
       <picture>
         <source
-          media="(max-width: 860px)"
+          media="(max-width: 860px) and (orientation: portrait)"
           srcset="/puertas/sala-vertical-480.webp 480w, /puertas/sala-vertical-780.webp 780w, /puertas/sala-vertical-1180.webp 1180w"
           sizes="120vw"
           width="1180"
@@ -44,21 +44,21 @@ const desc =
 
       <div class="umbral__hueco">
         <picture>
-          <source media="(max-width: 860px)" srcset="/mundo/nave-entrada-m.webp" width="780" height="1386" />
+          <source media="(max-width: 860px) and (orientation: portrait)" srcset="/mundo/nave-entrada-m.webp" width="780" height="1386" />
           <img src="/mundo/nave-entrada.webp" alt="" width="2000" height="1112" decoding="async" />
         </picture>
       </div>
 
       <div class="puerta puerta--izq">
         <picture>
-          <source media="(max-width: 860px)" srcset="/puertas/puerta-izq-vertical.webp" width="300" height="524" />
+          <source media="(max-width: 860px) and (orientation: portrait)" srcset="/puertas/puerta-izq-vertical.webp" width="300" height="524" />
           <img src="/puertas/puerta-izq.webp" alt="" width="739" height="1292" decoding="async" />
         </picture>
         <span class="puerta__luz"></span>
       </div>
       <div class="puerta puerta--der">
         <picture>
-          <source media="(max-width: 860px)" srcset="/puertas/puerta-der-vertical.webp" width="300" height="509" />
+          <source media="(max-width: 860px) and (orientation: portrait)" srcset="/puertas/puerta-der-vertical.webp" width="300" height="509" />
           <img src="/puertas/puerta-der.webp" alt="" width="761" height="1292" decoding="async" />
         </picture>
         <span class="puerta__luz"></span>
@@ -165,7 +165,7 @@ const desc =
             </div>
           </div>
 
-          <div class="copia" data-entrada="sube">
+          <div class="copia" data-scroll-panel data-entrada="sube">
             <p class="copia__eti">La nave · Sabadell</p>
             <h2>Más de cuarenta años en el mismo oficio.</h2>
             <p>
@@ -195,7 +195,7 @@ const desc =
              preparan con los dos scripts de scripts/, y la lista de maderas
              vive en src/data/maderas.js. -->
         <div data-sc-copy data-sc-window="0.1553 0.5824 0.13 0.11">
-          <div class="material">
+          <div class="material" data-scroll-panel>
             <div class="copia copia--der copia--material" data-entrada="derecha">
               <p class="copia__eti">Material</p>
               <h2>Saber de dónde viene cada cosa.</h2>
@@ -265,7 +265,7 @@ const desc =
         <!-- Silencio deliberado entre 0.5824 y 0.5908: la nave sin una palabra
              encima, para que el 1:1 llegue sin competencia. -->
         <div data-sc-copy data-sc-window="0.5908 0.8168 0.30 0.20">
-          <div class="copia copia--centro" data-entrada="abre">
+          <div class="copia copia--centro" data-scroll-panel data-entrada="abre">
             <p class="copia__eti">Escala 1:1</p>
             <h2>Tu tienda, montada entera en el taller, antes de existir</h2>
             <p>
@@ -276,7 +276,7 @@ const desc =
           </div>
         </div>
 
-        <div data-sc-copy data-sc-window="0.8354 1 0.34 0.06">
+        <div class="salida" data-scroll-panel data-sc-copy data-sc-window="0.8354 1 0.34 0.06">
           <!-- El globo vive DENTRO del bloque de copia de Salida, igual que el
                sello vive dentro del de la nave: asi el motor lo enciende y lo
                apaga con esta parada y no hay que sincronizar nada aparte.
@@ -888,7 +888,7 @@ const desc =
   -->
   <div class="cierre" id="cierre" hidden>
     <div class="hoja hoja--izq">
-      <div class="grabado">
+      <div class="grabado" data-scroll-panel>
         <p class="grabado__eti">Ebanistería Montesinos</p>
         <h2>Cuéntanos qué hay que resolver y te damos un presupuesto orientativo.</h2>
         <div class="grabado__ctas">
@@ -898,7 +898,7 @@ const desc =
       </div>
     </div>
     <div class="hoja hoja--der">
-      <div class="grabado">
+      <div class="grabado" data-scroll-panel>
         <dl class="grabado__sedes">
           <div>
             <dt>{sabadell.ciudad} · {sabadell.rol}</dt>

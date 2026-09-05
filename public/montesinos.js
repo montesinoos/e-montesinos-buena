@@ -628,6 +628,13 @@
       cartela.setAttribute('data-estado', 'lleno');
       cNombre.textContent = b.getAttribute('data-nombre') || '';
       cFrase.textContent = b.getAttribute('data-frase') || '';
+      // En el panel corto, mostrar la respuesta completa sin mover la página.
+      var panel = banco.closest('[data-scroll-panel]');
+      if (panel && getComputedStyle(panel).overflowY === 'auto') {
+        var margen = parseFloat(getComputedStyle(panel).scrollPaddingBottom) || 16;
+        var falta = cartela.getBoundingClientRect().bottom - panel.getBoundingClientRect().bottom + margen;
+        if (falta > 0) panel.scrollTop += falta;
+      }
     };
 
     banco.addEventListener('click', function (e) {
@@ -652,7 +659,8 @@
       // El objetivo de un evento no siempre es un elemento (el propio document
       // lo es de los eventos sintéticos), y ahí `closest` no existe.
       var t = e.target;
-      if (t && t.closest && t.closest('.muestra')) return;
+      // Arrastrar el panel para leer la cartela no cancela la madera elegida.
+      if (t && t.closest && t.closest('.material')) return;
       soltar();
     });
 
@@ -857,6 +865,7 @@
     var animando = false;
     var finPrevisto = 0;        // cuándo debería haber terminado el viaje
     var destino = 0;            // dónde tenía que acabar el viaje en curso
+    var viajeRaf = 0;           // fotograma pendiente, para poder interrumpirlo
     var posado = -1;            // parada en la que se quedó el último viaje
     var posadoY = 0;            // y en qué píxel se quedó
     var mudo = 0;               // instante hasta el que se ignora la entrada
@@ -949,24 +958,40 @@
       return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
     };
 
+    // Un gesto nuevo manda sobre el viaje anterior. Cancelar el rAF deja el
+    // scroll exactamente donde estaba y el siguiente destino se calcula desde
+    // ese fotograma, sin saltar al origen ni al final.
+    function cancelarViaje() {
+      if (!animando) return;
+      cancelAnimationFrame(viajeRaf);
+      viajeRaf = 0;
+      animando = false;
+      acumulado = 0;
+      mudo = 0;
+    }
+
+    function duracionLenta() {
+      var valor = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue('--sc-d-slow')
+      );
+      return Number.isFinite(valor) ? valor : 420;
+    }
+
     function viajar(i) {
+      cancelarViaje();
       var a = asegurar();
       i = clamp(i, 0, a.length - 1);
       var desde = scrollY, hasta = a[i], salto = hasta - desde;
       if (Math.abs(salto) < 2) return;
       destino = hasta;
 
-      // El tiempo, no la velocidad, es lo que se siente como "cuánto scroll
-      // me ha costado esta sección". En escritorio la duración sube con la
-      // distancia y está bien: la rueda es un mando fino y el paneo largo se
-      // agradece despacio. Con el dedo no: sueltas y esperas, y como las
-      // paradas no están a la misma distancia —salir de Material son 2860 px
-      // y salir de 1:1 son 1660— eso medía 1200 ms contra 700. El mismo gesto
-      // costaba casi el doble de espera y se leía como "aquí hay más scroll".
-      // Un tiempo fijo iguala las cuatro secciones; lo que varía entonces es
-      // la velocidad del paneo, que en una foto que se desplaza no se nota.
+      // La duración nace del token lento del sistema. En táctil es fija para
+      // que el mismo gesto siempre cueste lo mismo; en escritorio crece con la
+      // distancia, pero nunca pasa de dos tiempos lentos. Antes llegaba a
+      // 1600 ms y retenía el control demasiado tiempo.
       var vh = alturaMotor();
-      var dur = grueso() ? 820 : clamp(380 * (Math.abs(salto) / vh), 750, 1600);
+      var base = duracionLenta();
+      var dur = grueso() ? base : clamp(base * (Math.abs(salto) / vh), base, base * 2);
       var t0 = performance.now();
       animando = true;
       finPrevisto = t0 + dur;
@@ -982,8 +1007,9 @@
         var y = Math.round(desde + salto * facil(p));
         try { scrollTo({ top: y, left: 0, behavior: 'instant' }); }
         catch (err) { scrollTo(0, y); }
-        if (p < 1) requestAnimationFrame(paso);
+        if (p < 1) viajeRaf = requestAnimationFrame(paso);
         else {
+          viajeRaf = 0;
           animando = false;
           posado = i; posadoY = hasta;
           // La rueda de un trackpad sigue mandando eventos por inercia mucho
@@ -1002,13 +1028,23 @@
     }
 
     /* ---- rueda y trackpad ---- */
+    // Un panel que desborda debe poder leerse antes de saltar de escena.
+    // Al alcanzar un extremo, un gesto nuevo vuelve al recorrido habitual.
+    function desplazaPanel(target, dir) {
+      var panel = target && target.closest && target.closest('[data-scroll-panel]');
+      if (!panel || getComputedStyle(panel).overflowY !== 'auto') return false;
+      var max = panel.scrollHeight - panel.clientHeight;
+      return max > 1 && (dir > 0 ? panel.scrollTop < max - 1 : panel.scrollTop > 1);
+    }
     var ultimo = 0;
     addEventListener('wheel', function (e) {
       if (e.ctrlKey) return;              // zoom del navegador: no es scroll
+      if (desplazaPanel(e.target, e.deltaY > 0 ? 1 : -1)) { acumulado = 0; return; }
       // Se decide con el signo de ESTE evento y no con el acumulado: el
       // preventDefault hay que darlo o no darlo ahora, no dos ruedas después.
       if (sueltoEnElUmbral(e.deltaY > 0 ? 1 : -1)) { acumulado = 0; return; }
       e.preventDefault();
+      cancelarViaje();
       if (!libre() || performance.now() < mudo) { acumulado = 0; return; }
 
       var ahora = performance.now();
@@ -1028,6 +1064,7 @@
        usa quien necesita acercarse a leer (WCAG 1.4.4). */
     var y0 = 0, siguiendo = false;
     addEventListener('touchstart', function (e) {
+      cancelarViaje();
       siguiendo = e.touches.length === 1;
       if (siguiendo) y0 = e.touches[0].clientY;
     }, { passive: true });
@@ -1039,6 +1076,7 @@
       // cruce a la nave: cortarle el dedo a alguien a medio arrastre es peor
       // que dejarle pasar de largo una parada.
       var dy = y0 - e.touches[0].clientY;
+      if (desplazaPanel(e.target, dy > 0 ? 1 : -1)) { siguiendo = false; return; }
       if (sueltoEnElUmbral(dy > 0 ? 1 : -1)) { siguiendo = false; return; }
       e.preventDefault();
     }, { passive: false });
@@ -1058,6 +1096,7 @@
        foco está escribiendo. */
     addEventListener('keydown', function (e) {
       var t = e.target;
+      if (e.defaultPrevented) return;
       if (t && (t.isContentEditable ||
                 /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName || ''))) return;
 
@@ -1068,6 +1107,11 @@
       else if (k === 'Home') ir = 0;
       else if (k === 'End') ir = asegurar().length - 1;
       else return;
+
+      if ((k === ' ' || k === 'Spacebar') && t && t.closest && t.closest('button, a')) return;
+      if (desplazaPanel(t, ir >= 0 ? (k === 'End' ? 1 : -1) : dir)) return;
+
+      cancelarViaje();
 
       // Home y End son saltos pedidos a propósito: van a su parada desde
       // donde sea, umbral incluido.
@@ -1142,6 +1186,8 @@
     // pasó. Lo que importa es no dejar la página encallada entre dos paradas.
     document.addEventListener('visibilitychange', function () {
       if (document.hidden || !animando) return;
+      cancelAnimationFrame(viajeRaf);
+      viajeRaf = 0;
       animando = false;
       acumulado = 0;
       try { scrollTo({ top: destino, left: 0, behavior: 'instant' }); }

@@ -74,7 +74,7 @@ const { titulo, desc, ruta, mapa = false } = Astro.props;
         <span class="chrome__hamb-i" aria-hidden="true"></span>
       </button>
 
-      <nav aria-label="Páginas" id="menu-paginas">
+      <nav aria-label="Páginas" id="menu-paginas" data-scroll-panel>
         <ul class="chrome__menu">
           {paginas.map((p) => (
             <li>

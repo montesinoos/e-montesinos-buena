@@ -137,9 +137,24 @@ import { proceso, vias, sectores, contactoDirecto } from "../data/montesinos.js"
     };
     const raton = (e) => (e.pointerType ? e.pointerType === "mouse" : true) && conCursor();
 
+    const posicion = (e) => {
+      const margen = 16;
+      const ancho = visor.offsetWidth;
+      const alto = visor.offsetHeight;
+      const techo = document.querySelector(".chrome").getBoundingClientRect().bottom + margen;
+      const x = e.clientX + desf.x + ancho <= innerWidth - margen
+        ? e.clientX + desf.x : e.clientX - desf.x - ancho;
+      const y = e.clientY + desf.y + alto <= innerHeight - margen
+        ? e.clientY + desf.y : e.clientY - desf.y - alto;
+      return {
+        x: Math.max(margen, Math.min(x, innerWidth - ancho - margen)),
+        y: Math.max(techo, Math.min(y, innerHeight - alto - margen)),
+      };
+    };
+
     const mover = (e) => {
       if (!raton(e)) return;
-      destino = { x: e.clientX + desf.x, y: e.clientY + desf.y };
+      destino = posicion(e);
       if (quieto) { actual = { ...destino }; colocar(); }
     };
     const entrar = (e) => {
@@ -149,7 +164,7 @@ import { proceso, vias, sectores, contactoDirecto } from "../data/montesinos.js"
       rotulo.textContent = fila.getAttribute("data-rotulo") || "";
       if (src) { img.src = src; img.style.opacity = "1"; }
       else { img.removeAttribute("src"); img.style.opacity = "0"; }
-      destino = { x: e.clientX + desf.x, y: e.clientY + desf.y };
+      destino = posicion(e);
       if (!dentro) { actual = { ...destino }; colocar(); }
       dentro = true;
       visor.classList.add("es-visible");
@@ -159,6 +174,8 @@ import { proceso, vias, sectores, contactoDirecto } from "../data/montesinos.js"
       dentro = false;
       visor.classList.remove("es-visible");
     };
+
+    window.addEventListener("resize", salir);
 
     filas.forEach((f) => {
       f.addEventListener("pointerenter", entrar);

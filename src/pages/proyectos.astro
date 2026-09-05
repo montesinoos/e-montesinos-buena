@@ -73,6 +73,8 @@ const conMovil = new Set(
             {!conMovil.has(p.img) ? (
               <img
                 src={`/proyectos-web/${p.img}.webp`}
+                width={p.width}
+                height={p.height}
                 alt={`Proyecto de Ebanistería Montesinos para ${p.nombre}`}
                 loading="lazy"
                 decoding="async"
@@ -80,8 +82,10 @@ const conMovil = new Set(
             ) : (
               <img
                 src={`/proyectos-web/${p.img}.webp`}
-                srcset={`/proyectos-web/${p.img}-m.webp 900w, /proyectos-web/${p.img}.webp 1800w`}
+                srcset={`/proyectos-web/${p.img}-m.webp 900w, /proyectos-web/${p.img}.webp ${p.width}w`}
                 sizes="(max-width: 700px) 100vw, (max-width: 1100px) 50vw, 33vw"
+                width={p.width}
+                height={p.height}
                 alt={`Proyecto de Ebanistería Montesinos para ${p.nombre}`}
                 loading="lazy"
                 decoding="async"

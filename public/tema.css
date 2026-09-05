@@ -11,7 +11,10 @@
   --sc-ink:        #16171A;
   --sc-ink-soft:   #6E6B66;
   --sc-accent:     #A67C34;
-  --sc-accent-ink: #FFFFFF;
+  /* El latón original se conserva en superficies y trazos. Esta variante más
+     oscura mantiene el matiz para texto pequeño y supera AA sobre el lienzo. */
+  --sc-accent-text: #876421;
+  --sc-accent-ink: #16171A;
 
   --sc-font-display: "Instrument Sans", system-ui, sans-serif;
   --sc-font-text:    "Inter", system-ui, sans-serif;
@@ -36,7 +39,7 @@
 }
 
 /* La página es clara: el suelo del motor asume oscuro en un par de sitios. */
-::selection { background: var(--sc-accent); color: #fff; }
+::selection { background: var(--sc-accent); color: var(--sc-accent-ink); }
 
 /* ============================================================ CHROME ======
    Mapa de la nave + menú de páginas. La gramática de mundo continuo pide que
@@ -49,7 +52,7 @@
   z-index: 60;
   height: var(--barra);
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--sc-5);
   padding-inline: var(--sc-gutter);
@@ -196,12 +199,17 @@
               background var(--sc-d-base) var(--sc-ease-out);
 }
 .mapa button:hover { color: var(--sc-ink); }
-.mapa button[aria-current="true"] { color: var(--sc-accent); }
+.mapa button[aria-current="true"] { color: var(--sc-accent-text); }
 .mapa button[aria-current="true"]::before { opacity: 1; background: var(--sc-accent); }
 .mapa .txt { display: none; }
 /* Los rótulos del recorrido esperan a que la barra tenga ancho de sobra:
    la punta derecha la comparten ahora con el CTA. */
 @media (min-width: 1400px) { .mapa .txt { display: inline; } }
+
+@media (min-width: 861px) and (max-width: 1100px) {
+  .chrome { gap: var(--sc-3); }
+  .chrome__menu a { padding-inline: 0.35rem; font-size: 0.75rem; }
+}
 
 @media (max-width: 860px) {
   /* Tres columnas: marca, la punta derecha (CTA y, en la portada, el recorrido
@@ -224,9 +232,11 @@
      líneas ni empujar a la hamburguesa. */
   .chrome__cta {
     padding: 0.45rem clamp(0.5rem, 2.2vw, 0.75rem);
-    font-size: clamp(0.5rem, 2.05vw, 0.5625rem);
+    font-size: clamp(0.625rem, 2.35vw, 0.6875rem);
     letter-spacing: clamp(0.02em, 0.9vw, 0.06em);
-    white-space: nowrap;
+    max-width: 100%;
+    white-space: normal;
+    text-align: center;
   }
   .chrome__cta-esc { display: none; }
   .chrome__cta-mov { display: inline; }
@@ -642,9 +652,12 @@
   .sello { display: none; }
 }
 
-/* Sin excepción por `prefers-reduced-motion`: se pidió expresamente que la
-   flotación se vea en cualquier equipo sin tener que tocar ajustes. Es una
-   decisión consciente, no un olvido. */
+/* La flotación es decorativa: con movimiento reducido el sello conserva su
+   volumen y su posición, pero deja de desplazarse de forma perpetua. */
+@media (prefers-reduced-motion: reduce) {
+  .sello,
+  .sello__img { animation: none; }
+}
 
 .copia--der {
   left: auto;
@@ -702,7 +715,7 @@
   font-size: var(--sc-t-xs);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--sc-accent);
+  color: var(--sc-accent-text);
   margin: 0 0 var(--sc-3);
 }
 .copia h2 {
@@ -759,6 +772,7 @@
   }
   .copia--der p { margin-left: 0; }
   .copia--centro { left: var(--sc-gutter); right: var(--sc-gutter); translate: 0 -50%; max-width: none; }
+  .copia--centro p { margin-inline: 0; text-align: left; }
 }
 
 /* ============================================================ EL CIERRE ===
@@ -926,7 +940,7 @@
   font-size: var(--sc-t-xs);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--sc-accent);
+  color: var(--sc-accent-text);
   margin: 0 0 var(--sc-4);
 }
 .titular h1 {
@@ -979,10 +993,10 @@
 
 .rejilla {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr));
   gap: var(--sc-5);
 }
-.obra { display: grid; gap: var(--sc-3); }
+.obra { display: grid; gap: var(--sc-3); margin: 0; min-width: 0; }
 .obra[hidden] { display: none; }
 .obra__media {
   aspect-ratio: 4 / 3;
@@ -1142,7 +1156,7 @@
   font-family: var(--sc-font-mono);
   font-size: var(--sc-t-xs);
   letter-spacing: 0.08em;
-  color: var(--sc-accent);
+  color: var(--sc-accent-text);
 }
 .paso h2, .paso h3 {
   font-family: var(--sc-font-display);
@@ -1178,7 +1192,7 @@
    mismo gesto en toda la casa. */
 @media (hover: hover) and (pointer: fine) {
   .prensa:hover { background: color-mix(in oklab, var(--sc-accent) 7%, transparent); }
-  .prensa:hover h3 { color: var(--sc-accent); }
+  .prensa:hover h3 { color: var(--sc-accent-text); }
 }
 
 /* El foco de teclado rodea la fila completa, no la palabra: quien tabula ve la
@@ -1210,7 +1224,7 @@
 /* ---- dos columnas ---- */
 .dos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
   gap: var(--sc-6);
 }
 .tarjeta {
@@ -1263,8 +1277,8 @@
   cursor: pointer;
   transition: background var(--sc-d-fast) var(--sc-ease-out);
 }
-.enviar:hover { background: var(--sc-accent); }
-.recado { font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); color: var(--sc-accent); min-height: 1.2em; margin: 0; }
+.enviar:hover { background: var(--sc-accent); color: var(--sc-accent-ink); }
+.recado { font-family: var(--sc-font-mono); font-size: var(--sc-t-xs); color: var(--sc-accent-text); min-height: 1.2em; margin: 0; }
 
 /* ---- contacto: formulario + sedes ----
    Las dos columnas terminan a la misma altura sin recurrir a media queries: la
@@ -1305,7 +1319,7 @@
   font-weight: 400;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--sc-accent);
+  color: var(--sc-accent-text);
 }
 .sedes__lista {
   margin: 0;
@@ -1379,7 +1393,7 @@
   color: var(--sc-ink-soft);
 }
 .pie a { color: inherit; }
-.pie a:hover { color: var(--sc-accent); }
+.pie a:hover { color: var(--sc-accent-text); }
 
 /* La marca del pie es la misma imagen de la barra de arriba, y a la misma
    altura (1.75rem) por un motivo medido, no estético: dentro del PNG las letras
@@ -1408,7 +1422,7 @@
   font-size: var(--sc-t-xs);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--sc-accent);
+  color: var(--sc-accent-text);
   margin: 0 0 var(--sc-5);
 }
 .ct-seccion { padding-top: clamp(4rem, 8vw, 7rem); }
@@ -1427,7 +1441,7 @@
 .ct-cab__h span { display: block; }
 .ct-cab__pie {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
   gap: var(--sc-6) var(--sc-8);
   align-items: end;
   border-top: 1px solid var(--sc-hairline);
@@ -1489,7 +1503,7 @@
   font-family: var(--sc-font-mono);
   font-size: 0.92rem;
   letter-spacing: 0.12em;
-  color: var(--sc-accent);
+  color: var(--sc-accent-text);
 }
 .ct-paso h3 {
   font-family: var(--sc-font-display);
@@ -1520,7 +1534,7 @@
 /* ---- dos vías de encargo ---- */
 .ct-vias {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
   gap: clamp(2rem, 5vw, 4.5rem);
 }
 .ct-via {
@@ -1547,7 +1561,7 @@
   font-size: 0.8rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--sc-accent);
+  color: var(--sc-accent-text);
   margin: 0;
 }
 .ct-via h3 {
@@ -1598,16 +1612,15 @@
   left: 0;
   z-index: 55;
   width: 31rem;
-  max-width: 42vw;
+  max-width: min(42vw, calc((100dvh - var(--barra) - 2rem) * 4 / 3));
   pointer-events: none;
   opacity: 0;
   scale: 0.95;
   transform: translate3d(0, 0, 0);
-  will-change: transform, opacity;
   transition: opacity var(--sc-d-base) var(--sc-ease-out),
               scale var(--sc-d-base) var(--sc-ease-out);
 }
-.ct-visor.es-visible { opacity: 1; scale: 1; }
+.ct-visor.es-visible { opacity: 1; scale: 1; will-change: transform, opacity; }
 .ct-visor__marco {
   position: relative;
   aspect-ratio: 4 / 3;
@@ -2561,7 +2574,7 @@ html.mov .obra[data-anima].es-dentro {
   transition: opacity 190ms ease;
 }
 .ficha__pie b { font-weight: 500; }
-.ficha__pie span { color: var(--sc-accent); }
+.ficha__pie span { color: var(--sc-accent-text); }
 .ficha[data-cambiando="si"] .ficha__pie { opacity: 0; }
 
 /* Quien pide menos movimiento no ve deslizarse nada: la foto se cambia y ya. */
@@ -2682,7 +2695,6 @@ html.mov .obra[data-anima].es-dentro {
 @media (hover: none), (pointer: coarse) {
   .chrome__menu a,
   .chrome__cta,
-  .chrome__hamb,
   .mapa button,
   .filtros button,
   .enviar {
@@ -2875,20 +2887,20 @@ html.mov .obra[data-anima].es-dentro {
      puede ser el único medio"). Al encenderse sube de opacidad y de peso. */
   .recorrido__n {
     font-family: var(--sc-font-mono);
-    font-size: 0.5rem;
+    font-size: 0.625rem;
     letter-spacing: 0.12em;
     opacity: 0.42;
     transition: opacity var(--sc-d-fast) var(--sc-ease-out);
   }
   .recorrido__t {
     font-family: var(--sc-font-mono);
-    font-size: 0.625rem;
+    font-size: 0.6875rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
     line-height: 1;
   }
 
-  .recorrido__lista button[aria-current="true"] { color: var(--sc-accent); }
+  .recorrido__lista button[aria-current="true"] { color: var(--sc-accent-text); }
   .recorrido__lista button[aria-current="true"] .recorrido__n { opacity: 1; }
   .recorrido__lista button[aria-current="true"] .recorrido__t { font-weight: 500; }
 
@@ -3273,4 +3285,100 @@ html.mov .obra[data-anima].es-dentro {
      texto y la lista de doce países están en el HTML. Solo se retira el hueco
      del dibujo que no hay. */
   .mapa-salida[data-estado="sin-mapa"] { display: none; }
+}
+
+/* En pantallas bajas el contenido conserva su tamaño y se puede recorrer.
+   El gesto desplaza primero el panel; en su extremo continúa hacia la parada
+   siguiente. La cabecera y el recorrido permanecen siempre disponibles. */
+@media (max-width: 860px) and (max-height: 700px) {
+  .material,
+  .salida[data-sc-copy] {
+    top: var(--barra);
+    bottom: var(--recorrido-h);
+    height: calc(100dvh - var(--barra) - var(--recorrido-h));
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: thin;
+    padding: 1rem var(--sc-gutter) 4rem;
+    scroll-padding-block: 1rem 4rem;
+  }
+  .material { display: block; }
+  .material .banco { margin-top: 1rem; }
+  .salida[data-sc-copy] { display: flex; flex-direction: column; gap: 1.25rem; }
+  .salida .copia--salida {
+    position: relative;
+    inset: auto;
+    order: -1;
+    flex: 0 0 auto;
+    width: 100%;
+  }
+  .salida .copia--salida::before { inset: -1rem; }
+  .salida .mapa-salida.svgMap-wrapper {
+    position: relative;
+    inset: auto;
+    flex: 0 0 auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 860px) and (max-height: 500px) and (min-width: 600px) {
+  .material,
+  .salida[data-sc-copy] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 1.5rem;
+  }
+  .material .banco { margin-top: 0; }
+  .material .banco__tablero { max-width: 18rem; }
+  .salida .mapa-salida.svgMap-wrapper { grid-column: 2; }
+}
+
+/* Pantallas de poca altura: reservar las barras y permitir leer el contenido. */
+@media (max-width: 1180px) {
+  .hoja {
+    padding-block: calc(var(--barra) + 1rem) calc(var(--recorrido-h) + 1rem);
+    min-height: 0;
+  }
+  .grabado[data-scroll-panel] {
+    min-height: 0;
+    max-height: calc(100dvh - var(--barra) - var(--recorrido-h) - 2rem);
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: thin;
+    padding-bottom: 3.5rem;
+    overflow-wrap: anywhere;
+  }
+  .visor__marco { min-width: 0; width: 100%; }
+  .visor__marco img { max-width: 100%; max-height: calc(100dvh - 12rem); }
+  .visor__pie { min-width: 0; overflow-wrap: anywhere; }
+}
+@media (max-width: 860px) {
+  #menu-paginas { max-height: calc(100dvh - var(--barra) - var(--recorrido-h)); overflow-y: auto; overscroll-behavior: contain; }
+}
+@media (max-width: 1180px) and (max-height: 600px) {
+  .copia[data-scroll-panel] {
+    inset: var(--barra) var(--sc-gutter) var(--recorrido-h);
+    translate: none;
+    max-width: none;
+    padding-block: 1rem 4rem;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+    scrollbar-width: thin;
+    text-align: left;
+  }
+  .copia[data-scroll-panel] p { margin-inline: 0; }
+}
+@media (max-width: 860px) and (orientation: landscape) {
+  .umbral__escena { width: max(100vw, calc(100svh * 1.8)); aspect-ratio: 2736 / 1520; }
+  .umbral__hueco, .puerta { top: 7.368%; height: 85%; }
+  .umbral__copia { top: auto; bottom: var(--recorrido-h); padding-block: 1rem; }
+  .umbral__copia h1 { max-width: 100%; font-size: clamp(1.25rem, 3.5vw, 1.6rem); }
+  .umbral__copia::before { bottom: 0; height: 100%; background: linear-gradient(transparent, var(--sc-canvas) 35%); }
+}
+@media (max-width: 860px) and (max-height: 700px) and (orientation: portrait) {
+  .umbral__escena { top: calc(50% - 5rem); }
+  .umbral__copia { top: auto; bottom: var(--recorrido-h); padding-block: 1rem 4rem; }
+  .umbral__copia h1 { max-width: 100%; font-size: 1.25rem; }
+  .umbral__copia::before { bottom: 0; height: 100%; }
 }

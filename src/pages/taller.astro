@@ -35,12 +35,12 @@ import { pilares, prensa, acabados } from "../data/montesinos.js";
         </p>
       </div>
       <figure data-ent="foto" style="--i: 3; margin:0;">
-        <img src="/mundo/nave-materia.webp" alt="Tablas de madera maciza y planchas de latón en el taller" loading="lazy" style="width:100%;border-radius:2px;" />
+        <img src="/mundo/nave-materia.webp" width="2000" height="1112" alt="Tablas de madera maciza y planchas de latón en el taller" loading="lazy" decoding="async" style="width:100%;height:auto;border-radius:2px;" />
       </figure>
     </div>
 
     <section style="margin-top: var(--sc-9);" data-anima>
-      <h2 class="paso__n" data-ent style="--i: 0; color:var(--sc-accent); margin-bottom:var(--sc-4);">CUATRO PILARES</h2>
+      <h2 class="paso__n" data-ent style="--i: 0; color:var(--sc-accent-text); margin-bottom:var(--sc-4);">CUATRO PILARES</h2>
       <ol class="pasos">
         {pilares.map((p, i) => (
           <li class="paso" data-ent style={`--i: ${i + 1}`}>
@@ -81,7 +81,7 @@ import { pilares, prensa, acabados } from "../data/montesinos.js";
     </section>
 
     <section style="margin-top: var(--sc-9);" data-anima>
-      <h2 class="paso__n" data-ent style="--i: 0; color:var(--sc-accent); margin-bottom:var(--sc-4);">PRENSA</h2>
+      <h2 class="paso__n" data-ent style="--i: 0; color:var(--sc-accent-text); margin-bottom:var(--sc-4);">PRENSA</h2>
       <ul class="pasos" style="list-style:none; padding:0;">
         {prensa.map((m, i) => (
           <li data-ent style={`--i: ${i + 1}`}>

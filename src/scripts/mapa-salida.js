@@ -206,8 +206,56 @@ export function montarMapa(caja) {
     pin.setAttribute("data-pin-iso", iso);
     const d = porIso.get(iso);
     if (!d) continue;
+
     pin.addEventListener("click", () => mostrar(d));
   }
+
+  // El punto visible conserva sus 12 px. En captura, cualquier toque dentro
+  // de un círculo de 44 px elige el pin más cercano; así los objetivos pueden
+  // solaparse en Europa sin que un círculo invisible tape arbitrariamente a
+  // otro. Teclado y nombre accesible siguen viviendo en los países de arriba.
+  const datoEn = (x, y) => {
+    let cercano = null;
+    let distancia = 22;
+    for (const pin of caja.querySelectorAll(".svgMap-pin")) {
+      const r = pin.getBoundingClientRect();
+      const d = Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height / 2));
+      if (d <= distancia) { cercano = pin; distancia = d; }
+    }
+    return cercano && porIso.get(cercano.getAttribute("data-pin-iso"));
+  };
+
+  caja.addEventListener("click", (e) => {
+    if (e.target.closest && e.target.closest(".mapa-salida__zoom")) return;
+    const d = datoEn(e.clientX, e.clientY);
+    if (!d) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    mostrar(d);
+  }, true);
+
+  // svg-pan-zoom cancela touchstart/touchend incluso sin zoom ni paneo:
+  // el navegador no llega a emitir click. Resolver el toque con Pointer Events
+  // conserva el ratón y el teclado, sin confundir arrastres con selecciones.
+  let toque = null;
+  caja.addEventListener("pointerdown", (e) => {
+    toque = e.isPrimary && e.pointerType !== "mouse" &&
+      !e.target.closest(".mapa-salida__zoom")
+      ? { id: e.pointerId, x: e.clientX, y: e.clientY } : null;
+  });
+  caja.addEventListener("pointermove", (e) => {
+    if (toque && Math.hypot(e.clientX - toque.x, e.clientY - toque.y) > 6) toque = null;
+  });
+  caja.addEventListener("pointercancel", () => { toque = null; });
+  caja.addEventListener("pointerup", (e) => {
+    const inicio = toque;
+    toque = null;
+    if (!inicio || inicio.id !== e.pointerId ||
+        Math.hypot(e.clientX - inicio.x, e.clientY - inicio.y) > 6) return;
+    const d = datoEn(e.clientX, e.clientY) ||
+      porIso.get(e.target.closest(".svgMap-country")?.getAttribute("data-id"));
+    if (d) mostrar(d);
+  });
 
   // Qué se está mirando. `isos` a null es el encuadre de siempre, el de las
   // doce; con un conjunto dentro, el mapa se acerca solo sobre esas. Es un
