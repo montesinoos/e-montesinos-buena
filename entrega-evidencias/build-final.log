@@ -1,0 +1,31 @@
+15:37:10 [types] Generated 56ms
+15:37:10 [build] output: "static"
+15:37:10 [build] mode: "static"
+15:37:10 [build] directory: C:\Users\maris\Desktop\Claude Web\Claude Web\Montesinos\web-montesinos-buena\dist\
+15:37:10 [build] Collecting build info...
+15:37:10 [build] ✓ Completed in 91ms.
+15:37:10 [build] Building static entrypoints...
+15:37:10 [vite] ✓ built in 158ms
+15:37:11 [WARN] [vite] [plugin builtin:vite-reporter]
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+15:37:11 [vite] ✓ built in 532ms
+15:37:11 [build] Rearranging server assets...
+
+ generating static routes
+15:37:11   ├─ /404.html (+11ms)
+15:37:11   ├─ /como-trabajamos/index.html (+3ms)
+15:37:11   ├─ /contacto/index.html (+3ms)
+15:37:11   ├─ /estudio/index.html (+1ms)
+15:37:11   ├─ /proyectos/index.html (+4ms)
+15:37:11   ├─ /robots.txt (+3ms)
+15:37:11   ├─ /sitemap.xml (+3ms)
+15:37:11   ├─ /taller/index.html (+4ms)
+15:37:11   ├─ /index.html (+5ms)
+15:37:11 ✓ Completed in 135ms.
+
+15:37:11 [build] ✓ Completed in 867ms.
+15:37:11 [build] 6 page(s) built in 976ms
+15:37:11 [build] Complete!

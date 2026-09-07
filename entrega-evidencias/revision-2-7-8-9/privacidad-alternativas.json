@@ -1,0 +1,53 @@
+[
+  {
+    "privacy": "PASS",
+    "googleBeforeAction": 0,
+    "googleAfterAction": 1,
+    "externalMap": "interceptado y sustituido por HTML local",
+    "closeRestoresFocus": true
+  },
+  {
+    "route": "/aviso-legal",
+    "draft": true,
+    "noindex": true
+  },
+  {
+    "route": "/privacidad",
+    "draft": true,
+    "noindex": true
+  },
+  {
+    "route": "/cookies",
+    "draft": true,
+    "noindex": true
+  },
+  {
+    "countrySelect": "PASS",
+    "country": "Luxemburgo"
+  },
+  {
+    "orientation": {
+      "width": 844,
+      "height": 390
+    },
+    "overflow": false
+  },
+  {
+    "orientation": {
+      "width": 390,
+      "height": 844
+    },
+    "overflow": false
+  },
+  {
+    "orientation": {
+      "width": 320,
+      "height": 568
+    },
+    "overflow": false
+  },
+  {
+    "noWebGL": "PASS",
+    "country": "Luxemburgo"
+  }
+]

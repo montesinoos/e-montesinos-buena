@@ -211,6 +211,17 @@
   .chrome__menu a { padding-inline: 0.35rem; font-size: 0.75rem; }
 }
 
+/* Controles alternativos para teclado y países difíciles de pulsar. */
+.mapa-salida__selector { display:flex; align-items:center; gap:.5rem; padding-bottom:.4rem; font-size:.8125rem; }
+.mapa-salida__selector select { flex:1; min-width:0; min-height:44px; font:inherit; font-size:16px; color:var(--sc-ink); background:var(--sc-surface); border:1px solid var(--sc-ink-soft); border-radius:2px; }
+.globo__indice.globo__indice--alternativa { left:auto; right:var(--sc-gutter); background:var(--sc-surface); max-height:35vh; max-width:calc(100% - 2 * var(--sc-gutter)); overflow:auto; padding:.75rem; }
+.globo__indice.globo__indice--alternativa span, .globo__indice.globo__indice--alternativa button { position:static; width:auto; height:auto; clip-path:none; white-space:normal; }
+.globo__indice.globo__indice--alternativa button { min-height:44px; display:block; padding:.5rem; color:var(--sc-ink); background:var(--sc-surface); border:1px solid var(--sc-ink-soft); }
+:where(a, button, input, select, textarea):focus-visible { outline:2px solid var(--sc-ink); outline-offset:3px; box-shadow:0 0 0 5px var(--sc-surface); }
+@media (max-width:860px) {
+  .chrome #menu-paginas { max-height:calc(100svh - var(--barra)); overflow-y:auto; }
+}
+
 @media (max-width: 860px) {
   /* Tres columnas: marca, la punta derecha (CTA y, en la portada, el recorrido
      de la nave) y la hamburguesa. minmax(0,1fr) es lo que deja encoger la
@@ -2995,6 +3006,7 @@ html.mov .obra[data-anima].es-dentro {
   .umbral__escena {
     aspect-ratio: 2736 / 5000;
     width: var(--umbral-escena-w);
+    height: var(--umbral-escena-h);
   }
 
   .umbral__hueco,
@@ -3370,7 +3382,7 @@ html.mov .obra[data-anima].es-dentro {
   .copia[data-scroll-panel] p { margin-inline: 0; }
 }
 @media (max-width: 860px) and (orientation: landscape) {
-  .umbral__escena { width: max(100vw, calc(100svh * 1.8)); aspect-ratio: 2736 / 1520; }
+  .umbral__escena { width: max(100vw, calc(100svh * 1.8)); height: auto; aspect-ratio: 2736 / 1520; }
   .umbral__hueco, .puerta { top: 7.368%; height: 85%; }
   .umbral__copia { top: auto; bottom: var(--recorrido-h); padding-block: 1rem; }
   .umbral__copia h1 { max-width: 100%; font-size: clamp(1.25rem, 3.5vw, 1.6rem); }
@@ -3381,4 +3393,37 @@ html.mov .obra[data-anima].es-dentro {
   .umbral__copia { top: auto; bottom: var(--recorrido-h); padding-block: 1rem 4rem; }
   .umbral__copia h1 { max-width: 100%; font-size: 1.25rem; }
   .umbral__copia::before { bottom: 0; height: 100%; }
+}
+
+/* Pantallas muy bajas y zoom: el texto sigue siendo desplazable entre barras. */
+@media (max-width: 860px) and (max-height: 500px) {
+  .umbral__copia {
+    top: var(--barra);
+    bottom: var(--recorrido-h);
+    overflow-y: auto;
+    pointer-events: auto;
+    padding: 1rem var(--sc-gutter);
+    overscroll-behavior-y: contain;
+    justify-content: flex-start;
+  }
+  .umbral__copia > * { flex-shrink: 0; }
+}
+
+/* Sin movimiento reducido no cambia la coreografía. Con reducción, las
+   entradas no dejan texto semitransparente ni esperan escalonados. */
+@media (prefers-reduced-motion: reduce) {
+  html.mov [data-anima],
+  html.mov [data-anima] [data-ent],
+  html.mov [data-anima].es-dentro [data-ent],
+  html.mov .ct-diagrama .ct-paso__icono,
+  .ct-cab .ct-eti,
+  .ct-cab__h span,
+  .ct-cab__pie p,
+  .titular > *,
+  .filtros {
+    animation:none !important;
+    transition:none !important;
+    opacity:1 !important;
+    transform:none !important;
+  }
 }

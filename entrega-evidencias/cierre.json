@@ -1,0 +1,43 @@
+{
+  "console": [],
+  "checks": [
+    {
+      "mapCaption": "FranciaImagen de referencia · Showroom",
+      "mapImage": [
+        {
+          "alt": "Showroom de Montesinos; imagen de referencia, no una obra atribuida a este país",
+          "loaded": true
+        }
+      ]
+    },
+    {
+      "noWhatsApp": true,
+      "noInvalidPhone": true,
+      "submitDisabled": true
+    },
+    {
+      "navigation": "/proyectos",
+      "url": "http://127.0.0.1:4400/proyectos"
+    },
+    {
+      "navigation": "/como-trabajamos",
+      "url": "http://127.0.0.1:4400/como-trabajamos"
+    },
+    {
+      "navigation": "/taller",
+      "url": "http://127.0.0.1:4400/taller"
+    },
+    {
+      "navigation": "/contacto",
+      "url": "http://127.0.0.1:4400/contacto"
+    },
+    {
+      "shortScreen": {
+        "height": 109,
+        "scrollHeight": 184,
+        "overflow": "auto",
+        "top": 60
+      }
+    }
+  ]
+}

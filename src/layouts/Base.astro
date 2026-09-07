@@ -1,8 +1,11 @@
 ---
 import { paginas, contactoDirecto } from "../data/montesinos.js";
 import BotonWhatsApp from "../components/BotonWhatsApp.astro";
-interface Props { titulo: string; desc: string; ruta: string; mapa?: boolean; }
-const { titulo, desc, ruta, mapa = false } = Astro.props;
+import { indexable } from "../data/site.js";
+interface Props { titulo: string; desc: string; ruta: string; mapa?: boolean; noindex?: boolean; }
+const { titulo, desc, ruta, mapa = false, noindex = false } = Astro.props;
+const canonical = new URL(ruta === "/" ? "/" : ruta + "/", Astro.site);
+const socialImage = new URL("/logo-montesinos.png", Astro.site);
 ---
 <!doctype html>
 <html lang="es">
@@ -19,31 +22,21 @@ const { titulo, desc, ruta, mapa = false } = Astro.props;
     <meta name="description" content={desc} />
     <meta name="theme-color" content="#F4F3F0" />
     <title>{titulo}</title>
+    <meta name="robots" content={indexable && !noindex && ruta !== "/404" ? "index, follow" : "noindex, follow"} />
+    {ruta !== "/404" && <link rel="canonical" href={canonical} />}
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:site_name" content="Ebanistería Montesinos" />
+    <meta property="og:title" content={titulo} />
+    <meta property="og:description" content={desc} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:alt" content="Ebanistería Montesinos" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Las hojas propias van primero y bloqueando: son las que dibujan la
-         página. La de Google es de otro dominio y en una línea móvil su
-         resolución + handshake + descarga se cobra en la primera pantalla,
-         que es justo donde está el armario. Se carga sin bloquear (media
-         print, que no aplica, y al terminar se pasa a all) y las familias
-         tienen fallback de sistema en los tokens, así que el texto se lee
-         desde el primer fotograma y luego cambia de letra. El <noscript>
-         cubre al que navega sin JS. -->
+    <link rel="preload" href="/fonts/instrumentsans.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="/fonts/fonts.css" />
     <link rel="stylesheet" href="/scrollcraft.css" />
     <link rel="stylesheet" href="/tema.css" />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap"
-      media="print"
-      onload="this.media='all'"
-    />
-    <noscript>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap"
-      />
-    </noscript>
   </head>
   <body>
     <script is:inline>
@@ -91,10 +84,10 @@ const { titulo, desc, ruta, mapa = false } = Astro.props;
       <div class="chrome__fin">
         {mapa && (
           <ul class="mapa" id="mapa" data-mapa aria-label="Recorrido por la nave">
-            <li><button type="button" aria-current="true"><span class="txt">Nave</span></button></li>
-            <li><button type="button" aria-current="false"><span class="txt">Material</span></button></li>
-            <li><button type="button" aria-current="false"><span class="txt">1:1</span></button></li>
-            <li><button type="button" aria-current="false"><span class="txt">Salida</span></button></li>
+            <li><button type="button" aria-label="Nave" aria-current="true"><span class="txt">Nave</span></button></li>
+            <li><button type="button" aria-label="Material" aria-current="false"><span class="txt">Material</span></button></li>
+            <li><button type="button" aria-label="1:1" aria-current="false"><span class="txt">1:1</span></button></li>
+            <li><button type="button" aria-label="Salida" aria-current="false"><span class="txt">Salida</span></button></li>
           </ul>
         )}
         <!-- Dos rótulos, uno por pantalla, y el CSS enciende el que toca.

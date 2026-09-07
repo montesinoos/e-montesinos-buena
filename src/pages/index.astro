@@ -1,5 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
+import MapaSede from "../components/MapaSede.astro";
+import EnlacesLegales from "../components/EnlacesLegales.astro";
 import { sedes } from "../data/montesinos.js";
 const sabadell = sedes[0];
 import { maderas } from "../data/maderas.js";
@@ -16,7 +18,7 @@ const desc =
        no hay baldas: hay una nave. El hueco crece hasta tragarse la pantalla
        mientras la nave se queda quieta.
   -->
-  <div class="umbral" id="umbral">
+  <div class="umbral" id="umbral" role="region" aria-label="Presentación de Montesinos">
     <!-- La escena tiene la proporción EXACTA de la foto y se dimensiona a
          cubrir. Así los porcentajes de las puertas caen siempre sobre el mueble,
          sea cual sea la pantalla. Con la foto en object-fit:cover directamente
@@ -45,7 +47,7 @@ const desc =
       <div class="umbral__hueco">
         <picture>
           <source media="(max-width: 860px) and (orientation: portrait)" srcset="/mundo/nave-entrada-m.webp" width="780" height="1386" />
-          <img src="/mundo/nave-entrada.webp" alt="" width="2000" height="1112" decoding="async" />
+          <img src="/mundo/nave-entrada.webp" alt="" width="2000" height="1112" decoding="async" fetchpriority="high" />
         </picture>
       </div>
 
@@ -88,7 +90,7 @@ const desc =
                  la pantalla de un telefono. La apaisada, escalada a cubrir,
                  se sale de cuadro por los lados y ademas pesa el doble. -->
             <source media="(max-width: 860px) and (orientation: portrait)" srcset="/mundo/nave-entrada-m.webp" width="780" height="1386" />
-            <img class="sc-world__poster" src="/mundo/nave-entrada.webp" alt="Nave de Ebanistería Montesinos, vacía, con luz de los ventanales industriales" width="2000" height="1112" decoding="async" />
+            <img class="sc-world__poster" fetchpriority="low" src="/mundo/nave-entrada.webp" alt="Nave de Ebanistería Montesinos, vacía, con luz de los ventanales industriales" width="2000" height="1112" decoding="async" />
           </picture>
         </div>
         <!-- El fondo de Material es una superficie lisa a propósito. Aquí el
@@ -108,7 +110,7 @@ const desc =
                  la pantalla de un telefono. La apaisada, escalada a cubrir,
                  se sale de cuadro por los lados y ademas pesa el doble. -->
             <source media="(max-width: 860px) and (orientation: portrait)" srcset="/mundo/nave-fondo-liso-m.webp" width="780" height="1386" />
-            <img class="sc-world__poster" src="/mundo/nave-fondo-liso.webp" alt="Pared lisa del taller, sin objetos: fondo neutro para las muestras de madera" width="2400" height="1350" decoding="async" />
+            <img class="sc-world__poster" fetchpriority="low" src="/mundo/nave-fondo-liso.webp" alt="Pared lisa del taller, sin objetos: fondo neutro para las muestras de madera" width="2400" height="1350" decoding="async" />
           </picture>
         </div>
         <div data-sc-segment data-sc-w="2.2" data-sc-linger="0.2" data-sc-waypoint="Uno a uno">
@@ -118,7 +120,7 @@ const desc =
                  la pantalla de un telefono. La apaisada, escalada a cubrir,
                  se sale de cuadro por los lados y ademas pesa el doble. -->
             <source media="(max-width: 860px) and (orientation: portrait)" srcset="/mundo/nave-uno-a-uno-m.webp" width="780" height="1386" />
-            <img class="sc-world__poster" src="/mundo/nave-uno-a-uno.webp" alt="Un interior comercial completo, montado a escala real, de pie en mitad de la nave" width="2000" height="1112" decoding="async" />
+            <img class="sc-world__poster" fetchpriority="low" src="/mundo/nave-uno-a-uno.webp" alt="Un interior comercial completo, montado a escala real, de pie en mitad de la nave" width="2000" height="1112" decoding="async" />
           </picture>
         </div>
         <div data-sc-segment data-sc-w="1.4" data-sc-linger="0.25" data-sc-waypoint="Salida">
@@ -128,7 +130,7 @@ const desc =
                  la pantalla de un telefono. La apaisada, escalada a cubrir,
                  se sale de cuadro por los lados y ademas pesa el doble. -->
             <source media="(max-width: 860px) and (orientation: portrait)" srcset="/mundo/nave-embalaje-m.webp" width="780" height="1386" />
-            <img class="sc-world__poster" src="/mundo/nave-embalaje.webp" alt="Piezas terminadas, embaladas y flejadas junto al portón de carga" width="2000" height="1112" decoding="async" />
+            <img class="sc-world__poster" fetchpriority="low" src="/mundo/nave-embalaje.webp" alt="Piezas terminadas, embaladas y flejadas junto al portón de carga" width="2000" height="1112" decoding="async" />
           </picture>
         </div>
       </div>
@@ -225,6 +227,8 @@ const desc =
                         <img
                           class="muestra__cara"
                           src={m.img}
+                          srcset={`${m.img.replace(".webp", "-280.webp")} 280w, ${m.img} 560w`}
+                          sizes="(max-width: 860px) 20vw, 150px"
                           alt=""
                           width="560"
                           height="635"
@@ -316,7 +320,7 @@ const desc =
             {paisesGlobo.map((q) => (
               <li>
                 <button type="button" data-pais={q.pais}>
-                  Ver el proyecto de {q.ciudad}, {q.pais}
+                  Ver país: {q.pais}
                 </button>
               </li>
             ))}
@@ -381,6 +385,17 @@ const desc =
     let mapaPuesto = false;
     let globoPuesto = false;
     let yaArranco = false;
+    let alternativaActiva = false;
+    const activarAlternativa = () => {
+      if (alternativaActiva) return;
+      alternativaActiva = true;
+      const lista = document.querySelector(".globo__indice");
+      lista.classList.add("globo__indice--alternativa");
+      const ficha = crearFicha();
+      for (const boton of lista.querySelectorAll("button")) {
+        boton.addEventListener("click", () => ficha.mostrar(paisesGlobo.find(p => p.pais === boton.dataset.pais)));
+      }
+    };
 
     // ------------------------------------------------- cuando se carga ----
     // globe.gl + three + las texturas son, con diferencia, lo mas pesado de
@@ -461,6 +476,7 @@ const desc =
           // Si el mapa no llega, la seccion sigue en pie: el texto y la lista
           // de doce paises estan en el HTML y no dependen de esto.
           document.getElementById("mapa-salida").dataset.estado = "sin-mapa";
+          activarAlternativa();
         }
         return;
       }
@@ -477,6 +493,7 @@ const desc =
       // dejarle intentarlo ensuciaria la consola aunque se capture el fallo.
       if (!hayWebGL()) {
         caja.dataset.estado = "sin-webgl";
+        activarAlternativa();
         return;
       }
 
@@ -886,7 +903,7 @@ const desc =
        Las puertas vuelven a cerrarse por delante. En su cara interior, la que
        solo ve quien ha estado dentro, está grabada la firma.
   -->
-  <div class="cierre" id="cierre" hidden>
+  <div class="cierre" id="cierre" role="region" aria-label="Contacto y ubicación" hidden>
     <div class="hoja hoja--izq">
       <div class="grabado" data-scroll-panel>
         <p class="grabado__eti">Ebanistería Montesinos</p>
@@ -909,13 +926,7 @@ const desc =
           </div>
         </dl>
         <div class="grabado__mapa">
-          <iframe
-            title="Mapa de la sede de Ebanistería Montesinos en Sabadell"
-            src="https://www.google.com/maps?q=Carrer%20de%20Manso%2093-95%2C%2008205%20Sabadell%2C%20Barcelona&hl=es&z=16&output=embed"
-            loading="lazy"
-            referrerpolicy="no-referrer-when-downgrade"
-            allowfullscreen
-          ></iframe>
+          <MapaSede />
         </div>
         <a
           class="grabado__mapa-enlace"
@@ -923,6 +934,7 @@ const desc =
           target="_blank"
           rel="noopener"
         >Cómo llegar</a>
+        <EnlacesLegales />
       </div>
     </div>
   </div>

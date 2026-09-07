@@ -25,7 +25,7 @@ export function crearFicha({ alCambiar } = {}) {
     lamina.className = "ficha__lamina";
     const img = document.createElement("img");
     img.src = d.img;
-    img.alt = `Proyecto de Ebanistería Montesinos en ${d.ciudad}, ${d.pais}`;
+    img.alt = 'Showroom de Montesinos; imagen de referencia, no una obra atribuida a este país';
     img.decoding = "async";
     lamina.append(img);
     return lamina;
@@ -43,8 +43,8 @@ export function crearFicha({ alCambiar } = {}) {
 
     const escribirPie = () => {
       pie.replaceChildren();
-      pie.append(Object.assign(document.createElement("b"), { textContent: d.ciudad }));
-      pie.append(Object.assign(document.createElement("span"), { textContent: d.pais }));
+      pie.append(Object.assign(document.createElement("b"), { textContent: d.pais }));
+      pie.append(Object.assign(document.createElement("span"), { textContent: "Imagen de referencia · Showroom" }));
     };
 
     if (SUAVE.matches || !saliente) {

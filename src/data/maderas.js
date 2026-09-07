@@ -34,7 +34,7 @@ export const maderas = [
   {
     id: "fresno",
     nombre: "Fresno macizo",
-    frase: "Claro, elástico y de veta larga. Admite curvas y aguanta el golpe sin astillarse.",
+    frase: "Tono claro y veta larga y marcada, visible en la superficie del mueble.",
     x: 61, y: 30, giro: -1.5,
     img: "/maderas/fresno.webp", tono: "#E0CBA4"
   },
@@ -48,7 +48,7 @@ export const maderas = [
   {
     id: "cerezo",
     nombre: "Cerezo",
-    frase: "Rojizo cálido que se oscurece con los años. Envejece mejor que casi ninguna.",
+    frase: "Tono rojizo cálido que se oscurece con el paso del tiempo.",
     x: 20, y: 72, giro: 2.5,
     img: "/maderas/cerezo.webp", tono: "#B4714A"
   },

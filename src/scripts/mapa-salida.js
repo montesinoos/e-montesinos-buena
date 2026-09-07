@@ -164,11 +164,26 @@ export function montarMapa(caja) {
   // respuesta es el que pide la pregunta.
   pista = document.createElement("p");
   pista.className = "mapa-salida__pista";
-  pista.textContent = "Toca un país marcado para ver su proyecto.";
+  pista.textContent = "Toca un país marcado para consultarlo. Imagen de referencia.";
   cajonFicha.append(pista);
 
   cajonFicha.append(document.getElementById("ficha-globo"));
   caja.append(cajonFicha);
+
+  // Alternativa a acertar en países pequeños o chinchetas cercanas.
+  const selectorLabel = document.createElement("label");
+  selectorLabel.className = "mapa-salida__selector";
+  selectorLabel.textContent = "Elegir país";
+  const selector = document.createElement("select");
+  selector.id = "pais-mapa-salida";
+  selector.add(new Option("Selecciona un país", ""));
+  for (const p of paisesGlobo) selector.add(new Option(p.pais, p.iso));
+  selector.addEventListener("change", () => {
+    const elegido = porIso.get(selector.value);
+    if (elegido) mostrar(elegido);
+  });
+  selectorLabel.append(selector);
+  caja.insertBefore(selectorLabel, cajonFicha);
 
   // ---- teclado ----
   // svgMap pinta los países como <path> dentro de un SVG: no son tabulables y
@@ -185,7 +200,7 @@ export function montarMapa(caja) {
     if (!pais) continue;
     pais.setAttribute("role", "button");
     pais.setAttribute("tabindex", "0");
-    pais.setAttribute("aria-label", `Ver el proyecto de ${p.ciudad}, ${p.pais}`);
+    pais.setAttribute("aria-label", `Ver país: ${p.pais}`);
     pais.addEventListener("keydown", (e) => {
       if (e.key !== "Enter" && e.key !== " ") return;
       e.preventDefault();

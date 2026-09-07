@@ -1,0 +1,158 @@
+{
+  "links": [
+    {
+      "url": "http://127.0.0.1:4400/#principal",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4400/",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4400/proyectos",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4400/como-trabajamos",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4400/taller",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4400/contacto",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4400/contacto#nombre",
+      "status": 200
+    },
+    {
+      "url": "tel:+34937107722",
+      "check": "Sólo sintaxis; no se activa aplicación externa"
+    },
+    {
+      "url": "https://www.google.com/maps/search/?api=1&query=Carrer%20de%20Manso%2093-95%2C%2008205%20Sabadell%2C%20Barcelona",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4400/proyectos#principal",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4400/como-trabajamos#principal",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4400/taller#principal",
+      "status": 200
+    },
+    {
+      "url": "https://www.rtve.es/play/videos/linformatiu/linformatiu-cap-setmana-15-02-2014/2399288/",
+      "status": 200
+    },
+    {
+      "url": "https://static1.squarespace.com/static/5ad89fdd12b13f87eda3e47a/t/5b1cfb7470a6ad394ea2cc77/1528626061812/2013-05-24-lavanguardia-enconstruccion_p14.pdf",
+      "status": 200
+    },
+    {
+      "url": "https://static1.squarespace.com/static/5ad89fdd12b13f87eda3e47a/t/5b1cfd108a922ddcbe27f9e3/1528626474356/Diari+de+Sabadell",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:4400/contacto#principal",
+      "status": 200
+    },
+    {
+      "url": "tel:+34915902963",
+      "check": "Sólo sintaxis; no se activa aplicación externa"
+    },
+    {
+      "url": "tel:+07473029106",
+      "check": "Sólo sintaxis; no se activa aplicación externa"
+    }
+  ],
+  "other": [
+    {
+      "route": "/",
+      "meta": {
+        "canonical": "https://www.themontesinos.com/",
+        "robots": "noindex, follow",
+        "og": "Ebanistería Montesinos — Más de 40 años fabricando mobiliario a medida",
+        "h1": 1,
+        "thirdParty": [],
+        "cookies": "",
+        "storage": 0
+      }
+    },
+    {
+      "route": "/proyectos",
+      "meta": {
+        "canonical": "https://www.themontesinos.com/proyectos/",
+        "robots": "noindex, follow",
+        "og": "Proyectos — Ebanistería Montesinos",
+        "h1": 1,
+        "thirdParty": [],
+        "cookies": "",
+        "storage": 0
+      }
+    },
+    {
+      "route": "/como-trabajamos",
+      "meta": {
+        "canonical": "https://www.themontesinos.com/como-trabajamos/",
+        "robots": "noindex, follow",
+        "og": "Cómo trabajamos — Ebanistería Montesinos",
+        "h1": 1,
+        "thirdParty": [],
+        "cookies": "",
+        "storage": 0
+      }
+    },
+    {
+      "route": "/taller",
+      "meta": {
+        "canonical": "https://www.themontesinos.com/taller/",
+        "robots": "noindex, follow",
+        "og": "Taller — Ebanistería Montesinos",
+        "h1": 1,
+        "thirdParty": [],
+        "cookies": "",
+        "storage": 0
+      }
+    },
+    {
+      "route": "/contacto",
+      "meta": {
+        "canonical": "https://www.themontesinos.com/contacto/",
+        "robots": "noindex, follow",
+        "og": "Contacto — Ebanistería Montesinos",
+        "h1": 1,
+        "thirdParty": [],
+        "cookies": "",
+        "storage": 0
+      }
+    },
+    {
+      "js": false,
+      "homeText": "Un armario de  por fuera.Una fábrica entera por dentro.",
+      "contactLinkCount": 3
+    },
+    {
+      "js": true,
+      "homeText": "Un armario de  por fuera.Una fábrica entera por dentro.",
+      "contactLinkCount": 3
+    },
+    {
+      "utm": true,
+      "focused": true
+    },
+    {
+      "zoom200": {
+        "overflow": false
+      }
+    }
+  ],
+  "secrets": []
+}

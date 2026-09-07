@@ -565,6 +565,9 @@
     menuP.addEventListener('click', function (e) {
       if (e.target.closest('a')) abrir(false);
     });
+    menuP.addEventListener('focusout', function (e) {
+      if (e.relatedTarget && !menuP.contains(e.relatedTarget) && e.relatedTarget !== hamb) abrir(false);
+    });
 
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
@@ -688,8 +691,7 @@
         recado.textContent = 'Falta el nombre o el correo no es válido.';
         return;
       }
-      recado.textContent = 'Recibido. Contestamos con un presupuesto orientativo.';
-      form.reset();
+      recado.textContent = 'No se ha enviado el mensaje. El envío por formulario aún no está disponible; contacta por teléfono.';
     });
   }
 
@@ -746,6 +748,7 @@
     var visorSec = document.getElementById('visor-sector');
     var botones = [];   // los .obra__media visibles, en orden de rejilla
     var indice = -1;
+    var origenVisor = null;
 
     function recuentaBotones() {
       botones = [].slice
@@ -773,7 +776,7 @@
       if (!visor.open) return;
       visor.close();
       visorImg.removeAttribute('src');
-      var b = botones[indice];
+      var b = origenVisor;
       if (b) b.focus({ preventScroll: true });
     }
 
@@ -792,6 +795,7 @@
     document.addEventListener('click', function (e) {
       var abre = e.target.closest('[data-abrir-visor]');
       if (abre) {
+        origenVisor = abre;
         recuentaBotones();
         var i = botones.indexOf(abre);
         pinta(i < 0 ? 0 : i);
@@ -825,7 +829,7 @@
     visor.addEventListener('close', function () {
       if (visor.open) return;
       visorImg.removeAttribute('src');
-      var b = botones[indice];
+      var b = origenVisor;
       if (b) b.focus({ preventScroll: true });
     });
   }

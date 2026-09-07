@@ -1,0 +1,375 @@
+{
+  "date": "2026-09-07T13:26:47.422Z",
+  "browser": "152.0.4191.66",
+  "checks": [
+    {
+      "width": 390,
+      "stop": 0,
+      "scroll": 1764,
+      "active": "true"
+    },
+    {
+      "width": 390,
+      "stop": 1,
+      "scroll": 3809,
+      "active": "true"
+    },
+    {
+      "width": 390,
+      "stop": 2,
+      "scroll": 6829,
+      "active": "true"
+    },
+    {
+      "width": 390,
+      "stop": 3,
+      "scroll": 8583,
+      "active": "true"
+    },
+    {
+      "width": 390,
+      "filter": "Todos",
+      "count": 20
+    },
+    {
+      "width": 390,
+      "filter": "Tiendas y retail",
+      "count": 7
+    },
+    {
+      "width": 390,
+      "filter": "Hoteles y restaurantes",
+      "count": 3
+    },
+    {
+      "width": 390,
+      "filter": "Oficinas corporativas",
+      "count": 3
+    },
+    {
+      "width": 390,
+      "filter": "Particulares",
+      "count": 5
+    },
+    {
+      "width": 390,
+      "filter": "Stands y escaparatismo",
+      "count": 2
+    },
+    {
+      "width": 390,
+      "viewerChanges": true,
+      "focusRestored": true
+    },
+    {
+      "width": 390,
+      "disabled": true,
+      "message": "No se ha enviado el mensaje. El envío por formulario aún no está disponible; contacta por teléfono.",
+      "namePreserved": "Prueba local",
+      "posts": 0
+    },
+    {
+      "width": 768,
+      "stop": 0,
+      "scroll": 1764,
+      "active": "true"
+    },
+    {
+      "width": 768,
+      "stop": 1,
+      "scroll": 3809,
+      "active": "true"
+    },
+    {
+      "width": 768,
+      "stop": 2,
+      "scroll": 6829,
+      "active": "true"
+    },
+    {
+      "width": 768,
+      "stop": 3,
+      "scroll": 8583,
+      "active": "true"
+    },
+    {
+      "width": 768,
+      "filter": "Todos",
+      "count": 20
+    },
+    {
+      "width": 768,
+      "filter": "Tiendas y retail",
+      "count": 7
+    },
+    {
+      "width": 768,
+      "filter": "Hoteles y restaurantes",
+      "count": 3
+    },
+    {
+      "width": 768,
+      "filter": "Oficinas corporativas",
+      "count": 3
+    },
+    {
+      "width": 768,
+      "filter": "Particulares",
+      "count": 5
+    },
+    {
+      "width": 768,
+      "filter": "Stands y escaparatismo",
+      "count": 2
+    },
+    {
+      "width": 768,
+      "viewerChanges": true,
+      "focusRestored": true
+    },
+    {
+      "width": 768,
+      "disabled": true,
+      "message": "No se ha enviado el mensaje. El envío por formulario aún no está disponible; contacta por teléfono.",
+      "namePreserved": "Prueba local",
+      "posts": 0
+    },
+    {
+      "width": 1440,
+      "stop": 0,
+      "scroll": 1764,
+      "active": "true"
+    },
+    {
+      "width": 1440,
+      "stop": 1,
+      "scroll": 3809,
+      "active": "true"
+    },
+    {
+      "width": 1440,
+      "stop": 2,
+      "scroll": 6829,
+      "active": "true"
+    },
+    {
+      "width": 1440,
+      "stop": 3,
+      "scroll": 8583,
+      "active": "true"
+    },
+    {
+      "width": 1440,
+      "filter": "Todos",
+      "count": 20
+    },
+    {
+      "width": 1440,
+      "filter": "Tiendas y retail",
+      "count": 7
+    },
+    {
+      "width": 1440,
+      "filter": "Hoteles y restaurantes",
+      "count": 3
+    },
+    {
+      "width": 1440,
+      "filter": "Oficinas corporativas",
+      "count": 3
+    },
+    {
+      "width": 1440,
+      "filter": "Particulares",
+      "count": 5
+    },
+    {
+      "width": 1440,
+      "filter": "Stands y escaparatismo",
+      "count": 2
+    },
+    {
+      "width": 1440,
+      "viewerChanges": true,
+      "focusRestored": true
+    },
+    {
+      "width": 1440,
+      "disabled": true,
+      "message": "No se ha enviado el mensaje. El envío por formulario aún no está disponible; contacta por teléfono.",
+      "namePreserved": "Prueba local",
+      "posts": 0
+    },
+    {
+      "url": "http://127.0.0.1:4400/ruta-inexistente",
+      "status": 404,
+      "final": "http://127.0.0.1:4400/ruta-inexistente",
+      "headers": {
+        "connection": "keep-alive",
+        "content-encoding": "gzip",
+        "content-type": "text/html",
+        "date": "Mon, 07 Sep 2026 13:28:14 GMT",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked",
+        "vary": "Origin"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4400/estudio",
+      "status": 200,
+      "final": "http://127.0.0.1:4400/taller",
+      "headers": {
+        "cache-control": "no-cache",
+        "connection": "keep-alive",
+        "content-type": "text/html",
+        "date": "Mon, 07 Sep 2026 13:28:14 GMT",
+        "etag": "W/\"133-XvcbJSbvQ0yyvXVSWgOJ4Jvu+jM\"",
+        "keep-alive": "timeout=5",
+        "transfer-encoding": "chunked",
+        "vary": "Origin"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4400/robots.txt",
+      "status": 200,
+      "final": "http://127.0.0.1:4400/robots.txt",
+      "headers": {
+        "cache-control": "no-cache",
+        "connection": "keep-alive",
+        "content-length": "23",
+        "content-type": "text/plain",
+        "date": "Mon, 07 Sep 2026 13:28:15 GMT",
+        "etag": "W/\"23-1788787595257\"",
+        "keep-alive": "timeout=5",
+        "last-modified": "Mon, 07 Sep 2026 13:26:35 GMT",
+        "vary": "Origin"
+      }
+    },
+    {
+      "url": "http://127.0.0.1:4400/sitemap.xml",
+      "status": 200,
+      "final": "http://127.0.0.1:4400/sitemap.xml",
+      "headers": {
+        "cache-control": "no-cache",
+        "connection": "keep-alive",
+        "content-length": "409",
+        "content-type": "text/xml",
+        "date": "Mon, 07 Sep 2026 13:28:15 GMT",
+        "etag": "W/\"409-1788787595259\"",
+        "keep-alive": "timeout=5",
+        "last-modified": "Mon, 07 Sep 2026 13:26:35 GMT",
+        "vary": "Origin"
+      }
+    },
+    {
+      "url": "https://e-montesinos-buena.paraspotu.workers.dev/",
+      "status": 200,
+      "final": "https://e-montesinos-buena.paraspotu.workers.dev/",
+      "headers": {
+        "alt-svc": "h3=\":443\"; ma=86400",
+        "cache-control": "public, max-age=0, must-revalidate",
+        "cf-cache-status": "HIT",
+        "cf-ray": "a3760e4b7be8f779-MAD",
+        "content-encoding": "zstd",
+        "content-type": "text/html",
+        "date": "Mon, 07 Sep 2026 13:28:18 GMT",
+        "nel": "{\"report_to\":\"cf-nel\",\"success_fraction\":0.0,\"max_age\":604800}",
+        "report-to": "{\"group\":\"cf-nel\",\"max_age\":604800,\"endpoints\":[{\"url\":\"https://a.nel.cloudflare.com/report/v4?s=r6EfPsblY5f2EoyuvGEBPukCg6wLqz4KivB2ttnCbtq5LUgydKFy2AozZs5jMgavbezwgDCyiBD%2BrYGIIhT5%2BVk%2FDDPVQxutrLT3kxeyVz2%2F6ABpwFzsh2TABkN5y48aafBG%2BTB9QWcMQJepfZq6zqSWe8b2ki5WoaW8\"}]}",
+        "server": "cloudflare"
+      }
+    }
+  ],
+  "axe": [
+    {
+      "width": 390,
+      "route": "/",
+      "violations": []
+    },
+    {
+      "width": 390,
+      "route": "/proyectos",
+      "violations": []
+    },
+    {
+      "width": 390,
+      "route": "/como-trabajamos",
+      "violations": []
+    },
+    {
+      "width": 390,
+      "route": "/taller",
+      "violations": []
+    },
+    {
+      "width": 390,
+      "route": "/contacto",
+      "violations": []
+    },
+    {
+      "width": 390,
+      "route": "/404.html",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "route": "/",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "route": "/proyectos",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "route": "/como-trabajamos",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "route": "/taller",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "route": "/contacto",
+      "violations": []
+    },
+    {
+      "width": 768,
+      "route": "/404.html",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "route": "/",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "route": "/proyectos",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "route": "/como-trabajamos",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "route": "/taller",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "route": "/contacto",
+      "violations": []
+    },
+    {
+      "width": 1440,
+      "route": "/404.html",
+      "violations": []
+    }
+  ],
+  "network": []
+}

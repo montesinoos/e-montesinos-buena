@@ -1,5 +1,74 @@
 # Pendientes
 
+## Actualización: puntos 2, 7, 8 y 9 de la primera presentación
+
+- Legal: creados aviso legal, privacidad y cookies como borradores visibles y
+  noindex, con enlaces desde pie, cierre y formulario. El usuario aún no tiene
+  razón social/NIF/domicilio/correo; no inventados. Ver LEGAL-PENDIENTE-CLIENTE.md.
+- Privacidad: localizado iframe de Google en el cierre que no cubría la revisión
+  inicial. Sustituido por carga a petición y cierre con devolución del foco.
+- Accesos: documentada configuración Cloudflare y DNS Squarespace. No hay sesión
+  Wrangler; no se puede acreditar titularidad ni cambiar DNS. Ver ACCESOS-CLIENTE.md.
+- Accesibilidad: selector de países de 44 px, alternativa sin WebGL, foco más
+  visible, cierre del menú al salir con teclado, menú desplazable en pantallas
+  bajas, región semántica del cierre y eliminación de fundidos con movimiento
+  reducido (causaban contraste insuficiente durante la entrada).
+- Pruebas ampliadas a Chromium y WebKit sobre Windows, con emulación táctil y
+  tamaños móvil/tablet/escritorio. No equivalen a Safari/iPhone o Android físicos.
+- Verificación final: compilación correcta; 54 vistas de nueve páginas a
+  390/768/1440, sin desbordamientos, excepciones JS ni incidencias axe detectadas.
+  Aserciones de carga del mapa, borradores noindex, selector, orientación y
+  alternativa sin WebGL superadas. Evidencias en entrega-evidencias/revision-2-7-8-9/.
+- Pendiente externo: dispositivos reales, lector de pantalla real y persona
+  nueva; siguen necesarios antes de declarar entrega definitiva terminada.
+
+La primera revisión de diseño puede presentarse indicando claramente los
+borradores y servicios pendientes. Eso no implica aprobación de lanzamiento.
+
+## Revisión de entrega — 7 de septiembre de 2026
+
+**NO LISTA PARA ENTREGAR.** Este bloque refleja el estado actual; las fichas
+de agosto que siguen son históricas y no sustituyen la auditoría.
+Ver AUDITORIA-ENTREGA.md (90 comprobaciones), CHECKLIST-REFERENCIA.md y
+ENTREGA-Y-MANTENIMIENTO.md.
+
+Corregido y comprobado localmente:
+
+- Eliminado el éxito ficticio del formulario y el borrado de sus datos.
+  Envío desactivado y alternativa telefónica visible.
+- Retirados WhatsApp de ejemplo y teléfono londinense con prefijo inválido.
+- Fichas del mapa sin atribuir showroom a capitales; imagen etiquetada como
+  referencia. La ilustración del taller está identificada.
+- Nombres accesibles del recorrido y retorno de foco al cerrar el visor.
+- Altura estable de la escena móvil y texto desplazable en pantallas muy bajas.
+- Fuentes locales con licencias OFL, variantes pequeñas de maderas y
+  minificación de CSS/JS sólo en la compilación.
+- Canonical, Open Graph, sitemap y robots. Noindex por defecto hasta aprobar
+  dominio e indexación; no se ha publicado.
+
+Bloqueadores y siguiente paso:
+
+1. **Crítico — formulario:** facilitar endpoint/proveedor y receptor de pruebas,
+   aprobar privacidad; implementar backend y verificar recepción con autorización.
+2. **Alto — legal:** facilitar identidad del titular y textos aprobados; incorporarlos.
+3. **Alto — contactos:** confirmar número de WhatsApp y teléfono de Londres antes
+   de reponer enlaces; comprobar recepción de la vía telefónica.
+4. **Alto — dominio:** confirmar si workers.dev es staging y el dominio definitivo;
+   configurar SITE_URL/SITE_INDEXABLE, revisar DNS/HTTPS/redirecciones y propiedad.
+5. **Alto — evidencia de contenido:** confirmar permisos, vigencia de credenciales
+   y países/proyectos reales. Las coordenadas siguen siendo representativas.
+6. **Alto — dispositivos y entrega:** probar iPhone/Safari y Android/Chrome reales,
+   restauración, accesos y titularidad de cuentas. No hay versión etiquetada como
+   entregada mientras sigan estos bloqueos.
+
+Mejoras/documentación pendientes: LCP móvil de laboratorio 2,9 s (objetivo
+orientativo ≤2,5 s), módulo 3D grande diferido, contraste de todos los fotogramas,
+lector de pantalla, prueba con usuario nuevo, vista previa real en redes,
+analítica bajo cuenta del cliente, acuerdo de mantenimiento y versión inglesa.
+
+Resultados y condiciones completos en AUDITORIA-ENTREGA.md. Pruebas locales,
+no dispositivos reales ni datos de usuarios. No se envió ningún mensaje externo.
+
 ---
 
 ## El mapa plano de móvil (parada «Salida»)

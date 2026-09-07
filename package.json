@@ -4,9 +4,9 @@
   "description": "",
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && node scripts/minificar-produccion.mjs",
     "preview": "astro preview",
-    "deploy": "astro build && wrangler deploy"
+    "deploy": "npm run build && wrangler deploy"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +20,7 @@
     "three": "^0.185.1"
   },
   "devDependencies": {
+    "esbuild": "^0.28.2",
     "wrangler": "^4.126.0"
   }
 }

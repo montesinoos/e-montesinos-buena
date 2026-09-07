@@ -37,8 +37,10 @@ export const sedes = [
     rol: "Red de distribución",
     dir: "Wells House, 80 Upper Street",
     cp: "London N1 0NU",
-    tel: "+07 4730291 06",
-    telHref: "+07473029106",
+    // Original pendiente de confirmar: "+07 4730291 06".
+    // No se publica como enlace porque no es un número internacional válido.
+    tel: "",
+    telHref: "",
   },
 ];
 
@@ -175,13 +177,12 @@ export const acabados = [
 // El contacto directo. El CTA del chrome y el botón flotante de WhatsApp salen
 // de aquí, para que el número y el mensaje se toquen en un solo sitio.
 //
-// ⚠️ DATO PENDIENTE: el móvil de WhatsApp no lo tenemos. Los teléfonos de las
-// sedes son fijos y wa.me no funciona con un fijo, así que aquí va un número de
-// ejemplo hasta que el cliente dé el bueno.
+// DATO PENDIENTE: no hay un número de WhatsApp confirmado por el cliente.
+// Vacío oculta el botón; no debe reintroducirse el número de ejemplo.
 export const contactoDirecto = {
   ctaTexto: "Pedir presupuesto",
   ctaHref: "/contacto#nombre",
-  whatsappTel: "34600000000",
+  whatsappTel: "",
   whatsappMensaje: "Hola, me gustaría pedir un presupuesto orientativo para un proyecto de mueble a medida.",
 };
 

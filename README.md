@@ -39,7 +39,7 @@ que volver a medirlas o las hojas dejarán de encajar con el mueble.
 
 ```
 src/
-  data/montesinos.js       datos reales: sedes, proyectos, proceso, pilares
+  data/montesinos.js       sedes, proyectos, proceso, pilares y datos por confirmar
   layouts/Base.astro       <head>, chrome fijo, mapa de la nave, menú
   components/Pie.astro
   pages/                   index, proyectos, como-trabajamos, taller, contacto
@@ -118,9 +118,10 @@ node -e "const s=require('sharp');s('public/proyectos-web/NOMBRE.webp').resize({
 
 ## Sobre el contenido
 
-Todo lo de `src/data/montesinos.js` procede de themontesinos.com. Los teléfonos,
-las cuatro sedes, los cuatro pilares, la homologación de Krion y la prensa son
-datos reales.
+El contenido de `src/data/montesinos.js` procede de themontesinos.com y de las
+correcciones del cliente. Hay tres sedes en la versión actual. La vigencia de
+contactos, acreditaciones y autorizaciones está pendiente de cierre en
+AUDITORIA-ENTREGA.md; las fuentes públicas no equivalen a una certificación.
 
 **De los proyectos solo constan el nombre y el sector.** La web oficial no
 publica año, materiales ni superficie, así que aquí tampoco: una ficha con datos
@@ -134,7 +135,15 @@ y de la nave están generadas con KIE.AI; ninguna obra de cliente lo está.
 - Sustituir las imágenes generadas por fotografía real de la nave de Sabadell
   cuando el cliente la facilite.
 - Versión en inglés. Ahora mismo el sitio es solo en español.
-- El formulario de contacto valida y responde en cliente, pero no envía a
-  ningún sitio. Falta conectarlo a un endpoint.
+- El formulario no envía: botón desactivado y aviso con teléfono. Ya no simula
+  una recepción ni borra los datos. Falta endpoint y privacidad aprobada.
 - Probar el giro de las puertas en un iPhone real. Chrome headless no reproduce
   el compositor de iOS.
+
+## Preparación de entrega
+
+Ver AUDITORIA-ENTREGA.md y ENTREGA-Y-MANTENIMIENTO.md. La compilación minifica
+las copias de CSS/JS en dist y las fuentes se sirven desde public/fonts.
+SITE_URL conserva el dominio histórico como valor inicial; SITE_INDEXABLE=true
+activa indexación al compilar. Sin esa variable el resultado queda noindex:
+confirmar ambos valores antes de un lanzamiento autorizado.

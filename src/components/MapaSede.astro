@@ -1,0 +1,43 @@
+<div class="mapa-consentimiento">
+  <div data-aviso-mapa>
+    <p>El mapa de Google sólo se carga si lo solicitas. Al cargarlo, tu navegador compartirá datos de conexión con Google.</p>
+    <button type="button" data-cargar-mapa>Cargar mapa de Google</button>
+    <a href="/cookies">Información sobre este servicio</a>
+  </div>
+  <div data-mapa-contenedor></div>
+  <button type="button" data-cerrar-mapa hidden>Cerrar mapa de Google</button>
+  <noscript><p>Utiliza el enlace «Cómo llegar» para consultar la ubicación.</p></noscript>
+</div>
+<script>
+  for (const root of document.querySelectorAll(".mapa-consentimiento")) {
+    const load = root.querySelector<HTMLButtonElement>("[data-cargar-mapa]")!;
+    const close = root.querySelector<HTMLButtonElement>("[data-cerrar-mapa]")!;
+    const notice = root.querySelector<HTMLElement>("[data-aviso-mapa]")!;
+    const container = root.querySelector<HTMLElement>("[data-mapa-contenedor]")!;
+    load.addEventListener("click", () => {
+      const frame = document.createElement("iframe");
+      frame.title = "Mapa de la sede de Montesinos en Sabadell";
+      frame.referrerPolicy = "no-referrer";
+      frame.src = "https://www.google.com/maps?q=Carrer%20de%20Manso%2093-95%2C%2008205%20Sabadell%2C%20Barcelona&hl=es&z=16&output=embed";
+      container.replaceChildren(frame);
+      notice.hidden = true;
+      close.hidden = false;
+      close.focus();
+    });
+    close.addEventListener("click", () => {
+      container.replaceChildren();
+      notice.hidden = false;
+      close.hidden = true;
+      load.focus();
+    });
+  }
+</script>
+<style>
+  .mapa-consentimiento { padding:.75rem; color:var(--sc-ink); background:var(--sc-canvas); font-size:.8125rem; }
+  p { margin:0 0 .75rem; line-height:1.5; }
+  button, a { min-height:44px; padding:.5rem; color:inherit; }
+  button { border:1px solid currentColor; background:transparent; border-radius:2px; cursor:pointer; }
+  a { display:inline-flex; align-items:center; text-underline-offset:.2em; }
+  [hidden] { display:none !important; }
+  :global(.mapa-consentimiento iframe) { height:180px; width:100%; border:0; }
+</style>

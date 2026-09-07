@@ -1,0 +1,902 @@
+{
+  "date": "2026-09-07T21:09:25.997Z",
+  "conditions": "Emulación/engines sobre Windows; no dispositivos físicos ni lector de pantalla real.",
+  "engines": [
+    {
+      "name": "chromium",
+      "version": "152.0.4191.66",
+      "status": "running"
+    },
+    {
+      "name": "webkit",
+      "version": "26.5",
+      "status": "running"
+    },
+    {
+      "name": "firefox",
+      "status": "blocked",
+      "reason": "browserType.launch: Host system is missing dependencies!\n\nFull list of missing libraries:\n    msvcp140_1.dll\n"
+    }
+  ],
+  "pages": [
+    {
+      "name": "chromium",
+      "width": 390,
+      "route": "/",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 390,
+      "route": "/proyectos",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 390,
+      "route": "/como-trabajamos",
+      "status": 200,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                ".ct-cab__pie > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.46 (foreground color: #9e9c98, background color: #f4f3f0, font size: 14.7pt (19.55px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(3) > .ct-paso__texto > .ct-paso__n"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.43 (foreground color: #8d6b2c, background color: #f4f3f0, font size: 11.0pt (14.72px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(3) > .ct-paso__texto > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.31 (foreground color: #75726d, background color: #f4f3f0, font size: 10.6pt (14.142px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(4) > .ct-paso__texto > .ct-paso__n"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.55 (foreground color: #997c44, background color: #f4f3f0, font size: 11.0pt (14.72px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(4) > .ct-paso__texto > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.44 (foreground color: #85827d, background color: #f4f3f0, font size: 10.6pt (14.142px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chromium",
+      "width": 390,
+      "route": "/taller",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 390,
+      "route": "/contacto",
+      "status": 200,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                "label[for=\"asunto\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.44 (foreground color: #73706b, background color: #f4f3f0, font size: 9.1pt (12.105px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "label[for=\"mensaje\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.08 (foreground color: #787671, background color: #f4f3f0, font size: 9.1pt (12.105px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chromium",
+      "width": 390,
+      "route": "/aviso-legal",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 390,
+      "route": "/privacidad",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 390,
+      "route": "/cookies",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 390,
+      "route": "/404.html",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 768,
+      "route": "/",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 768,
+      "route": "/proyectos",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 768,
+      "route": "/como-trabajamos",
+      "status": 200,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                ".ct-cab__pie > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.21 (foreground color: #a7a5a0, background color: #f4f3f0, font size: 16.1pt (21.44px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(3) > .ct-paso__texto > .ct-paso__n"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.32 (foreground color: #8e6d2e, background color: #f4f3f0, font size: 11.0pt (14.72px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(3) > .ct-paso__texto > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.25 (foreground color: #76736f, background color: #f4f3f0, font size: 11.1pt (14.8224px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(4) > .ct-paso__texto > .ct-paso__n"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.33 (foreground color: #9d814a, background color: #f4f3f0, font size: 11.0pt (14.72px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(4) > .ct-paso__texto > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.26 (foreground color: #898682, background color: #f4f3f0, font size: 11.1pt (14.8224px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chromium",
+      "width": 768,
+      "route": "/taller",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 768,
+      "route": "/contacto",
+      "status": 200,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                "label[for=\"asunto\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.44 (foreground color: #73706b, background color: #f4f3f0, font size: 9.5pt (12.672px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "label[for=\"mensaje\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.08 (foreground color: #787671, background color: #f4f3f0, font size: 9.5pt (12.672px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chromium",
+      "width": 768,
+      "route": "/aviso-legal",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 768,
+      "route": "/privacidad",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 768,
+      "route": "/cookies",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 768,
+      "route": "/404.html",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 1440,
+      "route": "/",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 1440,
+      "route": "/proyectos",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 1440,
+      "route": "/como-trabajamos",
+      "status": 200,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                ".ct-cab__pie > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.46 (foreground color: #9e9c98, background color: #f4f3f0, font size: 18.0pt (24px), font weight: normal). Expected contrast ratio of 3:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(3) > .ct-paso__texto > .ct-paso__n"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.32 (foreground color: #8e6d2e, background color: #f4f3f0, font size: 11.0pt (14.72px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(3) > .ct-paso__texto > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.25 (foreground color: #76736f, background color: #f4f3f0, font size: 11.4pt (15.2px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(4) > .ct-paso__texto > .ct-paso__n"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.33 (foreground color: #9d814a, background color: #f4f3f0, font size: 11.0pt (14.72px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(4) > .ct-paso__texto > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.26 (foreground color: #898682, background color: #f4f3f0, font size: 11.4pt (15.2px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chromium",
+      "width": 1440,
+      "route": "/taller",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 1440,
+      "route": "/contacto",
+      "status": 200,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                "label[for=\"asunto\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.44 (foreground color: #73706b, background color: #f4f3f0, font size: 9.8pt (13.12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "label[for=\"mensaje\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.08 (foreground color: #787671, background color: #f4f3f0, font size: 9.8pt (13.12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chromium",
+      "width": 1440,
+      "route": "/aviso-legal",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 1440,
+      "route": "/privacidad",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 1440,
+      "route": "/cookies",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 1440,
+      "route": "/404.html",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "route": "/",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "route": "/proyectos",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "route": "/como-trabajamos",
+      "status": 200,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                ".ct-cab__pie > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.83 (foreground color: #93918c, background color: #f4f3f0, font size: 14.7pt (19.549999px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(3) > .ct-paso__texto > .ct-paso__n"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.43 (foreground color: #8d6b2c, background color: #f4f3f0, font size: 11.0pt (14.72px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(3) > .ct-paso__texto > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.31 (foreground color: #75726d, background color: #f4f3f0, font size: 10.6pt (14.142px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(4) > .ct-paso__texto > .ct-paso__n"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.55 (foreground color: #997c43, background color: #f4f3f0, font size: 11.0pt (14.72px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(4) > .ct-paso__texto > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.49 (foreground color: #84817d, background color: #f4f3f0, font size: 10.6pt (14.142px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "route": "/taller",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "route": "/contacto",
+      "status": 200,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                "label[for=\"mensaje\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.31 (foreground color: #75726e, background color: #f4f3f0, font size: 9.1pt (12.105px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "route": "/aviso-legal",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "route": "/privacidad",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "route": "/cookies",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "route": "/404.html",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 768,
+      "route": "/",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 768,
+      "route": "/proyectos",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 768,
+      "route": "/como-trabajamos",
+      "status": 200,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                ".ct-cab__pie > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.58 (foreground color: #9b9894, background color: #f4f3f0, font size: 16.1pt (21.440001px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(3) > .ct-paso__texto > .ct-paso__n"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.38 (foreground color: #8d6c2c, background color: #f4f3f0, font size: 11.0pt (14.72px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(3) > .ct-paso__texto > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.31 (foreground color: #75726d, background color: #f4f3f0, font size: 11.1pt (14.8224px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(4) > .ct-paso__texto > .ct-paso__n"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.5 (foreground color: #9a7d45, background color: #f4f3f0, font size: 11.0pt (14.72px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(4) > .ct-paso__texto > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.41 (foreground color: #85837e, background color: #f4f3f0, font size: 11.1pt (14.8224px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "webkit",
+      "width": 768,
+      "route": "/taller",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 768,
+      "route": "/contacto",
+      "status": 200,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                "label[for=\"mensaje\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.25 (foreground color: #76736e, background color: #f4f3f0, font size: 9.5pt (12.672px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "webkit",
+      "width": 768,
+      "route": "/aviso-legal",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 768,
+      "route": "/privacidad",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 768,
+      "route": "/cookies",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 768,
+      "route": "/404.html",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 1440,
+      "route": "/",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 1440,
+      "route": "/proyectos",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 1440,
+      "route": "/como-trabajamos",
+      "status": 200,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                ".ct-cab__pie > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 2.73 (foreground color: #96948f, background color: #f4f3f0, font size: 18.0pt (24px), font weight: normal). Expected contrast ratio of 3:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(3) > .ct-paso__texto > .ct-paso__n"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.43 (foreground color: #8d6b2c, background color: #f4f3f0, font size: 11.0pt (14.72px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(3) > .ct-paso__texto > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.31 (foreground color: #75726d, background color: #f4f3f0, font size: 11.4pt (15.2px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(4) > .ct-paso__texto > .ct-paso__n"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.55 (foreground color: #997c43, background color: #f4f3f0, font size: 11.0pt (14.72px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                ".ct-paso[data-paso=\"\"]:nth-child(4) > .ct-paso__texto > p"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 3.49 (foreground color: #84817d, background color: #f4f3f0, font size: 11.4pt (15.2px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "webkit",
+      "width": 1440,
+      "route": "/taller",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 1440,
+      "route": "/contacto",
+      "status": 200,
+      "overflow": false,
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "nodes": [
+            {
+              "target": [
+                "label[for=\"asunto\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.44 (foreground color: #73706b, background color: #f4f3f0, font size: 9.8pt (13.12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            },
+            {
+              "target": [
+                "label[for=\"mensaje\"]"
+              ],
+              "summary": "Fix any of the following:\n  Element has insufficient color contrast of 4.13 (foreground color: #787570, background color: #f4f3f0, font size: 9.8pt (13.12px), font weight: normal). Expected contrast ratio of 4.5:1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "webkit",
+      "width": 1440,
+      "route": "/aviso-legal",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 1440,
+      "route": "/privacidad",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 1440,
+      "route": "/cookies",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 1440,
+      "route": "/404.html",
+      "status": 200,
+      "overflow": false,
+      "violations": []
+    }
+  ],
+  "states": [
+    {
+      "name": "chromium",
+      "width": 390,
+      "stop": 0,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 390,
+      "stop": 1,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 390,
+      "stop": 2,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 390,
+      "stop": 3,
+      "violations": []
+    },
+    {
+      "name": "chromium",
+      "width": 390,
+      "closure": true,
+      "iframeBeforeClick": 0
+    },
+    {
+      "name": "chromium",
+      "width": 390,
+      "dialogClosed": true,
+      "focusRestored": true
+    },
+    {
+      "name": "chromium",
+      "width": 768,
+      "closure": true,
+      "iframeBeforeClick": 0
+    },
+    {
+      "name": "chromium",
+      "width": 768,
+      "dialogClosed": true,
+      "focusRestored": true
+    },
+    {
+      "name": "chromium",
+      "width": 1440,
+      "closure": true,
+      "iframeBeforeClick": 0
+    },
+    {
+      "name": "chromium",
+      "width": 1440,
+      "dialogClosed": true,
+      "focusRestored": true
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "stop": 0,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "stop": 1,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "stop": 2,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "stop": 3,
+      "violations": []
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "closure": true,
+      "iframeBeforeClick": 0
+    },
+    {
+      "name": "webkit",
+      "width": 390,
+      "dialogClosed": true,
+      "focusRestored": true
+    },
+    {
+      "name": "webkit",
+      "width": 768,
+      "closure": true,
+      "iframeBeforeClick": 0
+    },
+    {
+      "name": "webkit",
+      "width": 768,
+      "dialogClosed": true,
+      "focusRestored": true
+    },
+    {
+      "name": "webkit",
+      "width": 1440,
+      "closure": true,
+      "iframeBeforeClick": 0
+    },
+    {
+      "name": "webkit",
+      "width": 1440,
+      "dialogClosed": true,
+      "focusRestored": true
+    }
+  ],
+  "errors": []
+}

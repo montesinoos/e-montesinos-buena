@@ -6,7 +6,7 @@ import { sedes } from "../data/montesinos.js";
 
 <Base
   titulo="Contacto — Ebanistería Montesinos"
-  desc="Presupuesto orientativo. Taller y sede principal en Sabadell, oficina técnica en Madrid y red de distribución en Londres. Escríbenos y contestamos enseguida."
+  desc="Presupuesto orientativo. Taller y sede principal en Sabadell, oficina técnica en Madrid y red de distribución en Londres. Cuéntanos tu proyecto."
   ruta="/contacto"
 >
   <main id="principal" class="pagina sc-wrap contacto">
@@ -15,12 +15,14 @@ import { sedes } from "../data/montesinos.js";
       <h1 style="--i: 1">Presupuesto orientativo.</h1>
       <p style="--i: 2">
         Cuéntanos qué hay que resolver, o simplemente pregunta lo que necesites
-        saber. Contestamos enseguida.
+        saber. Nos pondremos en contacto contigo.
       </p>
     </div>
 
     <div class="dos dos--contacto">
-      <form class="form" id="form-contacto" novalidate data-anima>
+      <form class="form" id="form-contacto" novalidate data-anima aria-describedby="aviso-formulario">
+        <p id="aviso-formulario">El envío por formulario aún no está disponible. Para consultar tu proyecto, llama al <a href={`tel:${sedes[0].telHref}`}>{sedes[0].tel}</a>.</p>
+        <p class="form__privacidad">Información sobre el tratamiento de datos: <a href="/privacidad">privacidad — borrador pendiente de completar</a>.</p>
         <div class="campo" data-ent style="--i: 0">
           <label for="nombre">Nombre y apellido</label>
           <input id="nombre" name="nombre" type="text" autocomplete="name" enterkeyhint="next" required />
@@ -45,7 +47,7 @@ import { sedes } from "../data/montesinos.js";
              el cierre de "Cómo trabajamos": si el botón cargara las dos cosas, la
              transición de entrada le ganaría en especificidad al hover. -->
         <span class="form__accion" data-ent style="--i: 6">
-          <button class="enviar" type="submit">Enviar</button>
+          <button class="enviar" type="submit" disabled>Envío no disponible</button>
         </span>
         <p class="recado" id="recado" role="status" aria-live="polite"></p>
       </form>
