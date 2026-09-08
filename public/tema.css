@@ -348,7 +348,7 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.7rem 0.95rem;
+  padding: 0.9rem 1.2rem;
   border-radius: var(--sc-r-pill);
   border: 1px solid var(--sc-hairline);
   background: color-mix(in oklab, var(--sc-canvas) 94%, transparent);
@@ -366,11 +366,11 @@
 .wasap:hover { transform: translateY(-2px); border-color: var(--sc-accent); }
 /* El verde de WhatsApp es el único color de fuera de la paleta que había en
    toda la web. El icono se reconoce por su silueta, así que va en el latón. */
-.wasap svg { width: 1.15rem; height: 1.15rem; flex-shrink: 0; color: var(--sc-accent); }
+.wasap svg { width: 1.4rem; height: 1.4rem; flex-shrink: 0; color: var(--sc-accent); }
 
 /* En móvil se queda en icono: ahí abajo el ancho es del contenido. */
 @media (max-width: 640px) {
-  .wasap { padding: 0.7rem; }
+  .wasap { padding: 0.9rem; }
   .wasap__txt { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -1211,6 +1211,17 @@
   transition: background var(--sc-d-fast) var(--sc-ease-out);
 }
 .prensa h3 { transition: color var(--sc-d-fast) var(--sc-ease-out); }
+.prensa__medio-movil { display: none; }
+
+@media (max-width: 860px) {
+  .prensa__medio-completo { display: none; }
+  .prensa__medio-movil { display: inline; }
+}
+
+@media (min-width: 861px) {
+  .prensa { grid-template-columns: 3.5rem minmax(0, 1fr) auto; }
+  .prensa > p { justify-self: end; }
+}
 
 /* El mismo tono que .paso--pico, para que el realce de una fila sea siempre el
    mismo gesto en toda la casa. */
@@ -2706,7 +2717,7 @@ html.mov .obra[data-anima].es-dentro {
 
   /* En móvil el botón de WhatsApp se queda en icono y se quedaba en 43×43 por
      un pelo. El icono no crece; crece la pastilla. */
-  .wasap { min-width: 44px; min-height: 44px; justify-content: center; }
+  .wasap { min-width: 54px; min-height: 54px; justify-content: center; }
 
   .pie a { position: relative; }
   .pie a::after {

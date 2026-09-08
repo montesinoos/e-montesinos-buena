@@ -93,7 +93,7 @@ import { pilares, prensa, acabados } from "../data/montesinos.js";
               rel="noopener noreferrer"
             >
               <span class="paso__n" aria-hidden="true">·</span>
-              <h3>{m.medio}</h3>
+              <h3>{m.medioMovil ? <><span class="prensa__medio-completo">{m.medio}</span><span class="prensa__medio-movil">{m.medioMovil}</span></> : m.medio}</h3>
               <p>
                 {m.t}
                 {m.pdf && <span class="prensa__pdf">PDF</span>}

@@ -149,6 +149,12 @@ export const vias = [
 // nada.
 export const prensa = [
   {
+    medio: "Vapor Llonch - Ajuntament de Sabadell",
+    medioMovil: "Vapor Llonch",
+    t: "Vídeo en YouTube",
+    url: "https://youtu.be/h6k_zQCS-io?is=h5_8KZS_TdXy0Km-",
+  },
+  {
     medio: "RTVE",
     t: "RTVE a la Carta",
     url: "https://www.rtve.es/play/videos/linformatiu/linformatiu-cap-setmana-15-02-2014/2399288/",
