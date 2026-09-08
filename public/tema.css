@@ -1628,6 +1628,19 @@
   max-width: 42ch;
 }
 
+/* Textos explicativos largos de Taller y Cómo trabajamos. La separación
+   silábica evita huecos exagerados al justificar columnas estrechas. */
+.taller .titular > p:not(.eti),
+.taller .dos > div > p,
+.taller .tarjeta p,
+.taller .paso:not(.prensa) p,
+.ct-paso p,
+.ct-via__d {
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+
 /* ---- para quién ---- */
 .ct-sectores {
   margin: 0;
