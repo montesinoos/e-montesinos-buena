@@ -853,8 +853,9 @@
      que es justo lo que se pide aquí.
 
      Seis paradas, no cuatro: el umbral y el cierre son secciones para quien
-     mira aunque no lo sean para el motor. Y cinco saltos, no seis: el primero
-     —del armario cerrado a la nave— se recorre a mano, ver sueltoEnElUmbral().
+     mira aunque no lo sean para el motor. Todas participan en el mismo gesto,
+     incluida la apertura del armario: una interacción siempre completa una
+     transición y nunca deja las hojas o una escena a medio camino.
 
      Se apaga solo con movimiento reducido —convertir cada rueda en un viaje
      animado de un segundo es exactamente lo que esa preferencia pide evitar—
@@ -926,34 +927,6 @@
       return mejor;
     }
 
-    /* El umbral queda fuera del snap.
-       ---------------------------------------------------------------------
-       De la primera parada a la segunda —el armario cerrado abriéndose hasta
-       la nave— el scroll es el de toda la vida: rueda a rueda, dedo a dedo,
-       y se puede dejar a medias con las hojas a medio girar.
-
-       Es el movimiento firma de la página y no se parece a las otras
-       transiciones: en el resto del recorrido el scroll TE LLEVA de una foto
-       a la siguiente, aquí el scroll ES el que abre las puertas. Convertirlo
-       en un salto de un gesto lo reduce a un corte y se pierde justo lo que
-       hay que enseñar. Los tramos del mundo sí se saltan porque entre parada
-       y parada hay paisaje de paso; entre el armario y la nave no hay paso:
-       hay la única cosa que pasa.
-
-       Vale en los dos sentidos, así que hay que mirar la dirección: parado
-       en la nave, bajar es saltar al siguiente tramo, pero subir es volver a
-       entrar en el umbral y ahí se suelta el control. Y se suelta mirando a
-       qué parada se IRÍA, no a cuántos píxeles se está de ella: unos pocos
-       píxeles pasada la nave, un salto animado hasta arriba se traga el giro
-       entero de las puertas en tres cuartos de segundo, que es justo el
-       fotograma que este tramo existe para enseñar. */
-    function sueltoEnElUmbral(dir) {
-      var a = asegurar();
-      if (a.length < 2) return false;
-      if (scrollY < a[1] - 1) return true;   // aún dentro del umbral
-      return dir < 0 && masCercana() <= 1;   // saliendo hacia él
-    }
-
     // Animación propia y no scrollTo({behavior:'smooth'}): la del navegador no
     // avisa de cuándo termina —y hay que saberlo para tragarse la cola de
     // inercia del trackpad— ni deja elegir la duración, que aquí sube con la
@@ -962,9 +935,9 @@
       return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
     };
 
-    // Un gesto nuevo manda sobre el viaje anterior. Cancelar el rAF deja el
-    // scroll exactamente donde estaba y el siguiente destino se calcula desde
-    // ese fotograma, sin saltar al origen ni al final.
+    // Solo las acciones explícitas (por ejemplo, tocar una parada de la barra)
+    // pueden sustituir un viaje. La inercia de rueda y los dedos no lo cancelan:
+    // hacerlo dejaba la animación a medias y permitía encadenar varias escenas.
     function cancelarViaje() {
       if (!animando) return;
       cancelAnimationFrame(viajeRaf);
@@ -972,13 +945,6 @@
       animando = false;
       acumulado = 0;
       mudo = 0;
-    }
-
-    function duracionLenta() {
-      var valor = parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue('--sc-d-slow')
-      );
-      return Number.isFinite(valor) ? valor : 420;
     }
 
     function viajar(i) {
@@ -989,13 +955,12 @@
       if (Math.abs(salto) < 2) return;
       destino = hasta;
 
-      // La duración nace del token lento del sistema. En táctil es fija para
-      // que el mismo gesto siempre cueste lo mismo; en escritorio crece con la
-      // distancia, pero nunca pasa de dos tiempos lentos. Antes llegaba a
-      // 1600 ms y retenía el control demasiado tiempo.
-      var vh = alturaMotor();
-      var base = duracionLenta();
-      var dur = grueso() ? base : clamp(base * (Math.abs(salto) / vh), base, base * 2);
+      // La apertura inicial necesita enseñar el giro y el avance del mueble:
+      // dura más que el resto, que conservan un ritmo breve y uniforme. Solo
+      // se aplica al viaje armario cerrado -> Nave; volver hacia arriba mantiene
+      // la duración normal para que la navegación inversa no se vuelva pesada.
+      var abreArmario = i === 1 && desde < a[1] - 2;
+      var dur = abreArmario ? 3000 : 760;
       var t0 = performance.now();
       animando = true;
       finPrevisto = t0 + dur;
@@ -1028,7 +993,11 @@
     function mover(dir) {
       if (!libre() || performance.now() < mudo) return;
       if (document.querySelector('.chrome[data-menu="abierto"]')) return;
-      viajar(masCercana() + dir);
+      var a = asegurar();
+      var actual = posado >= 0 && Math.abs(scrollY - posadoY) < 3 ? posado : masCercana();
+      var siguiente = clamp(actual + dir, 0, a.length - 1);
+      if (siguiente === actual) return;
+      viajar(siguiente);
     }
 
     /* ---- rueda y trackpad ---- */
@@ -1044,18 +1013,16 @@
     addEventListener('wheel', function (e) {
       if (e.ctrlKey) return;              // zoom del navegador: no es scroll
       if (desplazaPanel(e.target, e.deltaY > 0 ? 1 : -1)) { acumulado = 0; return; }
-      // Se decide con el signo de ESTE evento y no con el acumulado: el
-      // preventDefault hay que darlo o no darlo ahora, no dos ruedas después.
-      if (sueltoEnElUmbral(e.deltaY > 0 ? 1 : -1)) { acumulado = 0; return; }
       e.preventDefault();
-      cancelarViaje();
+      // Durante el viaje y su breve cola se absorbe la inercia sin alterar el
+      // destino. Un giro físico de rueda equivale así a una sola sección.
       if (!libre() || performance.now() < mudo) { acumulado = 0; return; }
 
       var ahora = performance.now();
       if (ahora - ultimo > 200) acumulado = 0;   // gesto nuevo
       ultimo = ahora;
       acumulado += e.deltaY;
-      if (Math.abs(acumulado) > 40) {
+      if (Math.abs(acumulado) >= 24) {
         var d = acumulado > 0 ? 1 : -1;
         acumulado = 0;
         mover(d);
@@ -1066,22 +1033,26 @@
        Se bloquea el arrastre nativo, pero SOLO con un dedo: con dos o más el
        gesto se suelta entero para no capar el pellizco de zoom, que es lo que
        usa quien necesita acercarse a leer (WCAG 1.4.4). */
-    var y0 = 0, siguiendo = false;
+    var x0 = 0, y0 = 0, siguiendo = false, vertical = false;
     addEventListener('touchstart', function (e) {
-      cancelarViaje();
       siguiendo = e.touches.length === 1;
-      if (siguiendo) y0 = e.touches[0].clientY;
+      vertical = false;
+      if (siguiendo) { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }
     }, { passive: true });
 
     addEventListener('touchmove', function (e) {
       if (!siguiendo || e.touches.length > 1) { siguiendo = false; return; }
-      // La dirección sale del recorrido del dedo hasta aquí. Si el arrastre
-      // empieza en el umbral se suelta el gesto ENTERO, aunque a mitad se
-      // cruce a la nave: cortarle el dedo a alguien a medio arrastre es peor
-      // que dejarle pasar de largo una parada.
+      // No secuestrar un gesto horizontal. En cuanto queda clara la intención
+      // vertical, se bloquea el arrastre nativo hasta decidir la parada.
       var dy = y0 - e.touches[0].clientY;
+      var dx = x0 - e.touches[0].clientX;
+      if (!vertical && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 8) {
+        siguiendo = false;
+        return;
+      }
       if (desplazaPanel(e.target, dy > 0 ? 1 : -1)) { siguiendo = false; return; }
-      if (sueltoEnElUmbral(dy > 0 ? 1 : -1)) { siguiendo = false; return; }
+      if (Math.abs(dy) > 8) vertical = true;
+      if (!vertical) return;
       e.preventDefault();
     }, { passive: false });
 
@@ -1091,7 +1062,7 @@
       var t = e.changedTouches[0];
       if (!t) return;
       var dy = y0 - t.clientY;
-      if (Math.abs(dy) > 45) mover(dy > 0 ? 1 : -1);
+      if (Math.abs(dy) >= 18) mover(dy > 0 ? 1 : -1);
     }, { passive: true });
 
     /* ---- teclado ----
@@ -1115,15 +1086,18 @@
       if ((k === ' ' || k === 'Spacebar') && t && t.closest && t.closest('button, a')) return;
       if (desplazaPanel(t, ir >= 0 ? (k === 'End' ? 1 : -1) : dir)) return;
 
-      cancelarViaje();
-
       // Home y End son saltos pedidos a propósito: van a su parada desde
       // donde sea, umbral incluido.
-      if (ir >= 0) { e.preventDefault(); if (libre()) viajar(ir); return; }
+      if (ir >= 0) {
+        e.preventDefault();
+        // Home/End no forman parte de la inercia de rueda: son una orden
+        // deliberada de teclado y no deben quedar mudas tras una transición.
+        if (libre()) viajar(ir);
+        return;
+      }
 
-      if (sueltoEnElUmbral(dir)) return;   // sin preventDefault: scroll nativo
       e.preventDefault();
-      if (!libre()) return;
+      if (!libre() || performance.now() < mudo) return;
       mover(dir);
     });
 

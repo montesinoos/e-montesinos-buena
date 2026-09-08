@@ -906,13 +906,26 @@
 }
 
 .grabado__mapa-enlace {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
   margin-top: var(--sc-3);
+  padding: 0.65rem 0.85rem;
   font-family: var(--sc-font-mono);
   font-size: var(--sc-t-xs);
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  text-decoration: none;
+  background: rgba(58, 46, 28, 0.08);
+  border-left: 2px solid #3A2E1C;
+  transition: background var(--sc-d-fast) var(--sc-ease-out);
 }
+.grabado__mapa-enlace svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  flex: 0 0 auto;
+}
+.grabado__mapa-enlace:hover { background: rgba(58, 46, 28, 0.15); }
 
 @media (max-width: 860px) {
   .hoja { padding: var(--sc-5) var(--sc-4); }
@@ -2271,13 +2284,16 @@ html.mov .obra[data-anima].es-dentro {
   .banco__tablero {
     width: 100%;
     aspect-ratio: auto;
-    padding: 0.9rem;
+    /* La muestra elegida sube 0.55rem. El marco reserva ese recorrido además
+       del aire normal, para que la fila superior nunca roce el canto. */
+    padding: 1.45rem 1.15rem 1.15rem;
   }
   .banco__muestras {
     position: static;
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 0.7rem;
+    column-gap: 0.7rem;
+    row-gap: 1.2rem;
   }
   /* La proporción la sigue marcando la muestra, no la celda: así una tabla en
      el móvil se ve como la misma pieza que en escritorio, no como una tira. */
@@ -2334,8 +2350,8 @@ html.mov .obra[data-anima].es-dentro {
 @media (max-width: 860px) and (max-height: 700px) {
   .material { gap: 0.5rem; padding-bottom: calc(0.75rem + var(--recorrido-h)); }
   .banco { gap: 0.5rem; }
-  .banco__tablero { padding: 0.6rem; }
-  .banco__muestras { gap: 0.5rem; }
+  .banco__tablero { padding: 1rem 0.75rem 0.75rem; }
+  .banco__muestras { column-gap: 0.5rem; row-gap: 0.9rem; }
   /* La banda sigue reservada —el tablero no puede dar un tironcito al elegir
      una madera— pero con la reserva justa para dos lineas en vez de tres. */
   .banco__cartela { min-height: 4.25rem; }
@@ -2438,48 +2454,6 @@ html.mov .obra[data-anima].es-dentro {
   .copia--salida {
     top: calc(var(--barra) + clamp(1rem, 4vh, 2.5rem));
     bottom: auto;
-  }
-
-  /* ---- el velo de Salida ----
-     Las otras tres paradas usan el halo radial de .copia::before: un óvalo de
-     luz centrado en el bloque, que funciona cuando el texto flota en mitad de
-     la pantalla. Aquí no flota: en móvil esta es la única parada donde la copia
-     sube y se ancla arriba, contra el canto de la barra. Un óvalo centrado ahí
-     deja el borde de arriba a media opacidad —el texto empieza donde el halo
-     todavía está subiendo— y se corta a los lados.
-
-     Así que aquí el velo es LINEAL y de arriba abajo, que es la dirección en
-     la que está el problema:
-
-       · La caja empieza en el canto superior del cristal, no en el del bloque
-         de texto: el inset negativo de arriba es exactamente lo que la copia
-         baja (barra + su separación), así que el blanco nace en y=0 y no queda
-         una franja de foto asomando por encima del antetítulo.
-       · A los lados llega a los bordes (el inset es el propio --sc-gutter):
-         una banda, no un óvalo recortado.
-       · Opaco del todo mientras dura el antetítulo y el titular; se disuelve a
-         lo largo del párrafo; transparente pasado el texto, con 4,5rem de cola
-         para que el final sea un desvanecido y no un corte. Abajo aún quedan
-         unos 60 px de foto limpia antes de que empiece el globo.
-
-     Las paradas son porcentajes de la caja, no píxeles: cuando el texto se
-     parte en más líneas —una pantalla estrecha— la caja crece con él y el
-     desvanecido se estira con el párrafo en vez de quedarse a mitad. */
-  .copia--salida::before {
-    inset:
-      calc(-1 * (var(--barra) + clamp(1rem, 4vh, 2.5rem)))
-      calc(-1 * var(--sc-gutter))
-      -4.5rem;
-    background: linear-gradient(to bottom,
-      rgba(255,255,255,1)    0%,
-      rgba(255,255,255,1)    40%,
-      rgba(255,255,255,0.96) 55%,
-      rgba(255,255,255,0.86) 70%,
-      rgba(255,255,255,0.68) 82%,
-      rgba(255,255,255,0.42) 88%,
-      rgba(255,255,255,0.20) 93%,
-      rgba(255,255,255,0.06) 97%,
-      rgba(255,255,255,0)    100%);
   }
 
   .globo {
@@ -3066,6 +3040,68 @@ html.mov .obra[data-anima].es-dentro {
        solo escucha cuando esta parada está de verdad en pantalla. Con `auto`
        fijo se quedaría capturando toques durante todo el recorrido. */
     pointer-events: inherit;
+    overflow: clip;
+  }
+
+  /* Selector de respaldo integrado en la lámina del mapa. Sigue midiendo 44px
+     de alto y 16px de letra para evitar el zoom automático de Safari, pero el
+     dibujo visible es compacto, usa la tipografía de navegación y respira
+     separado del mapa. */
+  .mapa-salida__selector {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.65rem;
+    margin-top: clamp(0.4rem, 2vw, 0.6rem);
+    padding: 0.15rem 2rem 0.15rem 0.55rem;
+    min-height: 38px;
+    font-family: var(--sc-font-mono);
+    font-size: 0.625rem;
+    line-height: 1;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--sc-accent);
+    border: 1px solid color-mix(in oklab, var(--sc-accent) 74%, #3A2E1C);
+    border-radius: 2px;
+  }
+  .mapa-salida__selector::after {
+    content: "";
+    position: absolute;
+    right: 0.65rem;
+    width: 0.45rem;
+    height: 0.45rem;
+    border-right: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+    rotate: 45deg;
+    translate: 0 -25%;
+    pointer-events: none;
+  }
+  .mapa-salida__selector select {
+    width: 100%;
+    min-width: 0;
+    min-height: 34px;
+    padding: 0;
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: var(--sc-font-mono);
+    font-size: 16px;
+    line-height: 1.2;
+    letter-spacing: 0;
+    color: #fff;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    outline: 0;
+  }
+  .mapa-salida__selector:focus-within {
+    border-color: #3A2E1C;
+    box-shadow: 0 0 0 2px color-mix(in oklab, var(--sc-accent) 28%, transparent);
+  }
+  .mapa-salida__selector select option {
+    color: var(--sc-ink);
+    background: var(--sc-surface);
   }
 
   /* ---- el mapa ----
@@ -3308,15 +3344,22 @@ html.mov .obra[data-anima].es-dentro {
     top: var(--barra);
     bottom: var(--recorrido-h);
     height: calc(100dvh - var(--barra) - var(--recorrido-h));
-    overflow-y: auto;
-    overscroll-behavior-y: contain;
-    scrollbar-width: thin;
-    padding: 1rem var(--sc-gutter) 4rem;
-    scroll-padding-block: 1rem 4rem;
+    overflow: clip;
+    padding: 0.75rem var(--sc-gutter);
   }
-  .material { display: block; }
+  .material {
+    display: block;
+    /* Tras abreviar la copia, Material cabe completo incluso con las barras de
+       Safari abiertas. Ya no es un panel desplazable: el gesto pertenece al
+       recorrido principal y no puede correr el contenido ni lateralmente ni
+       dentro de la propia parada. */
+    overflow-x: clip;
+    overflow-y: visible;
+    overscroll-behavior-x: none;
+    touch-action: pinch-zoom;
+  }
   .material .banco { margin-top: 1rem; }
-  .salida[data-sc-copy] { display: flex; flex-direction: column; gap: 1.25rem; }
+  .salida[data-sc-copy] { display: flex; flex-direction: column; gap: 0.75rem; }
   .salida .copia--salida {
     position: relative;
     inset: auto;
@@ -3324,13 +3367,25 @@ html.mov .obra[data-anima].es-dentro {
     flex: 0 0 auto;
     width: 100%;
   }
-  .salida .copia--salida::before { inset: -1rem; }
   .salida .mapa-salida.svgMap-wrapper {
     position: relative;
     inset: auto;
     flex: 0 0 auto;
     width: 100%;
   }
+  /* En una ventana baja, texto y mapa siguen compartiendo una sola pantalla:
+     se compactan sus proporciones en vez de crear un segundo scroll interno. */
+  .salida .copia--salida h2 {
+    margin-bottom: 0.6rem;
+    font-size: clamp(1.65rem, 8vw, 2rem);
+  }
+  .salida .copia--salida > p:last-child {
+    font-size: 0.9375rem;
+    line-height: 1.45;
+  }
+  .salida .mapa-salida .svgMap-map-wrapper { aspect-ratio: 2.35 / 1; }
+  .salida .mapa-salida__ficha { min-height: 2.75rem; }
+  .salida .mapa-salida__pista { padding-right: 0; }
 }
 
 @media (max-width: 860px) and (max-height: 500px) and (min-width: 600px) {
@@ -3366,6 +3421,27 @@ html.mov .obra[data-anima].es-dentro {
   .visor__pie { min-width: 0; overflow-wrap: anywhere; }
 }
 @media (max-width: 860px) {
+  /* En móvil Salida lleva un velo propio ligado a la escena completa, no a la
+     caja del texto. Debe quedar dentro de este breakpoint: en escritorio la
+     copia conserva su halo y el globo comparte la escena sin un contexto de
+     capas adicional. */
+  .salida { isolation: isolate; }
+  .salida::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(to bottom,
+      rgba(255,255,255,0.98) 0%,
+      rgba(255,255,255,0.96) 28%,
+      rgba(255,255,255,0.80) 43%,
+      rgba(255,255,255,0.48) 56%,
+      rgba(255,255,255,0.16) 69%,
+      rgba(255,255,255,0) 82%);
+  }
+  .copia--salida::before { display: none; }
+
   #menu-paginas { max-height: calc(100dvh - var(--barra) - var(--recorrido-h)); overflow-y: auto; overscroll-behavior: contain; }
 }
 @media (max-width: 1180px) and (max-height: 600px) {
