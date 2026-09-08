@@ -177,12 +177,12 @@ export const acabados = [
 // El contacto directo. El CTA del chrome y el botón flotante de WhatsApp salen
 // de aquí, para que el número y el mensaje se toquen en un solo sitio.
 //
-// DATO PENDIENTE: no hay un número de WhatsApp confirmado por el cliente.
-// Vacío oculta el botón; no debe reintroducirse el número de ejemplo.
+// DATO PENDIENTE: sustituir este número provisional cuando el cliente confirme
+// el móvil definitivo de WhatsApp.
 export const contactoDirecto = {
   ctaTexto: "Pedir presupuesto",
   ctaHref: "/contacto",
-  whatsappTel: "",
+  whatsappTel: "34600000000",
   whatsappMensaje: "Hola, me gustaría pedir un presupuesto orientativo para un proyecto de mueble a medida.",
 };
 
