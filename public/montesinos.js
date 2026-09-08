@@ -695,10 +695,9 @@
     });
   }
 
-  /* ------------------------------------------ el CTA cae en el formulario --
-     El CTA de la barra apunta a /contacto#nombre. El navegador baja hasta el
-     campo, pero no lo enfoca: quien llega pidiendo presupuesto ya puede
-     escribir sin tener que hacer clic. */
+  /* ------------------------------------------ el CTA llega al inicio -------
+     Todos los enlaces de contacto apuntan a /contacto sin anclaje: en móvil y
+     escritorio la página se abre desde arriba, sin forzar el salto al campo. */
   if (location.hash === '#nombre') {
     var campoNombre = document.getElementById('nombre');
     if (campoNombre) {

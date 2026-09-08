@@ -4,13 +4,17 @@ import EnlacesLegales from "./EnlacesLegales.astro";
 const sabadell = sedes[0];
 ---
 <footer class="pie">
-  <p class="pie__marca">
+  <div class="pie__bloque pie__marca">
     <!-- El nombre lo pone ahora la marca, no el texto: por eso el alt lleva el
          nombre completo y no va vacío como el de la barra de arriba, donde el
          enlace ya lo dice por su aria-label. -->
     <img class="pie__logo" src="/logo-montesinos.png" alt="Ebanistería Montesinos" width="452" height="124" />
-    <span>{sabadell.dir}, {sabadell.cp}</span>
-  </p>
-  <p><a href={`tel:${sabadell.telHref}`}>{sabadell.tel}</a> · <a href="/contacto">Pedir presupuesto</a></p>
-  <EnlacesLegales />
+    <span class="pie__direccion"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M12 21s6-5.35 6-11a6 6 0 1 0-12 0c0 5.65 6 11 6 11Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="10" r="2" stroke="currentColor" stroke-width="1.5"/></svg>{sabadell.dir}, {sabadell.cp}</span>
+  </div>
+  <div class="pie__bloque pie__contacto">
+    <span class="pie__etiqueta">Contacto</span>
+    <a href={`tel:${sabadell.telHref}`}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M6.8 3.8 9.4 3l2 4.5-1.8 1.4a13.5 13.5 0 0 0 5.5 5.5l1.4-1.8 4.5 2-.8 2.6c-.3 1-1.3 1.6-2.3 1.4A16.5 16.5 0 0 1 5.4 6.1c-.2-1 .4-2 1.4-2.3Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>{sabadell.tel}</a>
+    <a href="/contacto"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M4 5.5h16v11H8l-4 3v-14Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="m7.5 9 4.5 3.2L16.5 9" stroke="currentColor" stroke-width="1.5"/></svg>Pedir presupuesto</a>
+  </div>
+  <div class="pie__bloque pie__legal"><span class="pie__etiqueta">Información</span><EnlacesLegales /></div>
 </footer>

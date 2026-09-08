@@ -181,7 +181,7 @@ export const acabados = [
 // Vacío oculta el botón; no debe reintroducirse el número de ejemplo.
 export const contactoDirecto = {
   ctaTexto: "Pedir presupuesto",
-  ctaHref: "/contacto#nombre",
+  ctaHref: "/contacto",
   whatsappTel: "",
   whatsappMensaje: "Hola, me gustaría pedir un presupuesto orientativo para un proyecto de mueble a medida.",
 };

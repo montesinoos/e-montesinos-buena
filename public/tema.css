@@ -547,9 +547,9 @@
      o sea el 37,9% de la imagen; el resto es el disco, que sobresale por
      arriba y por abajo como marca que es. En Instrument Sans 600 esa misma
      palabra mide 0,74 em de tinta. Para que las dos midan lo mismo:
-     0,74 / 0,379 = 1,95. Con 1,35 em que había antes, la palabra del logotipo
-     se quedaba en el 69% de la de al lado y se leía como una errata. */
-  --umbral-logo-h: 1.95em;
+     0,74 / 0,435 = 1,70. La proporción anterior de 1,95em hacía que la
+     palabra del logotipo sobresaliera visualmente por encima del titular. */
+  --umbral-logo-h: 1.70em;
   height: var(--umbral-logo-h);
   width: auto;
   /* El PNG deja un 29% de su alto por debajo de la línea base del logotipo:
@@ -1409,8 +1409,8 @@
   margin-top: var(--sc-10);
   padding: var(--sc-6) 0 var(--sc-7);
   border-top: 1px solid var(--sc-hairline);
-  display: flex; flex-wrap: wrap; gap: var(--sc-4);
-  justify-content: space-between;
+  display: grid; grid-template-columns: minmax(15rem, 1.4fr) minmax(12rem, 1fr) minmax(13rem, 1fr); gap: var(--sc-6);
+  align-items: start;
   font-family: var(--sc-font-mono);
   font-size: var(--sc-t-xs);
   letter-spacing: 0.04em;
@@ -1418,6 +1418,13 @@
 }
 .pie a { color: inherit; }
 .pie a:hover { color: var(--sc-accent-text); }
+.pie__bloque { display:flex; flex-direction:column; align-items:flex-start; gap:.55rem; min-width:0; }
+.pie__marca { gap:.8rem; }
+.pie__direccion, .pie__contacto a { display:inline-flex; align-items:center; gap:.6rem; line-height:1.5; }
+.pie svg { width:1.05rem; height:1.05rem; flex:0 0 auto; color:var(--sc-accent-text); }
+.pie__etiqueta { color:var(--sc-ink); font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; }
+.pie__legal .enlaces-legales { display:flex; flex-direction:column; align-items:flex-start; gap:.1rem; }
+.pie__legal .enlaces-legales a { min-height:2rem; }
 
 /* La marca del pie es la misma imagen de la barra de arriba, y a la misma
    altura (1.75rem) por un motivo medido, no estético: dentro del PNG las letras
@@ -1432,6 +1439,11 @@
    principio de la línea de abajo. Separa el hueco, que no se descuelga. */
 .pie__marca { display: flex; align-items: center; gap: 0.7rem; flex-wrap: wrap; margin: 0; }
 .pie__logo { height: 1.75rem; width: auto; display: block; }
+
+@media (max-width: 700px) {
+  .pie { grid-template-columns: 1fr; gap: var(--sc-5); }
+  .pie__marca { gap:.65rem; }
+}
 
 /* ====================================================== CÓMO TRABAJAMOS ===
    Página propia: cabecera, diagrama del proceso, dos vías, para quién y
