@@ -590,92 +590,120 @@
     else ancho.addListener(alCambiar);
   }
 
-  /* ----------------------------------------------------------- el banco --
-     La librería de materiales. Una sola muestra elegida a la vez y UNA sola
-     cartela, siempre en el canto del banco. Colgar el texto de cada tabla era
-     lo natural sobre el papel, pero la fila de atrás abría encima de la de
-     delante y no había forma de leerlo; en un sitio fijo se lee siempre.
-
-     Los botones son botones de verdad, así que Enter y Espacio ya funcionan
-     sin escribir una línea. Aquí solo se elige, se suelta y se avisa: los
-     botones llevan aria-pressed (están elegidos o no) y la cartela es una
-     región aria-live, que es lo que hace que el lector de pantalla lea el
-     nombre y la frase al cambiar de madera.
+  /* -------------------------------------------------- órbita de marcas --
+     Las cajas flotan con velocidades distintas y rebotan tanto en los límites
+     como entre ellas. Conservan un movimiento libre sin llegar a solaparse.
+     Los nombres permanecen horizontales. Solo se calcula cuando la sección es
+     visible y el movimiento se detiene si el usuario así lo prefiere.
   */
-  var banco = document.getElementById('banco');
-  if (banco) {
-    var cartela = document.getElementById('cartela-banco');
-    var cNombre = cartela && cartela.querySelector('.cartela__nombre');
-    var cFrase  = cartela && cartela.querySelector('.cartela__frase');
-    // La instrucción de partida se toma del HTML, no se repite aquí: si se
-    // reescribe en la plantilla, esto la sigue sin tocar nada.
-    var textoVacio = cFrase ? cFrase.textContent : '';
-    var elegida = null;
+  var orbitaMarcas = document.querySelector('[data-orbita-marcas]');
+  if (orbitaMarcas) {
+    var marcas = Array.prototype.slice.call(orbitaMarcas.querySelectorAll('.orbita-marcas__marca'));
+    var activa = true;
+    var inicioOrbita = performance.now();
+    var ultimoFotograma = inicioOrbita;
+    var estados = [
+      { nx: 0.20, ny: 0.22, vx:  19, vy:  13 },
+      { nx: 0.50, ny: 0.17, vx: -15, vy:  18 },
+      { nx: 0.79, ny: 0.30, vx: -18, vy: -12 },
+      { nx: 0.73, ny: 0.68, vx:  14, vy: -17 },
+      { nx: 0.45, ny: 0.77, vx: -20, vy: -11 },
+      { nx: 0.17, ny: 0.61, vx:  16, vy:  16 }
+    ];
 
-    var soltar = function () {
-      if (!elegida) return;
-      elegida.setAttribute('aria-pressed', 'false');
-      elegida = null;
-      if (!cartela) return;
-      cartela.setAttribute('data-estado', 'vacio');
-      cNombre.textContent = '';
-      cFrase.textContent = textoVacio;
-    };
+    var colocarMarcas = function (ahora) {
+      var rect = orbitaMarcas.getBoundingClientRect();
+      var delta = Math.min((ahora - ultimoFotograma) / 1000, 0.04);
+      var margen = 8;
+      var nota = orbitaMarcas.querySelector('.orbita-marcas__nota');
+      var limiteNota = nota && getComputedStyle(nota).display !== 'none'
+        ? nota.offsetTop
+        : rect.height;
+      ultimoFotograma = ahora;
 
-    var elegir = function (b) {
-      if (elegida === b) { soltar(); return; }
-      if (elegida) elegida.setAttribute('aria-pressed', 'false');
-      elegida = b;
-      b.setAttribute('aria-pressed', 'true');
-      if (!cartela) return;
-      cartela.setAttribute('data-estado', 'lleno');
-      cNombre.textContent = b.getAttribute('data-nombre') || '';
-      cFrase.textContent = b.getAttribute('data-frase') || '';
-      // En el panel corto, mostrar la respuesta completa sin mover la página.
-      var panel = banco.closest('[data-scroll-panel]');
-      if (panel && getComputedStyle(panel).overflowY === 'auto') {
-        var margen = parseFloat(getComputedStyle(panel).scrollPaddingBottom) || 16;
-        var falta = cartela.getBoundingClientRect().bottom - panel.getBoundingClientRect().bottom + margen;
-        if (falta > 0) panel.scrollTop += falta;
-      }
-    };
-
-    banco.addEventListener('click', function (e) {
-      var b = e.target.closest('.muestra__pieza');
-      if (b) elegir(b);
-    });
-
-    // Escape suelta y devuelve el foco a la tabla, que es de donde salió. Sin
-    // esto el foco se quedaría en el aire después de cerrar con teclado.
-    document.addEventListener('keydown', function (e) {
-      if (e.key !== 'Escape' || !elegida) return;
-      var b = elegida;
-      soltar();
-      b.focus();
-    });
-
-    // Un toque en cualquier otro sitio suelta. Incluye el propio tablero: si
-    // solo cambiara al tocar otra muestra, la cartela se quedaría puesta el
-    // resto del recorrido.
-    document.addEventListener('pointerdown', function (e) {
-      if (!elegida) return;
-      // El objetivo de un evento no siempre es un elemento (el propio document
-      // lo es de los eventos sintéticos), y ahí `closest` no existe.
-      var t = e.target;
-      // Arrastrar el panel para leer la cartela no cancela la madera elegida.
-      if (t && t.closest && t.closest('.material')) return;
-      soltar();
-    });
-
-    // Al salir del tramo de Material, el motor apaga el bloque y le quita los
-    // eventos de puntero. Una madera elegida debajo de una capa invisible es
-    // basura de estado: cuando el visitante vuelva, se la encontraría puesta.
-    var mundoBanco = document.querySelector('[data-sc-mode="worldflight"]');
-    if (mundoBanco) {
-      mundoBanco.addEventListener('sc:waypoint', function (e) {
-        if (e.detail.index !== 1) soltar();
+      estados.forEach(function (estado, i) {
+        var marca = marcas[i];
+        var mitadW = marca.offsetWidth / 2;
+        var mitadH = marca.offsetHeight / 2;
+        if (estado.x == null) {
+          estado.x = rect.width * estado.nx;
+          estado.y = rect.height * estado.ny;
+        }
+        if (!reduce) {
+          estado.x += estado.vx * delta;
+          estado.y += estado.vy * delta;
+        }
+        var minX = mitadW + margen;
+        var maxX = rect.width - mitadW - margen;
+        var minY = mitadH + margen;
+        // El borde superior real de la nota es el suelo de las cajas. Así un
+        // cambio de tamaño de letra o de viewport nunca vuelve a solaparlas.
+        var maxY = limiteNota - mitadH - margen;
+        if (estado.x <= minX || estado.x >= maxX) {
+          estado.x = Math.max(minX, Math.min(maxX, estado.x));
+          estado.vx *= -1;
+        }
+        if (estado.y <= minY || estado.y >= maxY) {
+          estado.y = Math.max(minY, Math.min(maxY, estado.y));
+          estado.vy *= -1;
+        }
       });
+
+      for (var a = 0; a < estados.length; a += 1) {
+        for (var b = a + 1; b < estados.length; b += 1) {
+          var ea = estados[a];
+          var eb = estados[b];
+          var solapeX = (marcas[a].offsetWidth + marcas[b].offsetWidth) / 2 + margen - Math.abs(eb.x - ea.x);
+          var solapeY = (marcas[a].offsetHeight + marcas[b].offsetHeight) / 2 + margen - Math.abs(eb.y - ea.y);
+          if (solapeX <= 0 || solapeY <= 0) continue;
+
+          if (solapeX < solapeY) {
+            var sentidoX = eb.x >= ea.x ? 1 : -1;
+            ea.x -= sentidoX * solapeX / 2;
+            eb.x += sentidoX * solapeX / 2;
+            var velocidadX = ea.vx;
+            ea.vx = eb.vx;
+            eb.vx = velocidadX;
+          } else {
+            var sentidoY = eb.y >= ea.y ? 1 : -1;
+            ea.y -= sentidoY * solapeY / 2;
+            eb.y += sentidoY * solapeY / 2;
+            var velocidadY = ea.vy;
+            ea.vy = eb.vy;
+            eb.vy = velocidadY;
+          }
+        }
+      }
+
+      marcas.forEach(function (marca, i) {
+        var estado = estados[i];
+        var mitadW = marca.offsetWidth / 2;
+        var mitadH = marca.offsetHeight / 2;
+        estado.x = Math.max(mitadW + margen, Math.min(rect.width - mitadW - margen, estado.x));
+        estado.y = Math.max(mitadH + margen, Math.min(limiteNota - mitadH - margen, estado.y));
+        // Posicionar la esquina en píxeles enteros evita que el navegador
+        // remuestree el SVG entre dos subpíxeles y parezca cambiar de tamaño.
+        var izquierda = Math.round(estado.x - mitadW);
+        var arriba = Math.round(estado.y - mitadH);
+        marca.style.transform = 'translate3d(' + izquierda + 'px,' + arriba + 'px,0)';
+        marca.style.zIndex = String(10 + Math.round((estado.y / rect.height) * 10));
+      });
+
+    };
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entradas) {
+        activa = entradas[0].isIntersecting;
+      }).observe(orbitaMarcas);
     }
+
+    var animarMarcas = function (ahora) {
+      if (activa) colocarMarcas(ahora);
+      if (!reduce) requestAnimationFrame(animarMarcas);
+    };
+
+    if (reduce) colocarMarcas(inicioOrbita);
+    else requestAnimationFrame(animarMarcas);
   }
 
   /* ------------------------------------------------------------ formulario */

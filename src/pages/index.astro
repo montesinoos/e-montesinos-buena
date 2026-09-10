@@ -4,8 +4,16 @@ import MapaSede from "../components/MapaSede.astro";
 import EnlacesLegales from "../components/EnlacesLegales.astro";
 import { sedes } from "../data/montesinos.js";
 const sabadell = sedes[0];
-import { maderas } from "../data/maderas.js";
 import { paisesGlobo } from "../data/montesinos.js";
+
+const marcasMateriales = [
+  { nombre: "EGGER", logo: "/marcas/egger.svg" },
+  { nombre: "GAMELA", logo: null },
+  { nombre: "FORMICA", logo: "/marcas/formica.svg" },
+  { nombre: "POLYREY", logo: "/marcas/polyrey.svg" },
+  { nombre: "FENIX", logo: "/marcas/fenix.svg" },
+  { nombre: "FINSA", logo: "/marcas/finsa.svg" },
+];
 
 const titulo = "Ebanistería Montesinos — Más de 40 años fabricando mobiliario a medida";
 const desc =
@@ -94,9 +102,9 @@ const desc =
           </picture>
         </div>
         <!-- El fondo de Material es una superficie lisa a propósito. Aquí el
-             protagonista es el banco de muestras, que ya es madera: una foto de
-             tablones detrás ponía dos texturas de veta a competir y el widget
-             perdía. Este archivo es un MARCADOR DE POSICIÓN generado
+             protagonista es la órbita de marcas: una foto de tablones detrás
+             pondría demasiado ruido visual y el conjunto perdería legibilidad.
+             Este archivo es un MARCADOR DE POSICIÓN generado
              (lab/gen-fondo.mjs) hasta que llegue la foto real de pared o suelo
              del taller. Instrucciones de encuadre en README-FOTOS.md. -->
         <!-- data-sc-parada ya NO decide donde para el boton del recorrido: ese
@@ -110,7 +118,7 @@ const desc =
                  la pantalla de un telefono. La apaisada, escalada a cubrir,
                  se sale de cuadro por los lados y ademas pesa el doble. -->
             <source media="(max-width: 860px) and (orientation: portrait)" srcset="/mundo/nave-fondo-liso-m.webp" width="780" height="1386" />
-            <img class="sc-world__poster" fetchpriority="low" src="/mundo/nave-fondo-liso.webp" alt="Pared lisa del taller, sin objetos: fondo neutro para las muestras de madera" width="2400" height="1350" decoding="async" />
+            <img class="sc-world__poster" fetchpriority="low" src="/mundo/nave-fondo-liso.webp" alt="Pared lisa del taller, sin objetos: fondo neutro para las marcas de materiales" width="2400" height="1350" decoding="async" />
           </picture>
         </div>
         <div data-sc-segment data-sc-w="2.2" data-sc-linger="0.2" data-sc-waypoint="Uno a uno">
@@ -179,88 +187,33 @@ const desc =
         </div>
 
         <!-- ============================================== MATERIAL =======
-             El texto y la librería comparten UN SOLO bloque de copia, y por
-             tanto una sola ventana de scroll: son la misma parada del
-             recorrido, no dos. En escritorio el banco ocupa la mitad
-             izquierda y el texto la derecha; en móvil se apilan.
-
-             El tramo de Material dura 3.4 alturas de pantalla justamente por
-             esto: el bloque está a plena presencia durante 2.7 pantallas de
-             scroll, que es la pausa donde da tiempo a tocar las muestras. Si
-             el visitante sigue bajando, el viaje continúa. Nadie queda
-             retenido.
-
-             Cada muestra es la fotografía de esa madera, encuadrada a 3:3.4
-             con la misma luz y el mismo plano cenital que las demás: van una
-             al lado de otra sobre el mismo banco, y basta con que una tenga
-             otra luz o la veta a otra escala para que cante. Se generan y se
-             preparan con los dos scripts de scripts/, y la lista de maderas
-             vive en src/data/maderas.js. -->
+             El texto y la órbita comparten un solo bloque de copia y, por
+             tanto, una sola ventana de scroll. En escritorio las marcas ocupan
+             la mitad izquierda y el texto la derecha; en móvil se apilan. -->
         <div data-sc-copy data-sc-window="0.1553 0.5824 0.13 0.11">
           <div class="material" data-scroll-panel>
             <div class="copia copia--der copia--material" data-entrada="derecha">
               <p class="copia__eti">Material</p>
               <h2>Saber de dónde viene cada cosa.</h2>
               <p>
-                Trabajamos con todo tipo de maderas, siempre con credenciales
-                ecológicas que aseguran una tala y reforestación responsables.
-                Las que ves aquí son solo algunos ejemplos: tócalas para conocerlas.
+                Trabajamos con todo tipo de maderas y materiales de marcas de
+                referencia, siempre con credenciales ecológicas que aseguran una
+                tala y reforestación responsables.
               </p>
             </div>
-            <div class="banco" id="banco">
-              <div class="banco__tablero">
-                <ul class="banco__muestras">
-                  {maderas.map((m) => (
-                    <li
-                      class="muestra"
-                      style={`--x:${m.x}%;--y:${m.y}%;--giro:${m.giro}deg;--tono:${m.tono}`}
-                    >
-                      <button
-                        type="button"
-                        class="muestra__pieza"
-                        aria-pressed="false"
-                        aria-controls="cartela-banco"
-                        data-nombre={m.nombre}
-                        data-frase={m.frase}
-                      >
-                        <img
-                          class="muestra__cara"
-                          src={m.img}
-                          srcset={`${m.img.replace(".webp", "-280.webp")} 280w, ${m.img} 560w`}
-                          sizes="(max-width: 860px) 20vw, 150px"
-                          alt=""
-                          width="560"
-                          height="635"
-                          loading="lazy"
-                          decoding="async"
-                        />
-                        <span class="muestra__canto" aria-hidden="true"></span>
-                        {/* El texto de cada madera vive en el HTML, no solo en
-                            el data-. Asi esta ahi para quien navega con lector
-                            de pantalla y para quien lo indexa, haya o no JS. */}
-                        <span class="sr">{m.nombre}. {m.frase}</span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              <!-- La cartela es UNA y esta siempre en el mismo sitio: la banda
-                   del canto del banco. Colgarla de cada muestra era lo natural
-                   sobre el papel, pero las cuatro de la fila de atras abrian
-                   encima de las cuatro de delante y no habia forma de leerlas.
-                   Un sitio fijo se lee siempre y el ojo aprende donde mirar.
-                   La banda esta reservada aunque no haya nada abierto, para que
-                   el tablero no de un salto al aparecer el texto. -->
-              <div
-                class="banco__cartela"
-                id="cartela-banco"
-                data-estado="vacio"
-                aria-live="polite"
-              >
-                <p class="cartela__nombre"></p>
-                <p class="cartela__frase">Toca una muestra para ver cuál es.</p>
-              </div>
+            <div class="orbita-marcas" data-orbita-marcas>
+              <ul class="orbita-marcas__lista" aria-label="Algunas de las marcas de materiales con las que trabajamos">
+                {marcasMateriales.map((marca, i) => (
+                  <li class="orbita-marcas__marca" data-marca={marca.nombre.toLowerCase()} style={`--indice:${i}`}>
+                    {marca.logo ? (
+                      <img src={marca.logo} alt={marca.nombre} loading="lazy" decoding="async" />
+                    ) : (
+                      <span>{marca.nombre}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              <p class="orbita-marcas__nota">Entre otras marcas de referencia</p>
             </div>
           </div>
         </div>
